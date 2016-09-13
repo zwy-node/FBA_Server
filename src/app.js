@@ -55,13 +55,13 @@ app.use(co.wrap(function *(ctx, next){
 
 
 //静态文件cache
-app.use(convert(KoaStatic(path.join(__dirname, './public'), {
+app.use(convert(KoaStatic(path.join(__dirname, '../public'), {
     pathPrefix: '/static'
 })));
 
 var options = {
     root: path.join(__dirname, '../views'),
-    layout: 'index',
+    layout: 'blockTemplate',
     viewExt: 'html',
     cache: !DEBUG,
     debug: DEBUG
@@ -70,8 +70,17 @@ render(app, options);
 app.context.blockRender = co.wrap(app.context.render);
 app.context.render = null;
 
+options = {
+    root: path.join(__dirname, '../views'),
+    layout: 'index',
+    viewExt: 'html',
+    cache: !DEBUG,
+    debug: DEBUG
+};
 render(app, options);
 app.context.render = co.wrap(app.context.render);
+
+
 
 //var redisStore = require('koa-redis')(config.redis);
 //app.redis = redisStore.client;

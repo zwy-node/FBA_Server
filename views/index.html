@@ -1,10 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>FBA-活动管理后台</title>
+    <script type="application/javascript" src="/static/jquery3.1.0.min.js"></script>
+    <script type="application/javascript" src="/static/semantic.min.js"></script>
+    <script type="application/javascript" src="/static/vue.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/semantic.min.css" />
+    <script type="application/javascript" src="/static/index.js"></script>
+    <style type="text/css">
+        body {
+            background-color: #FFFFFF;
+        }
+        div{
+            box-sizing: border-box;
+        }
+        .ui.menu.item img.logo {
+            margin-right: 1.5em;
+        }
+        .main.container {
+            margin-top: 7em;
+        }
+        .wireframe {
+            margin-top: 2em;
+        }
+        .ui.footer.segment {
+            margin: 5em 0em 0em;
+            padding: 5em 0em;
+        }
+        .page-main{
+            margin: 0 auto 0 0;
+            min-height: 395px;
+            padding: 0px 20px 10px 170px;
+        }
+        .ui.modal>.actions{
+            background: #F9FAFB;
+            border-top: 1px solid rgba(34,36,38,.15);
+            text-align: right;
+        }
+        .header-image{
+            width: 80px;
+            height: 60px;
+        }
+        #menuNav{
+            top: 52px !important;
+        }
+        .fileld-speaker{
+            width: 100%;
+            padding-left: 154px;
+            position: relative;
+            margin-bottom: 10px;
+            padding-bottom: 15px;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $('.ui.menu .ui.dropdown').dropdown({
+                on: 'hover'
+            });
+        });
+    </script>
 </head>
-<body>
-    <a>hello world!</a>
+<body id="app">
+<div class="ui fixed inverted menu">
+    <div class="ui container" style="width: 100%">
+        <a href="#" class="header item">
+            <img class="logo" src="/static/images/logo.png" style="margin-right: 15px;">
+            一起阅读-活动管理
+        </a>
+        <div class="right menu">
+            <div id="menuUserSetting" class="ui dropdown item">
+                admin
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <div class="item" onclick="location.href='/admin/signout';">退出</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="ui thin visible inverted left vertical sidebar menu" id="menuNav">
+    <a class="item"><i class="dashboard icon"></i> 概况 </a>
+    <a class="item"><i class="users icon"></i> 客户管理 </a>
+    <a class="item"><i class="unordered list icon"></i> 订单管理 </a>
+    <a class="item"><i class="list icon"></i> 配置管理 </a>
+    <a class="item"><i class="setting icon"></i> 设置 </a>
+</div>
+<div class="ui bottom attached segment pushable" style="border-style: none;margin-top: 53px;">
+    <div class="page-main">
+        <%- body %>
+    </div>
+</div>
 </body>
 </html>
