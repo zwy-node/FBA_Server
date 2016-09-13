@@ -10,12 +10,6 @@ module.exports = {
         user: 'root',
         password: 't9FVc6ephRLXGyid'
     },
-    storage:{
-        aliyun: {
-            accessID: 'NYEvkGXhsYwvCoco',
-            accessKey: 'NH9apbQFcgcB8PHzEC8Q73MSuTLkUo'
-        }
-    },
     redis: {
         RDS_PORT: 6390,
         RDS_HOST: '127.0.0.1',

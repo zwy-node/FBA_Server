@@ -22,7 +22,7 @@ const path = require('path');
 const co = require('co');
 const Koa = require('koa');
 const render = require('koa-ejs');
-const convert = require('koa-convert')
+const convert = require('koa-convert');
 const KoaStatic = require('koa-static-plus');
 const KoaCompose = require('koa-compose');
 const KoaBodyParser = require('koa-bodyparser');
@@ -33,13 +33,13 @@ const koaOnerror = require('koa-onerror');
 
 var routes = require('./routes');
 //var MKODBAction = require('./database/MKODBAction');
-//var app = koa();
+
+
 var app = new Koa();
-
 //post body 解析
-var bodyParser = require('koa-bodyparser');
-app.use(bodyParser());
+app.use(KoaBodyParser());
 
+//错误捕捉
 koaOnerror(app);
 
 //监听浏览器的请求方式,路径,和时间
