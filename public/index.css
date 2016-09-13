@@ -1,0 +1,11 @@
+.imageURL-field{
+    width: 140px;
+}
+.image-item{}
+.image-item>img {
+    height: 94px !important;
+}
+.spearkImageURL-field{
+    width: 140px;
+    margin-right: 20px !important;
+}
