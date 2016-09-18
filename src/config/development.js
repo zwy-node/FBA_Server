@@ -6,7 +6,7 @@ module.exports = {
     port: 8090,
     db: {
         //host: '120.76.229.128',
-        host: 'localhost',
+        host: '10.0.1.8',
         user: 'root',
         database: 'FBA',
         port: 3306
@@ -14,8 +14,8 @@ module.exports = {
         //password: 'YQYD_DEV_ONLY'
     },
     redis: {
-        RDS_PORT: 6390,
-        RDS_HOST: '120.76.229.128',
+        RDS_PORT: 6379,
+        RDS_HOST: '10.0.1.8',
         RDS_PWD:'123456'
     }
-}
+};
