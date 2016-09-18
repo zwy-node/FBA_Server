@@ -239,3 +239,9 @@ div{
 .user-address-view>li{
    width: auto;
 }
+
+/*订单*/
+
+.step{
+    cursor: pointer !important;
+}
