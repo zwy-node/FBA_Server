@@ -5,22 +5,43 @@
 
 var MKODBAction = require('./MKODBAction');
 
-class UserAction extends MKODBAction {
-    *getRecordByUser(data) {
+class CustomerAction extends MKODBAction {
+    constructor() {
+        super();
+    }
+
+    *addCustomer(data) {
         let dbConnection = yield this.getDBConnection();
-        let insertSQL = 'INSERT INTO YSGJ_Users (`headURL`, `userName`, `email`, `password`, `mobile`, `status`, `salesmanID`, `addressID`, `createDate`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        let resultData = yield this.execSQL(insertSQL, [data], dbConnection);
-        if(resultData.length > 0) {
-            resultData = resultData[0];
+        let querySQL = 'SELECT * FROM YSGJ_AdminUser where `userName` = ? AND `email` = ?';
+        let findAdmin = yield this.execSQL(querySQL, [data.userName, data.email], dbConnection);
+        if(findAdmin.length > 0) {
+            dbConnection.release();
+            return findAdmin[0];
         } else {
-            resultData = null;
+            let insertSQL = 'INSERT INTO YSGJ_Users SET ?';
+            //console.log(insertSQL)
+            let result = yield this.execSQL(insertSQL, data, dbConnection);
+            dbConnection.release();
+            return result.insertId;
         }
+    }
+
+    *updateCustomer(id, data) {
+        let dbConnection = yield this.getDBConnection();
+        let updateSQL = 'UPDATE YSGJ_Users SET ? WHERE `id` = ?';
+        let result = yield this.execSQL(updateSQL, [data, id], dbConnection);
         dbConnection.release();
-        return resultData;
+        return result;
+    }
+
+    *customerList() {
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT * FROM YSGJ_Users';
+        let result = yield this.queryList(querySQL, dbConnection);
+        dbConnection.release();
+        return  result;
     }
 }
 
-const userAction = new UserAction();
-
-module.exports = userAction;
+module.exports = CustomerAction;
 

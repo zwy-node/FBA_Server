@@ -14,6 +14,7 @@ global.logger = new (winston.Logger)({
     ]
 });
 
+
 //配置文件
 var config = require(BASEDIR + `/config/${NODE_ENV}`);
 global.CONFIG = config;
@@ -27,18 +28,21 @@ const KoaStatic = require('koa-static-plus');
 const KoaCompose = require('koa-compose');
 const KoaBodyParser = require('koa-bodyparser');
 const koaOnerror = require('koa-onerror');
-//const KoaSession = require('./services/koa-MKOSession');
-//const MKOSessionStore = require('./services/MKOSessionStore');
-
+const KoaSession = require('./services/koa-MKOSession');
+const MKOSessionStore = require('./services/MKOSessionStore');
+const initAccount = require('./services/initAccount');
 
 var routes = require('./routes');
 //var MKODBAction = require('./database/MKODBAction');
 
 
 var app = new Koa();
+
+let account = {account: "admin", name: "admin", password: "admin"};
+initAccount.init(account);
+
 //post body 解析
 app.use(KoaBodyParser());
-
 //错误捕捉
 koaOnerror(app);
 
@@ -81,34 +85,36 @@ render(app, options);
 app.context.render = co.wrap(app.context.render);
 
 
-
 //var redisStore = require('koa-redis')(config.redis);
 //app.redis = redisStore.client;
 //
 ////session中间件
-//var session = require('koa-generic-session');
-//
-//    var sessionConfig = {
-//    store: redisStore,
-//    prefix: 'FBA_Server:sess:',
-//    key: 'FBA_Server.sid'
-//    };
+app.use(co.wrap(KoaSession({
+    key: 'SESSIONID',
+    store: new MKOSessionStore()
+})));
 
-//app.use(session(sessionConfig));
-
-////数据校验
-//var validator = require('koa-validator');
-//app.use(validator());
-
+app.use(co.wrap(function*(ctx, next){
+    let timestamp = ctx.cookies.get('timestamp');
+    ctx.bLogin = false;
+    if (Object.keys(ctx.session).length > 0 && ctx.session.date && ctx.session.date.toString() == timestamp){
+        ctx.bLogin = true;
+        ctx.state.currnetUser = ctx.session.account;
+    }
+    if (!ctx.bLogin){
+        if (ctx.request.url.startsWith('/user/login')){
+            yield next();
+        }else{
+            let refer = ctx.request.url;
+            ctx.response.redirect(`/user/login?refer=${refer}`);
+        }
+        return;
+    }
+    yield next();
+}));
 
 //路由
-//var routes = require('koa-routes');
-//app.use(routes(app));
 app.use(KoaCompose(routes));
-
-//应用路由
-//var appRouter = require('./routes/index');
-//appRouter(app);
 
 const port = parseInt(config.port || '3000');
 

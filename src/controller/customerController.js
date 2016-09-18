@@ -1,12 +1,58 @@
+const CustomerAction = require('../database/CustomerAction');
+const customerAction = new CustomerAction();
+const Utils = require(BASEDIR + '/utils/utils');
+const resCode = require(BASEDIR + '/utils/utils').resCode;
 const co = require('co');
 
-//module.exports = co.wrap(function*(ctx, next) {
-//    yield ctx.render('user_list', {});
-//});
+var doAddCustomer = function*(ctx, next) {
+    if(ctx.query.action == 'addCustomer') {
+        let postData = ctx.request.body;
+        let rules = [
+            {key: 'userName'},
+            {key: 'email'},
+            {key: 'password'},
+            {key: 'mobile'},
+            {key: 'status', type: 'number'},    //0:未激活, 1:正常, 2:禁用
+            {key: 'salesmanID', type: 'number'},
+            {key: 'headURL'}
+        ];
+
+        let customerInfo = Utils.verifyAndFillObject(postData, rules);
+        customerInfo.createDate = Date.now();
+        let result = yield customerAction.addCustomer(customerInfo);
+        if (result.length > 0) {
+            ctx.body = Utils.createResponse(resCode.RES_UserExist, 'customer exist!');
+        } else {
+            ctx.response.redirect('/customer/list');
+        }
+    } else if(ctx.query.action == 'update') {
+        let postData = ctx.request.body;
+        let rules = [
+            {key: 'id', type: 'number'},
+            {key: 'userName'},
+            //{key: 'email'},
+            //{key: 'password'},
+            {key: 'mobile'},
+            {key: 'status', type: 'number'},
+            {key: 'salesmanID', type: 'number'},
+            {key: 'headURL'}
+        ];
+        let customerInfo = Utils.verifyAndFillObject(postData, rules);
+        let id = customerInfo.id;
+        delete customerInfo.id;
+        yield customerAction.updateCustomer(id, customerInfo);
+        ctx.response.redirect('/customer/list');
+    } else if(ctx.query.action == 'find') {
+
+    } else {
+        let result = yield customerAction.customerList();
+        yield ctx.render('customer/customer_list', {data: result});
+    }
+};
 
 module.exports = co.wrap(function*(ctx, next){
     if (ctx.params.type == 'list'){
-        yield ctx.render('customer/customer_list', {});
+        yield doAddCustomer(ctx, next);
     }else if (ctx.params.type == 'detail'){
         yield ctx.render('customer/customer_detail', {});
     }else if (ctx.params.type == 'order'){

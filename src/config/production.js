@@ -6,9 +6,9 @@ module.exports = {
     port: 3000,
     db: {
         host: 'localhost',
-        database: 'YQYD_Activity',
-        user: 'root',
-        password: 't9FVc6ephRLXGyid'
+        database: 'FBA',
+        //user: 'root',
+        //password: 't9FVc6ephRLXGyid'
     },
     redis: {
         RDS_PORT: 6390,
