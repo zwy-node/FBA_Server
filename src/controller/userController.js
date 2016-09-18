@@ -44,7 +44,7 @@ var doLogin = function*(ctx, next) {
             if (refer){
                 ctx.response.redirect(refer);
             }else{
-                ctx.response.redirect('/contents');
+                ctx.response.redirect('/');
             }
         } else {
             yield ctx.blockRender('login', {data: {bLoginFail: true}});

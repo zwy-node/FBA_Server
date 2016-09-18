@@ -96,6 +96,7 @@ app.use(co.wrap(KoaSession({
 
 app.use(co.wrap(function*(ctx, next){
     let timestamp = ctx.cookies.get('timestamp');
+    console.log(timestamp)
     ctx.bLogin = false;
     if (Object.keys(ctx.session).length > 0 && ctx.session.date && ctx.session.date.toString() == timestamp){
         ctx.bLogin = true;
