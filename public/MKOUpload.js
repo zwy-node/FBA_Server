@@ -90,6 +90,7 @@ function MKOUpload(buttonID, containerID, callback){
 function MKOUploaderManager(){
 	var uploaders = {};
 	var uploaderCount = 0;
+	/* 存储服务签名
 	$.ajax({
 		type:"GET",
 		url: '/admin/services/storage?action=signature&service=AliyunOSS',
@@ -111,6 +112,7 @@ function MKOUploaderManager(){
 			alert('存储服务签名失败!' + JSON.stringify(err));
 		}
 	});
+	 */
 
 	/* 上传参数
 		opts = {

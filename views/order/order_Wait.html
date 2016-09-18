@@ -1,0 +1,67 @@
+<div class="ui small menu" style="margin-bottom: 0;">
+    <a class="item" href="/order/all">全部</a>
+    <a class="item" href="/order/wait">待派单</a>
+    <a class="item" href="/order/notpay">待付款</a>
+    <a class="item" href="/order/completed">已完成</a>
+    <a class="active item" href="/order/closed">已关闭</a>
+    <a class="item" href="/order/failed">异常</a>
+    <div class="right menu">
+        <form id="queryForm" class="item">
+            <div class="ui action left icon input">
+                <i class="search icon"></i>
+                <input name="query" value="" style="width: 200px" type="text" placeholder="订单号,帐号,手机号...">
+                <button class="ui small button">查询</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<table class="ui fixed selectable striped table very compact">
+    <thead>
+        <tr>
+            <th class="left aligned two wide">订单号</th>
+            <th class="left aligned three wide">行程</th>
+            <th class="center aligned two wide">仓库</th>
+            <th class="center aligned two wide">品名</th>
+            <th class="center aligned two wide">金额</th>
+            <th class="center aligned two wide">下单日期</th>
+            <th class="center aligned two wide">状态</th>
+            <th class="right aligned one wide">操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="left aligned">001</td>
+            <td class="left aligned">深圳->美国</td>
+            <td class="center aligned">PHL53,PA</td>
+            <td class="center aligned">普货</td>
+            <td class="center aligned">7300</td>
+            <td class="center aligned">2016-01-19</td>
+            <td class="center aligned">正常</td>
+            <td class="right aligned">
+                <div class="ui small basic icon buttons">
+                    <a class="ui small button" href="#"><i class="info icon"></i></a>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="2">共 1/ 0页，共 0条，每页显示 20条
+            </th>
+            <th colspan="7">
+                <div class="ui right floated pagination menu">
+                    <a class="icon item">
+                        <i class="left chevron icon"></i>
+                    </a>
+                    <a class="item active">1</a>
+                    <a class="item">2</a>
+                    <a class="item">3</a>
+                    <a class="icon item">
+                        <i class="right chevron icon"></i>
+                    </a>
+                </div>
+            </th>
+        </tr>
+    </tfoot>
+</table>
