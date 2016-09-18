@@ -2,14 +2,14 @@
  * Created by Fizz on 16/9/14.
  */
 'use strict';
-const uid = require('uid-safe');
+
+const uid = require("uid-safe");
 
 const Session = function(opts = {}) {
     opts.key = opts.key || "koa:session";
     opts.store = opts.store || new Store();
     opts.sidKey = opts.sidKey || "sid";
 
-    //console.log(opts)
     return function*(ctx, next) {
         let id = ctx.cookies.get(opts.key, opts);
 
@@ -41,6 +41,6 @@ const Session = function(opts = {}) {
             ctx.cookies.set(opts.key, sid, opts);
         }
     }
-};
+}
 
 module.exports = Session;

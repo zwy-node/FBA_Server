@@ -12,22 +12,36 @@ class CustomerAction extends MKODBAction {
 
     *addCustomer(data) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT * FROM YSGJ_AdminUser where `account` = ?';
-        let findAdmin = yield this.execSQL(querySQL, data.account, dbConnection);
+        let querySQL = 'SELECT * FROM YSGJ_AdminUser where `userName` = ? AND `email` = ?';
+        let findAdmin = yield this.execSQL(querySQL, [data.userName, data.email], dbConnection);
         if(findAdmin.length > 0) {
             dbConnection.release();
-            return findAdmin;
+            return findAdmin[0];
         } else {
-            let insertSQL = 'INSERT INTO YSGJ_AdminUser SET ?';
+            let insertSQL = 'INSERT INTO YSGJ_Users SET ?';
             //console.log(insertSQL)
             let result = yield this.execSQL(insertSQL, data, dbConnection);
             dbConnection.release();
             return result.insertId;
         }
     }
+
+    *updateCustomer(id, data) {
+        let dbConnection = yield this.getDBConnection();
+        let updateSQL = 'UPDATE YSGJ_Users SET ? WHERE `id` = ?';
+        let result = yield this.execSQL(updateSQL, [data, id], dbConnection);
+        dbConnection.release();
+        return result;
+    }
+
+    *customerList() {
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT * FROM YSGJ_Users';
+        let result = yield this.queryList(querySQL, dbConnection);
+        dbConnection.release();
+        return  result;
+    }
 }
 
-const customerAction = new CustomerAction();
-
-module.exports = customerAction;
+module.exports = CustomerAction;
 

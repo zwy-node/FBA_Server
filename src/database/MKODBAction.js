@@ -37,6 +37,23 @@ class MKODBAction {
             });
         }
     }
+
+    queryList(sql, dbConnection) {
+        console.log(sql)
+        return function(cb) {
+            let start = new Date();
+            let query = dbConnection.query(sql, function(err, result){
+                let ms = new Date() - start;
+                logger.info(`EXEC SQL: "${query.sql}" ${ms}ms`);
+                if(err) {
+                    cb(err);
+                    logger.error(`EXEC SQL ERROR: "${query.sql}" ${ms}ms`);
+                    logger.error(err);
+                }
+                cb(null, result);
+            });
+        }
+    }
 }
 
 module.exports = MKODBAction;

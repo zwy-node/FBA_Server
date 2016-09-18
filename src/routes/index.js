@@ -1,5 +1,6 @@
 const Router = require('koa-router');
 const route = new Router();
+const co = require('co');
 const CustomerController = require('../controller/CustomerController');
 const OrderController = require(BASEDIR + '/controller/OrderController');
 const ConfigInfoController = require(BASEDIR + '/controller/ConfigInfoController');
@@ -10,6 +11,11 @@ route.get('/', MainController);
 
 route.get('/user/:type', UserController);
 route.post('/user/:type', UserController);
+route.get('/signout', co.wrap(function*(ctx, next){
+    ctx.cookies.set('SESSIONID', '');
+    ctx.cookies.set('timestamp', '');
+    ctx.MKORedirectToURL('/login');
+}));
 
 route.get('/customer/:type', CustomerController);
 route.post('/customer/:type', CustomerController);

@@ -28,18 +28,24 @@ var doLogin = function*(ctx, next) {
     let account = ctx.query.account;
     let password = ctx.query.password;
 
-    if(!account && ! password) {
+    if (!account && !password) {
         yield ctx.blockRender('login', {data: {bLoginFail: false}});
     } else {
         let userInfo = yield userAction.getRecordByUser(account);
-        if(userInfo && userInfo.password) {
+        if (userInfo && userInfo.password == password) {
             let sid = Utils.MD5(`$^${account}^$`);
             ctx.session = {
                 account: account,
                 sid: sid,
                 date: Date.now()
             };
-            ctx.cookie.set('timestamp', ctx.session.date);
+            ctx.cookies.set('timestamp', ctx.session.date);
+            let refer = ctx.query.refer;
+            if (refer){
+                ctx.response.redirect(refer);
+            }else{
+                ctx.response.redirect('/contents');
+            }
         } else {
             yield ctx.blockRender('login', {data: {bLoginFail: true}});
         }

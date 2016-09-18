@@ -24,7 +24,7 @@ class MKOSessionStore {
     *set(session, opts) {
         let sid = session.sid;
         yield (function(cb) {
-            MKORedis.set(`SESSION:${sid}`, JSON.parse(session), cb);
+            MKORedis.set(`SESSION:${sid}`, JSON.stringify(session), cb);
         });
         return sid;
     }
