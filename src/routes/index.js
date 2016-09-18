@@ -1,11 +1,15 @@
 const Router = require('koa-router');
 const route = new Router();
-const CustomerController = require(BASEDIR + '/controller/customerController');
-const OrderController = require(BASEDIR + '/controller/orderController');
-const ConfigInfoController = require(BASEDIR + '/controller/configInfoController');
+const CustomerController = require('../controller/CustomerController');
+const OrderController = require(BASEDIR + '/controller/OrderController');
+const ConfigInfoController = require(BASEDIR + '/controller/ConfigInfoController');
+const UserController = require(BASEDIR + '/controller/UserController');
 
 
-route.redirect('/', '/Customer/list');
+//route.redirect('/', '/customer/list');
+route.get('/user/:type', UserController);
+route.post('/user/:type', UserController);
+
 route.get('/customer/:type', CustomerController);
 route.get('/order/:type', OrderController);
 

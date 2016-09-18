@@ -6,6 +6,7 @@ const co = require('co');
 
 module.exports = co.wrap(function*(ctx, next){
     if (ctx.params.type == 'list'){
+        console.log('asdfasdg')
         yield ctx.render('user_list', {});
     }else if (ctx.params.type == 'info'){
         yield ctx.render('', {});

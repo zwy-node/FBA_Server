@@ -22,6 +22,7 @@ class MKODBAction {
     }
 
     execSQL(sql, values, dbConnection) {
+        console.log(sql)
         return function(cb) {
             let start = new Date();
             let query = dbConnection.query(sql, values, function(err, result){
