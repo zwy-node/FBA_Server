@@ -9,13 +9,13 @@ module.exports = {
         host: 'localhost',
         user: 'root',
         database: 'FBA',
-        port: 3306
+        port: 3306,
         //user: 'YQYD',
-        //password: 'YQYD_DEV_ONLY'
+        password: '123456'
     },
     redis: {
         RDS_PORT: 6379,
-        RDS_HOST: '10.0.1.8',
+        RDS_HOST: 'localhost',
         RDS_PWD:'123456'
     }
 };
