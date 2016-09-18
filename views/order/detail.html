@@ -1,14 +1,170 @@
-<div class="ui secondary menu" style="position: relative">
+<div class="ui secondary menu" style="position: relative;margin-bottom: 5px;">
     <a class="item" onclick="history.go(-1)"><i class="icon chevron left"></i>返回</a>
     <div class="user-title">黄子韬</div>
+</div>
+<div class="ui small menu" style="margin: 0;">
+    <a class="item active" href="/order/detail">基本信息</a>
+    <a class="item" href="/order/logistics">物流跟踪</a>
     <div class="right menu">
-        <a class="item active"><i class="icon edit"></i>编辑</a>
+        <form id="queryForm" class="item">
+            <div class="ui action left icon input">
+                <button class="ui small button negative">异常</button>
+            </div>
+        </form>
     </div>
 </div>
-<div class="ui tabular menu user-menu" style="margin-bottom: 0px;">
-    <a class="item active" href="/order/detail">基本信息</a>
-    <a class="item" href="/order/logistics">订单</a>
+<div class="ui five top attached steps" style="margin-top:15px;">
+    <div class="step">
+        <i class="checkmark icon green"></i>
+        <!--<i class="print icon"></i>-->
+        <div class="content">
+            <div class="title">打印派送单</div>
+        </div>
+    </div>
+    <div class="active step">
+        <i class="street view icon"></i>
+        <div class="content">
+            <div class="title">上传/更新司机</div>
+        </div>
+    </div>
+    <div class="disabled step">
+        <i class="upload icon"></i>
+        <div class="content">
+            <div class="title">上传唛头</div>
+        </div>
+    </div>
+    <div class="disabled step">
+        <i class="truck icon"></i>
+        <div class="content">
+            <div class="title">入仓</div>
+        </div>
+    </div>
+    <div class="disabled step">
+        <i class="payment icon"></i>
+        <div class="content">
+            <div class="title">发起支付</div>
+        </div>
+    </div>
 </div>
-<div class="user-tabular">
-    
+<div class="ui attached segment">
+    <div class="ui list">
+        <div class="item">FBA号: 1991001</div>
+        <div class="item">收货地址: 深圳市白石洲XXX路XX号</div>
+        <div class="item">国家: 中国</div>
+        <div class="item">邮编: 518000</div>
+        <div class="item">总箱数: 12</div>
+        <div class="item">敏感货物类型: 否</div>
+        <div class="item">备注: 无</div>
+    </div>
 </div>
+<table class="ui fixed selectable striped table very compact">
+    <thead>
+        <tr>
+            <th class="left aligned three wide">费用项目</th>
+            <th class="left aligned three wide">单价</th>
+            <th class="left aligned two wide">数量</th>
+            <th class="left aligned three wide">单位</th>
+            <th class="left aligned three wide">金额</th>
+            <th class="right aligned four wide">
+                <!--<div class="ui small basic icon buttons">
+                    <button class="ui button"><i class="edit icon"></i>编辑</button>
+                    <button class="ui small button"><i class="info icon"></i>添加额外费用</a>
+                </div>-->
+                <div class="ui buttons">
+                    <button class="ui button">编辑</button>
+                    <div class="or" data-text="or"></div>
+                    <button class="ui positive button">添加额外费用</button>
+                </div>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="left aligned">运费</td>
+            <td class="left aligned">24.50</td>
+            <td class="left aligned">400</td>
+            <td class="left aligned">KG</td>
+            <td class="left aligned">11393.00</td>
+            <td class="right aligned"></td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="ui fixed selectable striped table very compact">
+    <thead>
+        <tr>
+            <th class="left aligned two wide">商品SKU</th>
+            <th class="left aligned two wide">中文名称</th>
+            <th class="left aligned two wide">英文名称</th>
+            <th class="left aligned two wide">申报数量</th>
+            <th class="left aligned one wide">单位</th>
+            <th class="left aligned two wide">清关申报单价</th>
+            <th class="left aligned two wide">单个成品净重</th>
+            <th class="left aligned one wide">毛重</th>
+            <th class="left aligned one wide">长</th>
+            <th class="left aligned one wide">宽</th>
+            <th class="left aligned one wide">高</th>
+            <th class="left aligned two wide">货箱编号</th>
+            <th class="right aligned two wide">带电货箱编号</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="left aligned">运费</td>
+            <td class="left aligned">24.50</td>
+            <td class="left aligned">400</td>
+            <td class="left aligned">KG</td>
+            <td class="left aligned">11393.00</td>
+            <td class="left aligned">运费</td>
+            <td class="left aligned">24.50</td>
+            <td class="left aligned">400</td>
+            <td class="left aligned">KG</td>
+            <td class="left aligned">11393.00</td>
+            <td class="left aligned">11393.00</td>
+            <td class="left aligned">11393.00</td>
+            <td class="right aligned"></td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th class="right aligned" colspan="13">
+                <button class="ui primary button">下载</button>
+            </th>
+        </tr>
+    </tfoot>
+</table>
+
+<table class="ui fixed selectable striped table very compact">
+    <thead>
+        <tr>
+            <th class="center aligned three wide">产品图片</th>
+            <th class="left aligned two wide">产品名称</th>
+            <th class="left aligned two wide">品牌</th>
+            <th class="left aligned two wide">型号</th>
+            <th class="left aligned one wide">原理</th>
+            <th class="left aligned two wide">功率</th>
+            <th class="left aligned two wide">电池型号</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="center aligned">
+                <img class="header-image" src="/images/wireframe/image.png">
+            </td>
+            <td class="left aligned">lalalala</td>
+            <td class="left aligned">LOL</td>
+            <td class="left aligned">LOL-09</td>
+            <td class="left aligned"></td>
+            <td class="left aligned"></td>
+            <td class="left aligned"></td>
+
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th class="right aligned" colspan="7">
+                <button class="ui primary button">下载</button>
+            </th>
+        </tr>
+    </tfoot>
+</table>
