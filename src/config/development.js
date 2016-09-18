@@ -6,7 +6,7 @@ module.exports = {
     port: 8090,
     db: {
         //host: '120.76.229.128',
-        host: '10.0.1.8',
+        host: 'localhost',
         user: 'root',
         database: 'FBA',
         port: 3306
