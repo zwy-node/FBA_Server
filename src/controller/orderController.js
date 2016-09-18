@@ -17,6 +17,10 @@ module.exports = co.wrap(function*(ctx, next){
         yield ctx.render('order/order_NotPay', {});
     }else if (ctx.params.type == 'wait'){
         yield ctx.render('order/order_Wait', {});
+    }else if (ctx.params.type == 'detail'){
+        yield ctx.render('order/detail', {});
+    }else if (ctx.params.type == 'logistics'){
+        yield ctx.render('order/logistics', {});
     }
     yield next();
 });

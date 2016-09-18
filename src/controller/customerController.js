@@ -6,12 +6,13 @@ const co = require('co');
 
 module.exports = co.wrap(function*(ctx, next){
     if (ctx.params.type == 'list'){
-        console.log('asdfasdg')
         yield ctx.render('user_list', {});
     }else if (ctx.params.type == 'info'){
-        yield ctx.render('', {});
+        yield ctx.render('customer/customer_list', {});
+    }else if (ctx.params.type == 'detail'){
+        yield ctx.render('customer/customer_detail', {});
     }else if (ctx.params.type == 'order'){
-        yield ctx.render('configInfo/driver', {});
+        yield ctx.render('customer/customer_order', {});
     }
     yield next();
 });

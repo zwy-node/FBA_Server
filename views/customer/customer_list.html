@@ -1,0 +1,212 @@
+<div class="ui small menu" style="margin-bottom: 0;">
+    <a class="active item">客户列表</a>
+    <div class="right menu">
+        <form id="queryForm" class="item">
+            <div class="ui action left icon input">
+                <i class="search icon"></i>
+                <input name="query" value="" style="width: 200px" type="text" placeholder="订单号,帐号,手机号...">
+                <button class="ui small button">查询</button>
+                <button class="ui small button" onclick="newData(); return false;">新增</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<table class="ui fixed selectable striped table very compact">
+    <thead>
+        <tr>
+            <th class="left aligned three wide">ID</th>
+            <th class="left aligned two wide">头像</th>
+            <th class="center aligned one wide">用户名</th>
+            <th class="center aligned two wide">Email</th>
+            <th class="center aligned two wide">手机</th>
+            <th class="center aligned two wide">创建日期</th>
+            <th class="center aligned two wide">状态</th>
+            <th class="left aligned one wide">业务员</th>
+            <th class="right aligned">操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="left aligned">001</td>
+            <td class="left aligned">
+                <img class="header-image" src="/images/wireframe/image.png">
+            </td>
+            <td class="center aligned">yyd1142</td>
+            <td class="center aligned">yyd@qqmail.com</td>
+            <td class="center aligned">14222222222</td>
+            <td class="center aligned">2016-01-19</td>
+            <td class="center aligned">正常</td>
+            <td class="left aligned">啧啧啧</td>
+            <td class="right aligned">
+                <div class="ui small basic icon buttons">
+                    <button class="ui button"><i class="edit icon"></i></button>
+                    <a class="ui small button" href="/customer/detail"><i class="info icon"></i></a>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="2">共 1/ 0页，共 0条，每页显示 20条
+            </th>
+            <th colspan="7">
+                <div class="ui right floated pagination menu">
+                    <a class="icon item">
+                        <i class="left chevron icon"></i>
+                    </a>
+                    <a class="item active">1</a>
+                    <a class="item">2</a>
+                    <a class="item">3</a>
+                    <a class="icon item">
+                        <i class="right chevron icon"></i>
+                    </a>
+                </div>
+            </th>
+        </tr>
+    </tfoot>
+</table>
+<div class="ui modal coupled small" id="editPanel">
+    <div class="header">
+        新建客户
+    </div>
+    <form id="dataForm" class="ui form content" method="post" :action="panelInfo.action">
+        <input type="hidden" name="id" :value="data.id">
+        <div class="two fields">
+            <div class="field">
+                <label>客户姓名</label>
+                <input type="text" name="name" :value="data.name" placeholder="输入姓名">
+            </div>
+            <div class="field">
+                <label>搜索关键字</label>
+                <input type="text" name="key" :value="data.key" placeholder="输入关键字">
+            </div>
+        </div>
+        <div class="two fields">
+            <div class="field">
+                <label>手机号码</label>
+                <input type="tel" placeholder="输入手机号码" maxlength="11">
+            </div>
+            <div class="field">
+                <label>密码</label>
+                <input type="password" placeholder="输入密码，不少于6位数">
+            </div>
+        </div>
+        <div class="field">
+            <label>业务员</label>
+            <div class="field">
+                <select class="ui fluid search dropdown" name="status">
+                        <option value="0">Tony</option>
+                        <option value="1">天骄</option>
+                        <option value="2">曾哥哥</option>
+                </select>
+            </div>
+        </div>
+        <div class="field" id="container">
+            <label>客户头像</label>
+            <!--<input name="headURL" type="hidden" :value="data.headURL">-->
+            <div class="field imageURL-field" id="imgURLContainer">
+                <div class="ui card ">
+                    <div class="image image-item">
+                        <img :src="data.headURL || '/static/images/blank_image.jpg'">
+                    </div>
+                    <div class="ui bottom attached buttons">
+                        <div id="imgURLSelectFile" class="ui button">选择文件</div>
+                    </div>
+                    <div class="ui bottom attached progress" data-percent="100" id="imgURLProgress">
+                        <div class="bar" v-show="isUploading">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="actions">
+        <div class="ui approve positive button">保存</div>
+        <div class="ui button deny">取消</div>
+    </div>
+</div>
+<script type="text/javascript" src="/static/library/plupload-2.1.2/js/plupload.full.min.js"></script>
+<script type="application/javascript" src="/static/MKOUpload.js"></script>
+<script type="text/javascript">
+    var blankValue = {name: '', key: '', desc: '', status: 0, headURL: ''};
+    var mkoUpload = null;
+    var uploaderManager = new MKOUploaderManager();
+    var editPanel = $('#editPanel');
+    var vm = new Vue({
+        el: '#editPanel',
+        data: {
+            panelInfo: {
+                title: '',  //标题
+                type: 0,    //类型 0: 新建模式 1: 编辑模式
+                action: "?action=newData"
+            },
+            data: blankValue,
+            isUploading: false
+        },
+        ready: function(){
+            editPanel.modal({
+                closable: false,
+                onApprove : function() {
+                    $('.ui.form').submit();
+                    return false;
+                },
+                onDeny: function(){
+                    editPanel.form('reset');
+                    uploaderManager.cancelAll();
+                }
+            });
+
+            $("#dataForm").form({
+                fields: {
+                    name: 'empty',
+                    desc: 'empty',
+                    headURL: 'empty'
+                }
+            });
+
+            var self = this;
+            uploaderManager.newUploader({
+                button: "imgURLSelectFile",
+                container: "imgURLContainer",
+                progressBar: "imgURLProgress",
+                label: "imgURLSelectFile",
+                context: 0,
+                beforeCallback: function(context){
+                    self.isUploading = true;
+                },
+                completedCallback: function(context, url){
+                    self.isUploading = false;
+                    self.data.headURL = url;
+                }
+            });
+        },
+        methods: {
+
+        }
+    });
+
+    function newData(){
+        var newValue = {};
+        Object.assign(newValue, blankValue);
+        vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=newData"});
+        vm.$set('data', newValue);
+        editPanel.modal('show');
+    }
+
+    function editData(id){
+        $.ajax({
+            type: 'GET',
+            url: 'mrmj?action=getData&id='+ id,
+            success: function(data){
+                var editingData = data.data;
+                vm.$set('data', editingData);
+                vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=editData"});
+                editPanel.modal('show');
+            },error: function(xhr, type){
+                console.log(xhr, type);
+            }
+        });
+    }
+
+</script>
