@@ -74,7 +74,7 @@ var resCode = {
     RES_NoPermission: 15        //没有权限
 };
 
-function format(format) {
+Date.prototype.format = function (format) {
     var o = {
         'M+': this.getMonth() + 1,
         // month
@@ -107,6 +107,5 @@ module.exports = {
     verifyAndFillObject: verifyAndFillObject,
     MD5: MD5,
     createResponse: createResponse,
-    resCode: resCode,
-    format: format
+    resCode: resCode
 };
