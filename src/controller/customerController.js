@@ -53,10 +53,11 @@ var doAddCustomer = function*(ctx, next) {
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'customer not exist!')
         }
-
-
     } else {
         let result = yield customerAction.customerList();
+        for (let item of result.datas) {
+            item.createDate = item.createDate.format('yyyy-MM-dd');
+        }
         yield ctx.render('customer/customer_list', {data: result, status: ['未激活', '正常', '禁用']});
     }
 };
