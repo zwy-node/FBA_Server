@@ -58,7 +58,7 @@
                     </td>
                     <td class="center aligned">
                         <div class="ui small basic icon buttons">
-                            <button class="ui button"><i class="edit icon"></i></button>
+                            <button class="ui button" onclick="editData(<%= data.datas[i].id %>)"><i class="edit icon"></i></button>
                             <button class="ui button"><i class="info icon"></i></button>
                         </div>
                     </td>
@@ -169,7 +169,7 @@
 <script type="text/javascript" src="/static/library/plupload-2.1.2/js/plupload.full.min.js"></script>
 <script type="application/javascript" src="/static/MKOUpload.js"></script>
 <script type="text/javascript">
-    var blankValue = {name: '', key: '', desc: '', status: 0, headURL: ''};
+    var blankValue = {id: '', userName: '', email: '', mobile: '', password: 0, salesmanID: '', headURL: ''};
     var mkoUpload = null;
     var uploaderManager = new MKOUploaderManager();
     var editPanel = $('#editPanel');
@@ -234,14 +234,14 @@
         editPanel.modal('show');
     }
 
-    function editData(id){
+    function editData(data){
         $.ajax({
             type: 'GET',
-            url: 'mrmj?action=getData&id='+ id,
+            url: 'customer?action=getData&id='+ id,
             success: function(data){
                 var editingData = data.data;
                 vm.$set('data', editingData);
-                vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=editData"});
+                vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=update"});
                 editPanel.modal('show');
             },error: function(xhr, type){
                 console.log(xhr, type);
