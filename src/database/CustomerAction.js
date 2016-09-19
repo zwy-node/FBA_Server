@@ -41,6 +41,14 @@ class CustomerAction extends MKODBAction {
         dbConnection.release();
         return  result;
     }
+
+    *customerDetail(id) {
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT `userName`, `email`, `mobile`, `company`, `phone`, `createDate`, `loginTime`, `status`, `salesmanID` FROM YSGJ_Users WHERE `id` = ?';
+        let result = yield this.execSQL(querySQL, id, dbConnection);
+        dbConnection.release();
+        return result
+    }
 }
 
 module.exports = CustomerAction;
