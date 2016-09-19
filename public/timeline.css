@@ -33,9 +33,8 @@ Modules - reusable parts of our design
 -------------------------------- */
 .cd-container {
   /* this class is used to give a max-width to the element it is applied to, and center it horizontally when it reaches that max-width */
-  /* width: 90%; */
   max-width: 500px;
-  margin-right: 0;
+  margin: 0 auto;
 }
 .cd-container::after {
   /* clearfix */
@@ -277,9 +276,4 @@ a.cd-read-more:hover{text-decoration:none; background-color: #424242;  }
 
 .cd-active,.cd-active>h2{
   color: #2185d0 !important;
-}
-
-.cd-button{
-  width: 800px;
-  margin-left: auto; 
 }
