@@ -45,6 +45,16 @@ var doAddCustomer = function*(ctx, next) {
         ctx.response.redirect('/customer/list');
     } else if (ctx.query.action == 'find') {
 
+    } else if (ctx.query.action == 'info') {
+        try {
+            let id = ctx.query.id;
+            let customerDetail = yield customerAction.customerDetail(id);
+            ctx.body = Utils.createResponse(resCode.RES_Success, customerDetail);
+        } catch (e) {
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'customer not exist!')
+        }
+
+
     } else {
         let result = yield customerAction.customerList();
         yield ctx.render('customer/customer_list', {data: result});

@@ -23,7 +23,16 @@ var doFBAWarehouse = function*(ctx, next) {
         } else {
             ctx.response.redirect('configInfo/fba');
         }
-    } else if(ctx.query.action == '') {
+    } else if(ctx.query.action == 'update') {
+        let postData = ctx.request.body;
+        let rules = [
+            {key: 'addressID', type: 'number'},
+            {key: 'postcode', type: 'number'},
+            {key: 'supplier', type: 'number'}
+        ];
+        let FBAWarehouse = Utils.verifyAndFillObject(postData, rules);
+
+    } else if (ctx.query.action == 'update') {
 
     }
     yield ctx.render('configInfo/fba', {});
