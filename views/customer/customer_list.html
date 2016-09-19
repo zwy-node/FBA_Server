@@ -27,24 +27,37 @@
         </tr>
     </thead>
     <tbody>
-        <tr>
-            <td class="left aligned">001</td>
-            <td class="left aligned">
-                <img class="header-image" src="/images/wireframe/image.png">
-            </td>
-            <td class="center aligned">yyd1142</td>
-            <td class="center aligned">yyd@qqmail.com</td>
-            <td class="center aligned">14222222222</td>
-            <td class="center aligned">2016-01-19</td>
-            <td class="center aligned">正常</td>
-            <td class="left aligned">啧啧啧</td>
-            <td class="right aligned">
+        <% if (data.datas.length == 0) { %>
+            <td colspan="9" class="center aligned">暂无数据</td>
+            <% } %>
+                <% for (var i = 0; i < data.datas.length; i++) { %>                    
+            <tr>
+                <td class="left aligned" name="id"><%= data.datas[i].id %></td>
+                <td class="left aligned">
+                    <img class="header-image" name="headURL" src="<%= data.datas[i].headURL %>">
+                </td>
+                <td class="center aligned" name="userName"><%= data.datas[i].userName %></td>
+                <td class="center aligned"><%= data.datas[i].email %></td>
+                <td class="center aligned"><%= data.datas[i].mobile %></td>
+                <td class="center aligned"><%= data.datas[i].createDate %></td>
+                <td class="center aligned">
+                    <% if(data.datas[i].status == 0) { %>
+                    未激活
+                    <% } else if(data.datas[i].status == 1) %>
+                    正常
+                    <% }else{ %>
+                    禁用
+                    <% } %>
+                </td>
+                <td class="left aligned"><%= data.datas[i].salesmanID %></td>
+                <td class="right aligned">
                 <div class="ui small basic icon buttons">
-                    <button class="ui button"><i class="edit icon"></i></button>
-                    <a class="ui small button" href="/customer/detail"><i class="info icon"></i></a>
+                <button class="ui button"><i class="edit icon"></i></button>
+                <a class="ui small button" href="/customer/detail"><i class="info icon"></i></a>
                 </div>
-            </td>
-        </tr>
+                </td>
+            </tr>
+            <% } %>
     </tbody>
     <tfoot>
         <tr>
