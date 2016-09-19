@@ -12,14 +12,13 @@ class CustomerAction extends MKODBAction {
 
     *addCustomer(data) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT * FROM YSGJ_AdminUser where `userName` = ? AND `email` = ?';
+        let querySQL = 'SELECT * FROM YSGJ_Users where `userName` = ? AND `email` = ?';
         let findAdmin = yield this.execSQL(querySQL, [data.userName, data.email], dbConnection);
         if(findAdmin.length > 0) {
             dbConnection.release();
             return findAdmin[0];
         } else {
             let insertSQL = 'INSERT INTO YSGJ_Users SET ?';
-            //console.log(insertSQL)
             let result = yield this.execSQL(insertSQL, data, dbConnection);
             dbConnection.release();
             return result.insertId;
@@ -47,7 +46,15 @@ class CustomerAction extends MKODBAction {
         let querySQL = 'SELECT `userName`, `email`, `mobile`, `company`, `phone`, `createDate`, `loginTime`, `status`, `salesmanID` FROM YSGJ_Users WHERE `id` = ?';
         let result = yield this.execSQL(querySQL, id, dbConnection);
         dbConnection.release();
-        return result
+        return result[0];
+    }
+
+    *customerOrder(id) {
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT `startAddressID`, `endAddressID` FROM YSGJ_Order WHERE `id` = ?'
+        let result = yield this.execSQL(querySQL, id, dbConnection);
+        dbConnection.release();
+        return result;
     }
 }
 

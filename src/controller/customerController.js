@@ -20,6 +20,7 @@ var doAddCustomer = function*(ctx, next) {
         let customerInfo = Utils.verifyAndFillObject(postData, rules);
         customerInfo.createDate = Date.now();
         let result = yield customerAction.addCustomer(customerInfo);
+        console.log(result)
         if (result.length > 0) {
             ctx.body = Utils.createResponse(resCode.RES_UserExist, 'customer exist!');
         } else {
@@ -53,11 +54,17 @@ var doAddCustomer = function*(ctx, next) {
 var doDetail = function*(ctx, next) {
     try {
         let id = ctx.query.id;
-        let customerDetail =  yield customerAction.customerDetail(id);
-
+        let customerDetail = yield customerAction.customerDetail(id);
+        yield ctx.render('customer/customer_detail', {data: customerDetail});
     } catch (e) {
-        ctx.body = {code: 1, error: e};
+        ctx.render('customer/customer_detail')
     }
+};
+
+var doCustomerOrder = function*(ctx, next) {
+    let id = ctx.query.id;
+    let customerOrder = yield customerAction.customerOrder(id);
+    yield ctx.render('customer/customer_order', {data: customerOrder});
 };
 
 module.exports = co.wrap(function*(ctx, next) {
@@ -65,9 +72,8 @@ module.exports = co.wrap(function*(ctx, next) {
         yield doAddCustomer(ctx, next);
     } else if (ctx.params.type == 'detail') {
         yield doDetail(ctx, next);
-        yield ctx.render('customer/customer_detail', {});
     } else if (ctx.params.type == 'order') {
-        yield ctx.render('customer/customer_order', {});
+        yield doCustomerOrder(ctx, next);
     }
     yield next();
 });
