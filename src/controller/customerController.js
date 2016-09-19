@@ -47,7 +47,7 @@ var doAddCustomer = function*(ctx, next) {
 
     } else {
         let result = yield customerAction.customerList();
-        yield ctx.render('customer/customer_list', {data: result});
+        yield ctx.render('customer/customer_list', {data: result, status: ['未激活', '正常', '禁用']});
     }
 };
 
