@@ -5,7 +5,7 @@ const resCode = require(BASEDIR + '/utils/utils').resCode;
 const co = require('co');
 
 var doAddCustomer = function*(ctx, next) {
-    if(ctx.query.action == 'addCustomer') {
+    if (ctx.query.action == 'addCustomer') {
         let postData = ctx.request.body;
         let rules = [
             {key: 'userName'},
@@ -25,7 +25,7 @@ var doAddCustomer = function*(ctx, next) {
         } else {
             ctx.response.redirect('/customer/list');
         }
-    } else if(ctx.query.action == 'update') {
+    } else if (ctx.query.action == 'update') {
         let postData = ctx.request.body;
         let rules = [
             {key: 'id', type: 'number'},
@@ -42,7 +42,7 @@ var doAddCustomer = function*(ctx, next) {
         delete customerInfo.id;
         yield customerAction.updateCustomer(id, customerInfo);
         ctx.response.redirect('/customer/list');
-    } else if(ctx.query.action == 'find') {
+    } else if (ctx.query.action == 'find') {
 
     } else {
         let result = yield customerAction.customerList();
@@ -50,12 +50,23 @@ var doAddCustomer = function*(ctx, next) {
     }
 };
 
-module.exports = co.wrap(function*(ctx, next){
-    if (ctx.params.type == 'list'){
+var doDetail = function*(ctx, next) {
+    try {
+        let id = ctx.query.id;
+        let customerDetail =  yield customerAction.customerDetail(id);
+
+    } catch (e) {
+        ctx.body = {code: 1, error: e};
+    }
+};
+
+module.exports = co.wrap(function*(ctx, next) {
+    if (ctx.params.type == 'list') {
         yield doAddCustomer(ctx, next);
-    }else if (ctx.params.type == 'detail'){
+    } else if (ctx.params.type == 'detail') {
+        yield doDetail(ctx, next);
         yield ctx.render('customer/customer_detail', {});
-    }else if (ctx.params.type == 'order'){
+    } else if (ctx.params.type == 'order') {
         yield ctx.render('customer/customer_order', {});
     }
     yield next();

@@ -5,8 +5,8 @@
 module.exports = {
     port: 8090,
     db: {
-        //host: '120.76.229.128',
-        host: 'localhost',
+        host: '120.76.242.237',
+        //host: 'localhost',
         user: 'root',
         database: 'FBA',
         port: 3306,
@@ -15,7 +15,7 @@ module.exports = {
     },
     redis: {
         RDS_PORT: 6379,
-        RDS_HOST: 'localhost',
-        RDS_PWD:'123456'
+        RDS_HOST: '120.76.242.237',
+        RDS_PWD:'FBA-redis'
     }
 };
