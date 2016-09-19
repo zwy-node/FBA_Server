@@ -1,17 +1,21 @@
 <link rel="stylesheet" type="text/css" href="/timeline.css" />
-<div class="ui secondary menu" style="position: relative;margin-bottom: 5px;">
-	<a class="item" onclick="history.go(-1)"><i class="icon chevron left"></i>返回</a>
+<div class="ui secondary menu" style="position: relative;margin: 0 5px 0 0;">
+	<a class="item" href="/order/all"><i class="icon chevron left"></i>返回</a>
 	<div class="user-title">黄子韬</div>
 </div>
 <div class="ui small menu" style="margin: 0;">
 	<a class="item" href="/order/detail">基本信息</a>
 	<a class="item active" href="/order/logistics">物流跟踪</a>
 	<div class="right menu">
-		<form id="queryForm" class="item">
-			<div class="ui action left icon input">
-				<button class="ui small button negative">异常</button>
-			</div>
-		</form>
+		<div class="ui action left icon input item">
+			<button class="ui primary button small">发货</button>
+		</div>
+		<div class="ui action left icon input item">
+			<button class="ui small button">录入航班提单号</button>
+		</div>
+		<div class="ui action left icon input item">
+			<button class="ui small button negative">出港派送</button>
+		</div>
 	</div>
 </div>
 <section id="cd-timeline" class="cd-container">
