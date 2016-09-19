@@ -14,7 +14,7 @@ route.post('/user/:type', UserController);
 route.get('/signout', co.wrap(function*(ctx, next){
     ctx.cookies.set('SESSIONID', '');
     ctx.cookies.set('timestamp', '');
-    ctx.MKORedirectToURL('/login');
+    ctx.render('/user/login');
 }));
 
 route.get('/customer/:type', CustomerController);
