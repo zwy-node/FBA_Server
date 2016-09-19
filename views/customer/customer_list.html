@@ -234,12 +234,13 @@
         editPanel.modal('show');
     }
 
-    function editData(data){
+    function editData(id){
         $.ajax({
             type: 'GET',
-            url: 'customer?action=getData&id='+ id,
+            url: '?action=info&id='+ id,
             success: function(data){
-                var editingData = data.data;
+                console.log(data);
+                var editingData = data.desc;
                 vm.$set('data', editingData);
                 vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=update"});
                 editPanel.modal('show');
