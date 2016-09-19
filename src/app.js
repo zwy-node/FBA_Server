@@ -94,25 +94,25 @@ app.use(co.wrap(KoaSession({
     store: new MKOSessionStore()
 })));
 
-app.use(co.wrap(function*(ctx, next){
-    let timestamp = ctx.cookies.get('timestamp');
-    console.log(timestamp)
-    ctx.bLogin = false;
-    if (Object.keys(ctx.session).length > 0 && ctx.session.date && ctx.session.date.toString() == timestamp){
-        ctx.bLogin = true;
-        ctx.state.currnetUser = ctx.session.account;
-    }
-    if (!ctx.bLogin){
-        if (ctx.request.url.startsWith('/user/login')){
-            yield next();
-        }else{
-            let refer = ctx.request.url;
-            ctx.response.redirect(`/user/login?refer=${refer}`);
-        }
-        return;
-    }
-    yield next();
-}));
+//app.use(co.wrap(function*(ctx, next){
+//    let timestamp = ctx.cookies.get('timestamp');
+//    console.log(timestamp)
+//    ctx.bLogin = false;
+//    if (Object.keys(ctx.session).length > 0 && ctx.session.date && ctx.session.date.toString() == timestamp){
+//        ctx.bLogin = true;
+//        ctx.state.currnetUser = ctx.session.account;
+//    }
+//    if (!ctx.bLogin){
+//        if (ctx.request.url.startsWith('/user/login')){
+//            yield next();
+//        }else{
+//            let refer = ctx.request.url;
+//            ctx.response.redirect(`/user/login?refer=${refer}`);
+//        }
+//        return;
+//    }
+//    yield next();
+//}));
 
 //路由
 app.use(KoaCompose(routes));
