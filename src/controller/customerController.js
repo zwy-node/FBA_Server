@@ -47,7 +47,7 @@ var doAddCustomer = function*(ctx, next) {
 
     } else {
         let result = yield customerAction.customerList();
-        yield ctx.render('customer/customer_list', {page: 1, pageCount: 0, pageNumber: 1, datas: result});
+        yield ctx.render('customer/customer_list', {data: result});
     }
 };
 

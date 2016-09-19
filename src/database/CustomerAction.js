@@ -38,7 +38,7 @@ class CustomerAction extends MKODBAction {
         let querySQL = 'SELECT * FROM YSGJ_Users';
         let result = yield this.queryList(querySQL, dbConnection);
         dbConnection.release();
-        return  result;
+        return  {page: 1, pageCount: 0, pageNumber: 1, datas: result};
     }
 
     *customerDetail(id) {
