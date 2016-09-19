@@ -1,14 +1,46 @@
-<div class="ui secondary menu" style="position: relative">
-    <a class="item" onclick="history.go(-1)"><i class="icon chevron left"></i>返回</a>
-    <div class="user-title">黄子韬</div>
-    <div class="right menu">
-        <a class="item active"><i class="icon edit"></i>编辑</a>
-    </div>
+<link rel="stylesheet" type="text/css" href="/timeline.css" />
+<div class="ui secondary menu" style="position: relative;margin-bottom: 5px;">
+	<a class="item" onclick="history.go(-1)"><i class="icon chevron left"></i>返回</a>
+	<div class="user-title">黄子韬</div>
 </div>
-<div class="ui tabular menu user-menu" style="margin-bottom: 0px;">
-    <a class="item" href="/order/detail">基本信息</a>
-    <a class="item active" href="/order/logistics">订单</a>
+<div class="ui small menu" style="margin: 0;">
+	<a class="item" href="/order/detail">基本信息</a>
+	<a class="item active" href="/order/logistics">物流跟踪</a>
+	<div class="right menu">
+		<form id="queryForm" class="item">
+			<div class="ui action left icon input">
+				<button class="ui small button negative">异常</button>
+			</div>
+		</form>
+	</div>
 </div>
-<div class="user-tabular">
-    
-</div>
+<section id="cd-timeline" class="cd-container">
+	<div class="cd-timeline-block">
+		<div class="cd-timeline-img cd-picture"></div>
+		<div class="cd-timeline-content">
+			<h2>您的订单开始处理【深圳市】</h2>
+			<span class="cd-date">2015-01-06</span>
+		</div>
+	</div>
+	<div class="cd-timeline-block">
+		<div class="cd-timeline-img cd-movie"></div>
+		<div class="cd-timeline-content">
+			<h2>您的订单待配货【深圳市】</h2>
+			<span class="cd-date">2014-12-25</span>
+		</div>
+	</div>
+	<div class="cd-timeline-block">
+		<div class="cd-timeline-img cd-movie"></div>
+		<div class="cd-timeline-content">
+			<h2>包裹正在等待揽收【深圳市】</h2>
+			<span class="cd-date">2014-12-25</span>
+		</div>
+	</div>
+	<div class="cd-timeline-block">
+		<div class="cd-timeline-img cd-movie cd-active"></div>
+		<div class="cd-timeline-content cd-active">
+			<h2>您的订单出现异常，正在处理【深圳市】</h2>
+			<span class="cd-date cd-active">2014-12-25</span>
+		</div>
+	</div>
+</section>
