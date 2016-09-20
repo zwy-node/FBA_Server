@@ -1,11 +1,12 @@
 <div class="ui small menu" style="margin-bottom: 0;">
     <a class="active item">客户列表</a>
     <div class="right menu">
-        <form id="queryForm" class="item">
+        <form id="queryForm" class="item" method="get" action="">
             <div class="ui action left icon input">
                 <i class="search icon"></i>
-                <input name="query" value="" style="width: 200px" type="text" placeholder="订单号,帐号,手机号...">
-                <button class="ui small button">查询</button>
+                <input name="page" value="<%= data.page %>" type="hidden"/>
+                <input name="param" value="" style="width: 200px" type="text" placeholder="订单号,帐号,手机号...">
+                <button class="ui small button" type="submit">查询</button>
                 <button class="ui small button" onclick="newData(); return false;">新增</button>
             </div>
         </form>
