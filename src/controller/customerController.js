@@ -65,9 +65,9 @@ var doAddCustomer = function*(ctx, next) {
         }
         let param = ctx.query.param || '';
         let result = yield customerAction.customerList(param, page);
-        //for (let item of result.datas) {
-        //    item.createDate = item.createDate.format('yyyy-MM-dd');
-        //}
+        for (let item of result.datas) {
+            item.createDate = item.createDate.format('yyyy-MM-dd');
+        }
         yield ctx.render('customer/customer_list', {data: result, status: ['未激活', '正常', '禁用']});
     }
 };

@@ -3,16 +3,16 @@
  */
 
 module.exports = {
-    port: 3000,
+    port: 8090,
     db: {
         host: 'localhost',
+        user: 'root',
         database: 'FBA',
-        //user: 'root',
-        //password: 't9FVc6ephRLXGyid'
+        port: 3306,
     },
     redis: {
-        RDS_PORT: 6390,
+        RDS_PORT: 6379,
         RDS_HOST: '127.0.0.1',
-        RDS_PWD:'123456'
+        RDS_PWD:'FBA-redis'
     }
-}
+};
