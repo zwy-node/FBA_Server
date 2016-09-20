@@ -1,191 +1,51 @@
-<div class="ui secondary menu" style="position: relative">
+<div class="ui secondary menu" style="position: relative;margin-bottom: 5px;">
     <a class="item" href="/customer/list"><i class="icon chevron left"></i>返回</a>
-    <div class="user-title">黄子韬</div>
-    <div class="right menu" onclick="editData(); return false;">
-        <a class="item active"><i class="icon edit"></i>编辑</a>
-    </div>
+    <div class="user-title"><%= data.userName%></div>
 </div>
-<div class="ui tabular menu user-menu" style="margin-bottom: 0;">
-    <a class="item active" href="/customer/detail">基本信息</a>
-    <a class="item" href="/customer/order">订单</a>
+<div class="ui small menu" style="margin: 0;">
+    <a class="item active" href="/customer/detail?id=<%= data.id%>">基本信息</a>
+    <a class="item" href="/customer/order?id=<%= data.id%>">订单</a>
+    <div class="right menu"></div>
 </div>
+<!--SELECT `id`, `userName`, `headURL`, `email`, `mobile`, `company`, `phone`, `createDate`, `loginTime`, `status`, `salesmanID` FROM YSGJ_Users WHERE `id` = ?';-->
 <div class="user-tabular">
-    <img class="user-header-image image" src="/images/wireframe/square-image.png">
+    <img class="user-header-image image" src="<%= data.headURL %>">
     <div class="user-conent">
-        <span>用户名：</span><span>黄子韬</span>
+        <span>用户名：</span><span><%= data.userName%></span>
     </div>
     <div class="user-conent">
-        <span>Email：</span><span>yyd123@hotmail.com</span>
+        <span>Email：</span><span><%= data.email%></span>
     </div>
     <div class="user-conent">
-        <span>手机号码：</span><span>13454544434</span>
+        <span>手机号码：</span><span><%= data.mobile%></span>
     </div>
     <div class="user-conent">
-        <span>公司名称：</span><span>深圳市猫空科技有限公司</span>
+        <span>公司名称：</span><span>暂无</span>
     </div>
     <div class="user-conent">
-        <span>公司电话：</span><span>0755-2988282828</span>
+        <span>公司电话：</span><span>暂无</span>
     </div>
     <div class="user-conent">
-        <span>公司地址：</span><span>深圳市南山区东方科技大厦1103</span>
+        <span>公司地址：</span><span>暂无</span>
     </div>
     <div class="user-conent">
-        <span>邮政编码：</span><span>518000</span>
+        <span>邮政编码：</span><span>暂无</span>
     </div>
     <div class="ui divider"></div>
     <div class="user-conent">
-        <span>创建时间：</span><span>2015-02-19</span>
+        <span>创建时间：</span><span><%= data.createDate%></span>
     </div>
     <div class="user-conent">
-        <span>最后登录时间：</span><span>2016-08-14</span>
+        <span>最后登录时间：</span><span>暂无</span>
     </div>
     <div class="ui divider"></div>
     <div class="user-conent">
         <div class="user-address">常用地址：</div>
         <ul class="user-address-view">
-            <li>广东省深圳市白石洲沙河西</li>
-            <li>广东省深圳市白石洲沙河西</li>
-            <li>广东省深圳市白石洲沙河西</li>
+            <li>暂无</li>
         </ul>
     </div>
     <div class="user-conent">
-        <span>业务员：</span><span>宁泽涛</span>
+        <span>业务员：</span><span><%= data.name%></span>
     </div>
 </div>
-<div class="ui modal coupled small" id="editPanel">
-    <div class="header">
-        编辑客户
-    </div>
-    <form id="dataForm" class="ui form content" method="post" :action="panelInfo.action">
-        <input type="hidden" name="id" :value="data.id">
-        <div class="two fields">
-            <div class="field">
-                <label>客户姓名</label>
-                <input type="text" name="name" :value="data.name" placeholder="输入姓名">
-            </div>
-            <div class="field">
-                <label>搜索关键字</label>
-                <input type="text" name="key" :value="data.key" placeholder="输入关键字">
-            </div>
-        </div>
-        <div class="two fields">
-            <div class="field">
-                <label>手机号码</label>
-                <input type="tel" placeholder="输入手机号码" maxlength="11">
-            </div>
-            <div class="field">
-                <label>密码</label>
-                <input type="password" placeholder="输入密码，不少于6位数">
-            </div>
-        </div>
-        <div class="field">
-            <label>业务员</label>
-            <div class="field">
-                <select class="ui fluid search dropdown" name="status">
-                        <option value="0">Tony</option>
-                        <option value="1">天骄</option>
-                        <option value="2">曾哥哥</option>
-                </select>
-            </div>
-        </div>
-        <div class="field" id="container">
-            <label>客户头像</label>
-            <!--<input name="headURL" type="hidden" :value="data.headURL">-->
-            <div class="field imageURL-field" id="imgURLContainer">
-                <div class="ui card ">
-                    <div class="image image-item">
-                        <img :src="data.headURL || '/static/images/blank_image.jpg'">
-                    </div>
-                    <div class="ui bottom attached buttons">
-                        <div id="imgURLSelectFile" class="ui button">选择文件</div>
-                    </div>
-                    <div class="ui bottom attached progress" data-percent="100" id="imgURLProgress">
-                        <div class="bar" v-show="isUploading">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
-    <div class="actions">
-        <div class="ui approve positive button">保存</div>
-        <div class="ui button deny">取消</div>
-    </div>
-</div>
-<script type="text/javascript" src="/static/library/plupload-2.1.2/js/plupload.full.min.js"></script>
-<script type="application/javascript" src="/static/MKOUpload.js"></script>
-<script type="text/javascript">
-    var blankValue = {name: '', key: '', desc: '', status: 0, headURL: ''};
-    var mkoUpload = null;
-    var uploaderManager = new MKOUploaderManager();
-    var editPanel = $('#editPanel');
-    var vm = new Vue({
-        el: '#editPanel',
-        data: {
-            panelInfo: {
-                title: '',  //标题
-                type: 0,    //类型 0: 新建模式 1: 编辑模式
-                action: "?action=newData"
-            },
-            data: blankValue,
-            isUploading: false
-        },
-        ready: function(){
-            editPanel.modal({
-                closable: false,
-                onApprove : function() {
-                    $('.ui.form').submit();
-                    return false;
-                },
-                onDeny: function(){
-                    editPanel.form('reset');
-                    uploaderManager.cancelAll();
-                }
-            });
-
-            $("#dataForm").form({
-                fields: {
-                    name: 'empty',
-                    desc: 'empty',
-                    headURL: 'empty'
-                }
-            });
-
-            var self = this;
-            uploaderManager.newUploader({
-                button: "imgURLSelectFile",
-                container: "imgURLContainer",
-                progressBar: "imgURLProgress",
-                label: "imgURLSelectFile",
-                context: 0,
-                beforeCallback: function(context){
-                    self.isUploading = true;
-                },
-                completedCallback: function(context, url){
-                    self.isUploading = false;
-                    self.data.headURL = url;
-                }
-            });
-        },
-        methods: {
-
-        }
-    });
-
-    function editData(id){
-        editPanel.modal('show');
-        // $.ajax({
-        //     type: 'GET',
-        //     url: 'mrmj?action=getData&id='+ id,
-        //     success: function(data){
-        //         var editingData = data.data;
-        //         vm.$set('data', editingData);
-        //         vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=editData"});
-        //         editPanel.modal('show');
-        //     },error: function(xhr, type){
-        //         console.log(xhr, type);
-        //     }
-        // });
-    }
-
-</script>

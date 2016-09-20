@@ -54,13 +54,13 @@
                     <td class="left aligned" name="status">
                         <%= status[data.datas[i].status] %>
                     </td>
-                    <td class="center aligned" name="salesmanID">
-                        <%= data.datas[i].salesmanID %>
+                    <td class="center aligned" name="name">
+                        <%= data.datas[i].name %>
                     </td>
                     <td class="center aligned">
                         <div class="ui small basic icon buttons">
                             <button class="ui button" onclick="editData(<%= data.datas[i].id %>)"><i class="edit icon"></i></button>
-                            <button class="ui button"><i class="info icon"></i></button>
+                            <a class="ui button" href="/customer/detail?id=<%= data.datas[i].id %>"><i class="info icon"></i></a>
                         </div>
                     </td>
                 </tr>
