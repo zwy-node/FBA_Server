@@ -51,8 +51,18 @@ class CustomerAction extends MKODBAction {
 
     *customerOrder(id) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT `startAddressID`, `endAddressID` FROM YSGJ_Order WHERE `id` = ?'
+        let querySQL = 'SELECT `startAddressID`, `endAddressID` FROM YSGJ_Order WHERE `id` = ?';
         let result = yield this.execSQL(querySQL, id, dbConnection);
+        dbConnection.release();
+        return result;
+    }
+
+    *salesmanList(value) {
+        console.log(value) ;
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT `id`, `name` FROM YSGJ_AdminUser WHERE `role` = ?';
+        let result = yield this.execSQL(querySQL, value, dbConnection);
+        console.log(result) ;
         dbConnection.release();
         return result;
     }

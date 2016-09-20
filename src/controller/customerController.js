@@ -43,8 +43,14 @@ var doAddCustomer = function*(ctx, next) {
         delete customerInfo.id;
         yield customerAction.updateCustomer(id, customerInfo);
         ctx.response.redirect('/customer/list');
-    } else if (ctx.query.action == 'find') {
-
+    } else if (ctx.query.action == 'salesman') {
+        try {
+            let role = ctx.query.role;
+            let salesmanList = yield customerAction.salesmanList(role);
+            ctx.body = Utils.createResponse(resCode.RES_Success, salesmanList);
+        } catch (e) {
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'customer not exist!');
+        }
     } else if (ctx.query.action == 'info') {
         try {
             let id = ctx.query.id;
