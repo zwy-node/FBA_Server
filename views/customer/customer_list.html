@@ -5,7 +5,7 @@
             <div class="ui action left icon input">
                 <i class="search icon"></i>
                 <input name="page" value="<%= data.page %>" type="hidden"/>
-                <input name="param" value="" style="width: 200px" type="text" placeholder="订单号,帐号,手机号...">
+                <input name="param" value="<%= param ? param : '' %>" style="width: 200px" type="text" placeholder="用户名,手机号,Email...">
                 <button class="ui small button" type="submit">查询</button>
                 <button class="ui small button" onclick="newData(); return false;">新增</button>
             </div>

@@ -11,20 +11,38 @@ if (!String.prototype.startsWith) {
 
 
 $(document).ready(function(){
-    var pathName = window.location.pathname;
+    var pathName = window.location.pathname.split("/")[1];
     var menuNavItems = $('#menuNav .item');
-    if (pathName.startsWith('/admin/contents')){
+    if (pathName == ''){
         $(menuNavItems[0]).addClass('active');
         $(menuNavItems[1]).removeClass('active');
         $(menuNavItems[2]).removeClass('active');
-    }else if (pathName.startsWith('/admin/operations')){
+        $(menuNavItems[3]).removeClass('active');
+        $(menuNavItems[4]).removeClass('active');
+    }else if(pathName == 'customer'){
         $(menuNavItems[1]).addClass('active');
         $(menuNavItems[0]).removeClass('active');
         $(menuNavItems[2]).removeClass('active');
-    }else if (pathName.startsWith('/admin/datas')){
+        $(menuNavItems[3]).removeClass('active');
+        $(menuNavItems[4]).removeClass('active');
+    }else if(pathName == 'order'){
         $(menuNavItems[2]).addClass('active');
         $(menuNavItems[0]).removeClass('active');
         $(menuNavItems[1]).removeClass('active');
+        $(menuNavItems[3]).removeClass('active');
+        $(menuNavItems[4]).removeClass('active');
+    }else if(pathName == 'config'){
+        $(menuNavItems[3]).addClass('active');
+        $(menuNavItems[0]).removeClass('active');
+        $(menuNavItems[1]).removeClass('active');
+        $(menuNavItems[2]).removeClass('active');
+        $(menuNavItems[4]).removeClass('active');
+    }else{
+        $(menuNavItems[4]).addClass('active');
+        $(menuNavItems[0]).removeClass('active');
+        $(menuNavItems[1]).removeClass('active');
+        $(menuNavItems[2]).removeClass('active');
+        $(menuNavItems[3]).removeClass('active');
     }
 
     $(document).ready(function(){
