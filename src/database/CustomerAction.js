@@ -14,7 +14,7 @@ class CustomerAction extends MKODBAction {
         let dbConnection = yield this.getDBConnection();
         let querySQL = 'SELECT * FROM YSGJ_Users where `email` = ?';
         let findAdmin = yield this.execSQL(querySQL, [data.email], dbConnection);
-        if(findAdmin.length > 0) {
+        if (findAdmin.length > 0) {
             dbConnection.release();
             return findAdmin[0];
         } else {
@@ -36,12 +36,12 @@ class CustomerAction extends MKODBAction {
     *customerList(param, page = 1, count = 20) {
         let dbConnection = yield this.getDBConnection();
         let mainQuery = `SELECT COUNT(*) as recordCount FROM YSGJ_Users`;
-        let conditionQuery = param == '' ? '': `WHERE userName REGEXP '${param}' OR mobile REGEXP '${param}' OR email REGEXP '${param}'`;
+        let conditionQuery = param == '' ? '' : `WHERE userName REGEXP '${param}' OR mobile REGEXP '${param}' OR email REGEXP '${param}'`;
         let querySQL = `${mainQuery} ${conditionQuery}`;
         let resultCount = yield this.execSQL(querySQL, null, dbConnection);
         let recordCount = resultCount[0].recordCount;
-        let pageCount = Math.floor((resultCount - 1) / count + 1);
-        if (recordCount == 0){
+        let pageCount = Math.floor((recordCount - 1) / count + 1);
+        if (recordCount == 0) {
             return {page: page, pageCount: pageCount, pageNumber: count, datas: []};
         }
 
@@ -50,7 +50,7 @@ class CustomerAction extends MKODBAction {
         querySQL = `${mainQuery} ${conditionQuery} ${pageQuery}`;
         let result = yield this.execSQL(querySQL, [], dbConnection);
         dbConnection.release();
-        return  {page: page, pageCount: pageCount, pageNumber: count, datas: result};
+        return {page: page, pageCount: pageCount, pageNumber: count, datas: result};
     }
 
     *customerDetail(id) {

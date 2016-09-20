@@ -38,8 +38,8 @@ var routes = require('./routes');
 
 var app = new Koa();
 
-let account = {account: "admin", name: "admin", password: "admin"};
-initAccount.init(account);
+//let account = {account: "admin", name: "admin", password: "admin"};
+//initAccount.init(account);
 
 //post body 解析
 app.use(KoaBodyParser());
