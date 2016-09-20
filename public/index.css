@@ -51,6 +51,7 @@
 .header-image{
     width: 90px;
     height: 45px;
+    border-radius: 5px;
 }
 
 .home-page-main{

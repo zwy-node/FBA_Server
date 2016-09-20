@@ -1,0 +1,18 @@
+<div class="four fields" v-for="cost in costs">
+    <div class="field">
+        <label>最低重量</label>
+        <input type="number" placeholder="输入区间最小值" v-model="cost.min">
+    </div>
+    <div class="field">
+        <label>最大重量</label>
+        <input type="number" placeholder="输入区间最大值" v-model="cost.max">
+    </div>
+    <div class="field">
+        <label>费用（元）</label>
+        <input type="number" placeholder="输入费用" v-model="cost.price">
+    </div>
+    <div class="field">
+        <label>&nbsp;</label>
+        <div class="ui submit button" @click="deleteCost($index)">删除</div>
+    </div>
+</div>
