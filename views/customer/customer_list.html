@@ -1,11 +1,12 @@
 <div class="ui small menu" style="margin-bottom: 0;">
     <a class="active item">客户列表</a>
     <div class="right menu">
-        <form id="queryForm" class="item">
+        <form id="queryForm" class="item" method="get" action="">
             <div class="ui action left icon input">
                 <i class="search icon"></i>
-                <input name="query" value="" style="width: 200px" type="text" placeholder="订单号,帐号,手机号...">
-                <button class="ui small button">查询</button>
+                <input name="page" value="<%= data.page %>" type="hidden"/>
+                <input name="param" value="<%= param ? param : '' %>" style="width: 200px" type="text" placeholder="用户名,手机号,Email...">
+                <button class="ui small button" type="submit">查询</button>
                 <button class="ui small button" onclick="newData(); return false;">新增</button>
             </div>
         </form>
@@ -53,13 +54,13 @@
                     <td class="left aligned" name="status">
                         <%= status[data.datas[i].status] %>
                     </td>
-                    <td class="center aligned" name="salesmanID">
-                        <%= data.datas[i].salesmanID %>
+                    <td class="center aligned" name="name">
+                        <%= data.datas[i].name %>
                     </td>
                     <td class="center aligned">
                         <div class="ui small basic icon buttons">
                             <button class="ui button" onclick="editData(<%= data.datas[i].id %>)"><i class="edit icon"></i></button>
-                            <button class="ui button"><i class="info icon"></i></button>
+                            <a class="ui button" href="/customer/detail?id=<%= data.datas[i].id %>"><i class="info icon"></i></a>
                         </div>
                     </td>
                 </tr>
