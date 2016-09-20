@@ -18,9 +18,8 @@ var doAddCustomer = function*(ctx, next) {
         ];
 
         let customerInfo = Utils.verifyAndFillObject(postData, rules);
-        customerInfo.createDate = Date.now();
+        customerInfo.createDate = new Date();
         let result = yield customerAction.addCustomer(customerInfo);
-        console.log(result)
         if (result.length > 0) {
             ctx.body = Utils.createResponse(resCode.RES_UserExist, 'customer exist!');
         } else {
@@ -45,8 +44,7 @@ var doAddCustomer = function*(ctx, next) {
         ctx.response.redirect('/customer/list');
     } else if (ctx.query.action == 'salesman') {
         try {
-            let role = ctx.query.role;
-            let salesmanList = yield customerAction.salesmanList(role);
+            let salesmanList = yield customerAction.salesmanList();
             ctx.body = Utils.createResponse(resCode.RES_Success, salesmanList);
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'customer not exist!');

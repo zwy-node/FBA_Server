@@ -12,8 +12,8 @@ class CustomerAction extends MKODBAction {
 
     *addCustomer(data) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT * FROM YSGJ_Users where `userName` = ? AND `email` = ?';
-        let findAdmin = yield this.execSQL(querySQL, [data.userName, data.email], dbConnection);
+        let querySQL = 'SELECT * FROM YSGJ_Users where `email` = ?';
+        let findAdmin = yield this.execSQL(querySQL, [data.email], dbConnection);
         if(findAdmin.length > 0) {
             dbConnection.release();
             return findAdmin[0];
@@ -57,12 +57,11 @@ class CustomerAction extends MKODBAction {
         return result;
     }
 
-    *salesmanList(value) {
-        console.log(value) ;
+    *salesmanList() {
+        const ROLE = 2;
         let dbConnection = yield this.getDBConnection();
         let querySQL = 'SELECT `id`, `name` FROM YSGJ_AdminUser WHERE `role` = ?';
-        let result = yield this.execSQL(querySQL, value, dbConnection);
-        console.log(result) ;
+        let result = yield this.execSQL(querySQL, ROLE, dbConnection);
         dbConnection.release();
         return result;
     }
