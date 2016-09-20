@@ -23,7 +23,7 @@
             <th class="left aligned two wide">创建日期</th>
             <th class="left aligned two wide">状态</th>
             <th class="center aligned one wide">业务员</th>
-            <th class="center aligned">操作</th>
+            <th class="center aligned two wide">操作</th>
         </tr>
     </thead>
     <tbody>
@@ -36,7 +36,7 @@
                         <%= data.datas[i].id %>
                     </td>
                     <td class="center aligned" name="headURL">
-                        <img src="<%= data.datas[i].headURL %>">
+                        <img class="header-image" src="<%= data.datas[i].headURL %>">
                     </td>
                     <td class="left aligned" name="userName">
                         <%= data.datas[i].userName %>
@@ -109,44 +109,43 @@
     <div class="header">
         {{panelInfo.title}}
     </div>
-    <form id="dataForm" class="ui form content" method="post" :action="panelInfo.action">
-        <input type="hidden" name="id" :value="data.id" />
-        <input type="hidden" name="status" :value="1" />
+    <form id="dataForm" class="ui form content">
+        <input type="hidden" v-model="data.id" :value="data.id" />
+        <input type="hidden" v-model="data.status" :value="1" />
         <div class="two fields">
             <div class="field">
                 <label>客户姓名</label>
-                <input type="text" name="userName" :value="data.userName" placeholder="输入姓名">
+                <input type="text" v-model="data.userName" :value="data.userName" placeholder="输入姓名" name="userName">
             </div>
             <div class="field">
                 <label>Email</label>
-                <input type="email" name="email" :value="data.email" placeholder="输入邮箱" v-if="panelInfo.type == 0"/>
-                <input type="email" name="email" :value="data.email" placeholder="输入邮箱" disabled v-else/>
+                <input type="email" v-model="data.email" :value="data.email" placeholder="输入邮箱" v-if="panelInfo.type == 0"/>
+                <input type="email" v-model="data.email" :value="data.email" placeholder="输入邮箱" disabled v-else/>
             </div>
         </div>
         <div class="two fields">
             <div class="field">
                 <label>手机号码</label>
-                <input type="tel" name="mobile" :value="data.mobile" placeholder="输入手机号码" maxlength="11">
+                <input type="tel" v-model="data.mobile" :value="data.mobile" placeholder="输入手机号码" maxlength="11">
             </div>
             <div class="field">
                 <label>密码</label>
-                <input type="password" name="password" :value="data.password" placeholder="输入密码，不少于6位数" v-if="panelInfo.type == 0"/>
-                <input type="password" name="password" :value="data.password" placeholder="输入密码，不少于6位数" disabled v-else/>
+                <input type="password" v-model="data.password" :value="data.password" placeholder="输入密码，不少于6位数" v-if="panelInfo.type == 0"/>
+                <input type="password" v-model="data.password" :value="data.password" placeholder="输入密码，不少于6位数" disabled v-else/>
             </div>
         </div>
         <div class="field">
             <label>业务员</label>
             <div class="field">
-                <select class="ui fluid search dropdown" name="salesmanID">
-                        <option value="0">Tony</option>
-                        <option value="1">天骄</option>
-                        <option value="2">曾哥哥</option>
+                <select class="ui fluid search dropdown" v-model="data.salesmanID">
+                    <option value="">请选择业务员</option>
+                    <option v-for="item in salesmans" :value="item.id">{{item.name}}</option>
                 </select>
             </div>
         </div>
         <div class="field" id="container">
             <label>客户头像</label>
-            <input name="headURL" type="hidden" value="http://activity.yiqiyuedu.cn/static/images/logo.png">
+            <input v-model="data.headURL" type="hidden" value="http://cdn.steamstatic.com.8686c.com/steam/apps/466500/header.jpg?t=1468763225">
             <div class="field imageURL-field" id="imgURLContainer">
                 <div class="ui card ">
                     <div class="image image-item">
@@ -169,6 +168,7 @@
     </div>
 </div>
 <script type="text/javascript" src="/static/library/plupload-2.1.2/js/plupload.full.min.js"></script>
+<script type="text/javascript" src="/static/md5.min.js"></script>
 <script type="application/javascript" src="/static/MKOUpload.js"></script>
 <script type="text/javascript">
     var blankValue = {id: '', userName: '', email: '', mobile: '', password: '', salesmanID: '', headURL: ''};
@@ -184,13 +184,14 @@
                 action: "?action=newData"
             },
             data: blankValue,
+            salesmans: '',
             isUploading: false
         },
         ready: function(){
             editPanel.modal({
                 closable: false,
                 onApprove : function() {
-                    $('.ui.form').submit();
+                    doSubmit();
                     return false;
                 },
                 onDeny: function(){
@@ -201,13 +202,21 @@
 
             $("#dataForm").form({
                 fields: {
-                    name: 'empty',
+                    userName: 'empty',
                     desc: 'empty'
                     // headURL: 'empty'
                 }
             });
-
             var self = this;
+            $.ajax({
+                type: 'GET',
+                url: '?action=salesman',
+                success: function(data){
+                    self.salesmans = data.desc;
+                },error: function(xhr, type){
+                    self.salesmans = [];
+                }
+            });
             uploaderManager.newUploader({
                 button: "imgURLSelectFile",
                 container: "imgURLContainer",
@@ -227,7 +236,40 @@
 
         }
     });
-
+    function doSubmit(){
+        var panelInfo = vm.panelInfo;
+        var params = vm.data;
+        if(panelInfo.type == 0){
+            delete params.id;
+            for(var key in params){
+                if(params[key] == null || params[key] == ''){
+                    return false;
+                }
+            }
+            params.password = md5(params.password);
+            $.ajax({
+                type: 'POST',
+                data: params,
+                url: panelInfo.action,
+                success: function(data){
+                    window.location.reload();
+                },error: function(xhr, type){
+                    console.log(xhr, type);
+                }
+            });
+        }else if(vm.panelInfo.type == 1){
+            $.ajax({
+                type: 'POST',
+                data: params,
+                url: panelInfo.action,
+                success: function(data){
+                    window.location.reload();
+                },error: function(xhr, type){
+                    console.log(xhr, type);
+                }
+            });
+        }
+    }
     function newData(){
         var newValue = {};
         Object.assign(newValue, blankValue);

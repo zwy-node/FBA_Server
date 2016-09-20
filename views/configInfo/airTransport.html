@@ -26,9 +26,9 @@
                 <th class="left aligned two wide">费用编号</th>
                 <th class="center aligned two wide">起运地</th>
                 <th class="center aligned two wide">目的地</th>
-                <th class="center aligned two wide">邮编开头</th>
+                <th class="center aligned one wide">邮编开头</th>
                 <th class="center aligned one wide">货类</th>
-                <th class="center aligned three wide">价格区间</th>
+                <th class="center aligned five wide">价格区间</th>
                 <th class="center aligned one wide">最快（天）</th>
                 <th class="center aligned one wide">最慢（天）</th>
                 <th class="center aligned two wide">有效日期</th>
@@ -37,15 +37,16 @@
         </thead>
         <tbody>
             <tr>
-                <td class="left aligned" rowspan="3">001</td>
+                <td class="left aligned">001</td>
                 <td class="center aligned">USA</td>
                 <td class="center aligned">AZ</td>
                 <td class="center aligned">AZ</td>
                 <td class="center aligned">AZ</td>
                 <td class="center aligned">
-                    <div class="ui small basic icon buttons">
-                        <button class="ui secondary button">查看</button>
-                    </div>
+                    <div class="ui label">0-21KG <div class="detail">$214</div></div>
+                    <div class="ui label">21-100KG <div class="detail">$214</div></div>
+                    <div class="ui label">100-200KG <div class="detail">$214</div></div>
+                    <div class="ui label">200-1t <div class="detail">$214</div></div>
                 </td>
                 <td class="center aligned">AZ</td>
                 <td class="center aligned">AZ</td>
@@ -56,14 +57,6 @@
                         <button class="ui button"><i class="remove icon"></i></button>
                     </div>
                 </td>
-            </tr>
-            <tr>
-                <td colspan="4"></td>
-                <td colspan="6">0-21KG:  $45,10</td>
-            </tr>
-            <tr>
-                <td colspan="4"></td>
-                <td colspan="6">21-100KG:  $50,10</td>
             </tr>
         </tbody>
         <tfoot>
@@ -93,13 +86,24 @@
     </div>
     <form id="dataForm" class="ui form content" method="post" :action="panelInfo.action">
         <input type="hidden" name="id" :value="data.id">
-        <div class="field">
-            <label>仓库编号</label>
-            <input type="text" placeholder="输入仓库编号">
-        </div>
-        <div class="three fields">
+        <div class="inline fields">
+            <label>类型</label>
             <div class="field">
-                <label>国家</label>
+                <div class="ui radio checkbox">
+                    <input type="radio" class="hidden">
+                    <label>双清专线</label>
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui radio checkbox">
+                    <input type="radio" class="hidden">
+                    <label>快递</label>
+                </div>
+            </div>
+        </div>
+        <div class="two fields">
+            <div class="field">
+                <label>起始地</label>
                 <div class="field">
                     <select class="ui fluid search dropdown" name="status">
                         <option value="0">美国</option>
@@ -109,45 +113,23 @@
                 </div>
             </div>
             <div class="field">
-                <label>州</label>
+                <label>目的地</label>
                 <div class="field">
                     <select class="ui fluid search dropdown" name="status">
                         <option value="0">dfd</option>
                         <option value="1">ff</option>
                         <option value="2">zz</option>
-                </select>
-                </div>
-            </div>
-            <div class="field">
-                <label>城市</label>
-                <div class="field">
-                    <select class="ui fluid search dropdown" name="status">
-                        <option value="0">dfd</option>
-                        <option value="1">ff</option>
-                        <option value="2">zz</option>
-                </select>
-                </div>
-            </div>
-        </div>
-        <div class="two fields">
-            <div class="field">
-                <label>邮编</label>
-                <input type="number" placeholder="输入邮编" maxlength="10">
-            </div>
-            <div class="field">
-                <label>供应商</label>
-                <div class="field">
-                    <select class="ui fluid search dropdown" name="status">
-                        <option value="0">Tony</option>
-                        <option value="1">天骄</option>
-                        <option value="2">曾哥哥</option>
-                </select>
+                    </select>
                 </div>
             </div>
         </div>
         <div class="field">
-            <label>详细地址</label>
-            <input type="text" placeholder="输入地址">
+            <label>有效期</label>
+            <input type="date" placeholder="输入有效期">
+        </div>
+        <% include costsTemplate.html %>
+        <div class="wide field">
+            <button class="ui button" type="button" id="addCost" @click="addCost()">添加费用</button>
         </div>
     </form>
     <div class="actions">
@@ -171,6 +153,7 @@
                 action: "?action=newData"
             },
             data: blankValue,
+            costs: [],
             isUploading: false
         },
         ready: function(){
@@ -211,14 +194,22 @@
             });
         },
         methods: {
-
+            addCost: function(cost){
+                if (!cost){
+                    cost = {min: '', max: '', price: ''};
+                }
+                this.costs.push(cost);
+            },
+            deleteCost: function(index){
+                this.costs.splice(index, 1);
+            }
         }
     });
 
     function newData(){
         var newValue = {};
         Object.assign(newValue, blankValue);
-        vm.$set('panelInfo', {title: '新增FBA仓库', type: 0, action: "?action=newData"});
+        vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=newData"});
         vm.$set('data', newValue);
         editPanel.modal('show');
     }
