@@ -15,13 +15,13 @@
 <table class="ui fixed selectable striped table very compact">
     <thead>
         <tr>
-            <th class="left aligned three wide">ID</th>
-            <th class="left aligned two wide">头像</th>
-            <th class="center aligned one wide">用户名</th>
-            <th class="center aligned two wide">Email</th>
-            <th class="center aligned two wide">手机</th>
-            <th class="center aligned two wide">创建日期</th>
-            <th class="center aligned two wide">状态</th>
+            <th class="left aligned one wide">ID</th>
+            <th class="center aligned two wide">头像</th>
+            <th class="left aligned one wide">用户名</th>
+            <th class="left aligned two wide">Email</th>
+            <th class="left aligned two wide">手机</th>
+            <th class="left aligned two wide">创建日期</th>
+            <th class="left aligned two wide">状态</th>
             <th class="center aligned one wide">业务员</th>
             <th class="center aligned">操作</th>
         </tr>
@@ -35,22 +35,22 @@
                     <td class="left aligned" name="id">
                         <%= data.datas[i].id %>
                     </td>
-                    <td class="left aligned" name="headURL">
+                    <td class="center aligned" name="headURL">
                         <img src="<%= data.datas[i].headURL %>">
                     </td>
-                    <td class="center aligned" name="userName">
+                    <td class="left aligned" name="userName">
                         <%= data.datas[i].userName %>
                     </td>
-                    <td class="center aligned" name="email">
+                    <td class="left aligned" name="email">
                         <%= data.datas[i].email %>
                     </td>
-                    <td class="lefcentert aligned" name="mobile">
+                    <td class="left aligned" name="mobile">
                         <%= data.datas[i].mobile %>
                     </td>
-                    <td class="center aligned" name="createDate">
+                    <td class="left aligned" name="createDate">
                         <%= data.datas[i].createDate %>
                     </td>
-                    <td class="center aligned" name="status">
+                    <td class="left aligned" name="status">
                         <%= status[data.datas[i].status] %>
                     </td>
                     <td class="center aligned" name="salesmanID">
@@ -119,7 +119,8 @@
             </div>
             <div class="field">
                 <label>Email</label>
-                <input type="email" name="email" :value="data.email" placeholder="输入邮箱">
+                <input type="email" name="email" :value="data.email" placeholder="输入邮箱" v-if="panelInfo.type == 0"/>
+                <input type="email" name="email" :value="data.email" placeholder="输入邮箱" disabled v-else/>
             </div>
         </div>
         <div class="two fields">
@@ -129,7 +130,8 @@
             </div>
             <div class="field">
                 <label>密码</label>
-                <input type="password" name="password" :value="data.password" placeholder="输入密码，不少于6位数">
+                <input type="password" name="password" :value="data.password" placeholder="输入密码，不少于6位数" v-if="panelInfo.type == 0"/>
+                <input type="password" name="password" :value="data.password" placeholder="输入密码，不少于6位数" disabled v-else/>
             </div>
         </div>
         <div class="field">
@@ -169,7 +171,7 @@
 <script type="text/javascript" src="/static/library/plupload-2.1.2/js/plupload.full.min.js"></script>
 <script type="application/javascript" src="/static/MKOUpload.js"></script>
 <script type="text/javascript">
-    var blankValue = {id: '', userName: '', email: '', mobile: '', password: 0, salesmanID: '', headURL: ''};
+    var blankValue = {id: '', userName: '', email: '', mobile: '', password: '', salesmanID: '', headURL: ''};
     var mkoUpload = null;
     var uploaderManager = new MKOUploaderManager();
     var editPanel = $('#editPanel');
