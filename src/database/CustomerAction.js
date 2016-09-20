@@ -33,12 +33,24 @@ class CustomerAction extends MKODBAction {
         return result;
     }
 
-    *customerList() {
+    *customerList(param, page = 1, count = 20) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT * FROM YSGJ_Users';
-        let result = yield this.queryList(querySQL, dbConnection);
+        let mainQuery = `SELECT COUNT(*) as recordCount FROM YSGJ_Users`;
+        let conditionQuery = param == '' ? '': `WHERE userName REGEXP '${param}' OR mobile REGEXP '${param}' OR email REGEXP '${param}'`;
+        let querySQL = `${mainQuery} ${conditionQuery}`;
+        let resultCount = yield this.execSQL(querySQL, null, dbConnection);
+        let recordCount = resultCount[0].recordCount;
+        let pageCount = Math.floor((resultCount - 1) / count + 1);
+        if (recordCount == 0){
+            return {page: page, pageCount: pageCount, pageNumber: count, datas: []};
+        }
+
+        mainQuery = `SELECT e.*, d.name FROM YSGJ_Users e JOIN YSGJ_AdminUser d ON e.salesmanID = d.id`
+        let pageQuery = `LIMIT ${(page - 1) * count},${count}`;
+        querySQL = `${mainQuery} ${conditionQuery} ${pageQuery}`;
+        let result = yield this.execSQL(querySQL, [], dbConnection);
         dbConnection.release();
-        return  {page: 1, pageCount: 0, pageNumber: 1, datas: result};
+        return  {page: page, pageCount: pageCount, pageNumber: count, datas: result};
     }
 
     *customerDetail(id) {

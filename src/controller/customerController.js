@@ -12,13 +12,14 @@ var doAddCustomer = function*(ctx, next) {
             {key: 'email'},
             {key: 'password'},
             {key: 'mobile'},
-            {key: 'status', type: 'number'},    //0:未激活, 1:正常, 2:禁用
+            //{key: 'status', type: 'number'},    //0:未激活, 1:正常, 2:禁用
             {key: 'salesmanID', type: 'number'},
             {key: 'headURL'}
         ];
 
         let customerInfo = Utils.verifyAndFillObject(postData, rules);
         customerInfo.createDate = new Date();
+        customerInfo.status = 1;
         let result = yield customerAction.addCustomer(customerInfo);
         if (result.length > 0) {
             ctx.body = Utils.createResponse(resCode.RES_UserExist, 'customer exist!');
@@ -58,10 +59,15 @@ var doAddCustomer = function*(ctx, next) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'customer not exist!')
         }
     } else {
-        let result = yield customerAction.customerList();
-        for (let item of result.datas) {
-            item.createDate = item.createDate.format('yyyy-MM-dd');
+        let page = parseInt(ctx.query.page);
+        if (Number.isNaN(page) || page < 1){
+            page = 1;
         }
+        let param = ctx.query.param || '';
+        let result = yield customerAction.customerList(param, page);
+        //for (let item of result.datas) {
+        //    item.createDate = item.createDate.format('yyyy-MM-dd');
+        //}
         yield ctx.render('customer/customer_list', {data: result, status: ['未激活', '正常', '禁用']});
     }
 };

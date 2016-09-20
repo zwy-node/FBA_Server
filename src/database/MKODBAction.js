@@ -38,11 +38,12 @@ class MKODBAction {
         }
     }
 
-    queryList(sql, dbConnection) {
-        console.log(sql)
+    queryList(condition, page = 1, count = 20, dbConnection){
+        console.log(sql);
         return function(cb) {
             let start = new Date();
-            let query = dbConnection.query(sql, function(err, result){
+            let querySQL = `${condition} LIMIT ${(page - 1) * count},${count}`;
+            let query = dbConnection.query(querySQL, function(err, result){
                 let ms = new Date() - start;
                 logger.info(`EXEC SQL: "${query.sql}" ${ms}ms`);
                 if(err) {
