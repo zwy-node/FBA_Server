@@ -1,8 +1,8 @@
 const Utils = require(BASEDIR + '/utils/utils');
 const resCode = require(BASEDIR + '/utils/utils').resCode;
 const co = require('co');
-const CustomerAction = require('../database/CustomerAction');
-const customerAction = new CustomerAction();
+const ConfigInfoAction = require('../database/ConfigInfoAction');
+const configInfoAction = new ConfigInfoAction();
 
 var doFBAWarehouse = function*(ctx, next) {
     if (ctx.query.action == 'addFBAWarehouse') {
@@ -14,16 +14,12 @@ var doFBAWarehouse = function*(ctx, next) {
         ];
         let FBAWarehouse = Utils.verifyAndFillObject(postData, rules);
         FBAWarehouse.status = 1;
-        FBAWarehouse.createDate = Date.now();
-        FBAWarehouse.modifiedTime = Date.now();
+        FBAWarehouse.createDate = new Date();
+        FBAWarehouse.modifiedTime = new Date();
         console.log(FBAWarehouse)
-        let result = yield customerAction.addCustomer(FBAWarehouse);
-        if (result.length > 0) {
-            ctx.body = Utils.createResponse(resCode.RES_RecordExist, 'FBAWarehouse exist!');
-        } else {
-            ctx.response.redirect('configInfo/fba');
-        }
-    } else if(ctx.query.action == 'update') {
+        yield configInfoAction.addFBAWarehouse(FBAWarehouse);
+        ctx.response.redirect('configInfo/fba');
+    } else if (ctx.query.action == 'update') {
         let postData = ctx.request.body;
         let rules = [
             {key: 'addressID', type: 'number'},
@@ -34,33 +30,137 @@ var doFBAWarehouse = function*(ctx, next) {
 
     } else if (ctx.query.action == 'update') {
 
+    } else {
+        let result = yield configInfoAction.FBAWarehouseList();
+        console.log(result);
+        yield ctx.render('configInfo/fba', {data: result});
     }
-    yield ctx.render('configInfo/fba', {});
 };
 
-module.exports = co.wrap(function*(ctx, next){
-    if (ctx.params.type == 'fba'){
-        yield doFBAWarehouse(ctx, next);
-    }else if (ctx.params.type == 'driverCosts'){
+var doDriverCost = function*(ctx, next) {
+    if(ctx.query.action == 'addDriverCost') {
+
+    } else if(ctx.query.action == 'update') {
+
+    } else {
         yield ctx.render('configInfo/driverCosts', {});
-    }else if (ctx.params.type == 'airTransport'){
+    }
+};
+
+var doAirTransport = function*(ctx, next) {
+    if(ctx.query.action == 'addAirTransport') {
+
+    } else if(ctx.query.action == 'update') {
+
+    } else {
         yield ctx.render('configInfo/airTransport', {});
-    }else if (ctx.params.type == 'express'){
+    }
+};
+
+var doExpress = function*(ctx, next) {
+    if(ctx.query.action == 'addExpress') {
+
+    } else if(ctx.query.action == 'update') {
+
+    } else {
         yield ctx.render('configInfo/express', {});
-    }else if (ctx.params.type == 'driver'){
+    }
+};
+
+
+var doDriver = function*(ctx, next) {
+    if(ctx.query.action == 'addDriver') {
+
+    } else if(ctx.query.action == 'update') {
+
+    } else {
         yield ctx.render('configInfo/driver', {});
-    }else if (ctx.params.type == 'destinationAddress'){
+    }
+};
+
+var doDestinationAddress = function*(ctx, next) {
+    if(ctx.query.action == 'addDestinationAddress') {
+
+    } else if(ctx.query.action == 'update') {
+
+    } else {
         yield ctx.render('configInfo/destinationAddress', {});
-    }else if (ctx.params.type == 'goodsType'){
+    }
+};
+
+var doGoodsType = function*(ctx, next) {
+    if(ctx.query.action == 'addGoodsType') {
+
+    } else if(ctx.query.action == 'update') {
+
+    } else {
         yield ctx.render('configInfo/goodsType', {});
-    }else if (ctx.params.type == 'localCosts'){
+    }
+};
+
+var doLocalCosts = function*(ctx, next) {
+    if(ctx.query.action == 'addLocalCosts') {
+
+    } else if(ctx.query.action == 'update') {
+
+    } else {
         yield ctx.render('configInfo/localCosts', {});
-    }else if (ctx.params.type == 'localWarehouse'){
+    }
+};
+
+var doLocalWarehouse =  function*(ctx, next) {
+    if(ctx.query.action == 'addLocalCosts') {
+
+    } else if(ctx.query.action == 'update') {
+
+    } else {
         yield ctx.render('configInfo/localWarehouse', {});
-    }else if (ctx.params.type == 'originatingAddress'){
+    }
+};
+
+var doOriginatingAddress = function*(ctx, next) {
+    if(ctx.query.action == 'addOriginatingAddress') {
+
+    } else if(ctx.query.action == 'update') {
+
+    } else {
         yield ctx.render('configInfo/originatingAddress', {});
-    }else if (ctx.params.type == 'supplier'){
+    }
+};
+
+var doSupplier = function*(ctx, next) {
+    if(ctx.query.action == 'addSupplier') {
+
+    } else if(ctx.query.action == 'update') {
+
+    } else {
         yield ctx.render('configInfo/supplier', {});
+    }
+};
+
+module.exports = co.wrap(function*(ctx, next) {
+    if (ctx.params.type == 'fba') {
+        yield doFBAWarehouse(ctx, next);
+    } else if (ctx.params.type == 'driverCosts') {
+        yield doDriverCost(ctx, next);
+    } else if (ctx.params.type == 'airTransport') {
+        yield doAirTransport(ctx, next);
+    } else if (ctx.params.type == 'express') {
+        yield doExpress(ctx, next);
+    } else if (ctx.params.type == 'driver') {
+        yield doDriver(ctx, next);
+    } else if (ctx.params.type == 'destinationAddress') {
+        yield doDestinationAddress(ctx, next);
+    } else if (ctx.params.type == 'goodsType') {
+        yield doGoodsType(ctx, next);
+    } else if (ctx.params.type == 'localCosts') {
+        yield doLocalCosts(ctx, next);
+    } else if (ctx.params.type == 'localWarehouse') {
+        yield doLocalWarehouse(ctx, next);
+    } else if (ctx.params.type == 'originatingAddress') {
+        yield doOriginatingAddress(ctx, next);
+    } else if (ctx.params.type == 'supplier') {
+        yield doSupplier(ctx, next);
     }
     yield next();
 });

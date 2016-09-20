@@ -12,8 +12,9 @@ class ConfigInfoAction extends MKODBAction {
 
     *addFBAWarehouse(data){
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT * FROM YSGJ_AdminUser where `addressID` = ? AND `postcode` = ?';
+        let querySQL = 'SELECT * FROM YSGJ_FBAWarehouse where `postcode` = ?';
         let findFBAWarehouse = yield this.execSQL(querySQL, [data.addressID, data.postcode], dbConnection);
+        console.log(findFBAWarehouse);
         if(findFBAWarehouse.length > 0) {
             dbConnection.release();
             return findFBAWarehouse;
@@ -23,6 +24,14 @@ class ConfigInfoAction extends MKODBAction {
             dbConnection.release();
             return result.insertId;
         }
+    }
+
+    *FBAWarehouseList(){
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT * FROM YSGJ_FBAWarehouse';
+        let result = yield this.execSQL(querySQL, [], dbConnection);
+        dbConnection.release();
+        return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
     }
 }
 
