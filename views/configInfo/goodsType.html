@@ -1,10 +1,220 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<div class="ui small menu" style="margin-bottom: 0;">
+    <a class="item" href="/config/fba">FBA仓库</a>
+    <a class="item" href="/config/airTransport">空运费用</a>
+    <a class="item" href="/config/driverCosts">提货拖车费用</a>
+    <a class="item" href="/config/driver">提货司机</a>
+    <a class="item" href="/config/localWarehouse">本地仓库</a>
+    <a class="item" href="/config/localCosts">本地费用</a>
+    <a class="active item" href="/config/goodsType">货品类型</a>
+    <a class="item" href="/config/originatingAddress">起运地址</a>
+    <a class="item" href="/config/destinationAddress">目的地址</a>
+    <a class="item" href="/config/supplier">供应商</a>
+    <div class="right menu">
+        <div class="ui action left icon input">
+            <button class="ui small button" onclick="newData(); return false;">新增</button>
+        </div>
+    </div>
+</div>
 
-</body>
-</html>
+<table class="ui fixed selectable striped table very compact">
+    <thead>
+    <tr>
+        <th class="left aligned three wide">ID</th>
+        <th class="center aligned three wide">货品名称</th>
+        <th class="center aligned two wide">带电</th>
+        <th class="center aligned three wide">备注</th>
+        <th class="center aligned three wide">创建时间</th>
+        <th class="center aligned two wide">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="left aligned">001</td>
+        <td class="center aligned">USA</td>
+        <td class="center aligned">AZ</td>
+        <td class="center aligned">AZ</td>
+        <td class="center aligned">AZ</td>
+        <td class="center aligned">
+            <div class="ui small basic icon buttons">
+                <button class="ui button"><i class="edit icon"></i></button>
+                <button class="ui button"><i class="red remove icon"></i></button>
+            </div>
+        </td>
+    </tr>
+    </tbody>
+    <tfoot>
+    <tr>
+        <th colspan="3">共 1/ 0页，共 0条，每页显示 20条
+        </th>
+        <th colspan="7">
+            <div class="ui right floated pagination menu">
+                <a class="icon item">
+                    <i class="left chevron icon"></i>
+                </a>
+                <a class="item active">1</a>
+                <a class="item">2</a>
+                <a class="item">3</a>
+                <a class="icon item">
+                    <i class="right chevron icon"></i>
+                </a>
+            </div>
+        </th>
+    </tr>
+    </tfoot>
+</table>
+<div class="ui modal coupled small" id="editPanel">
+    <div class="header">
+        {{panelInfo.title}}
+    </div>
+    <form id="dataForm" class="ui form content" method="post" :action="panelInfo.action">
+        <input type="hidden" name="id" :value="data.id">
+        <div class="two fields">
+            <div class="field">
+                <label>渠道</label>
+                <div class="field">
+                    <select class="ui fluid search dropdown" name="status">
+                        <option value="0">双清专线</option>
+                        <option value="1">快递</option>
+                    </select>
+                </div>
+            </div>
+            <div class="field">
+                <label>品名分类</label>
+                <div class="field">
+                    <select class="ui fluid search dropdown" name="status">
+                        <option value="0">双清专线</option>
+                        <option value="1">快递</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="field">
+            <label>中文名</label>
+            <input type="text" placeholder="输入中文名"/>
+        </div>
+        <div class="ui form">
+            <div class="inline fields">
+                <label>属性</label>
+                <div class="field">
+                    <div class="ui radio checkbox">
+                        <input type="radio" name="fruit" checked="" tabindex="0" class="hidden">
+                        <label>带电</label>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui radio checkbox">
+                        <input type="radio" name="fruit" tabindex="0" class="hidden">
+                        <label>不带电</label>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui radio checkbox">
+                        <input type="radio" name="fruit" tabindex="0" class="hidden">
+                        <label>其他</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="field">
+            <label>备注</label>
+            <textarea placeholder="输入备注" rows="2"></textarea>
+        </div>
+    </form>
+    <div class="actions">
+        <div class="ui approve positive button">保存</div>
+        <div class="ui button deny">取消</div>
+    </div>
+</div>
+<script type="text/javascript" src="/static/library/plupload-2.1.2/js/plupload.full.min.js"></script>
+<script type="application/javascript" src="/static/MKOUpload.js"></script>
+<script type="text/javascript">
+    var blankValue = {name: '', key: '', desc: '', status: 0, headURL: ''};
+    var mkoUpload = null;
+    var uploaderManager = new MKOUploaderManager();
+    var editPanel = $('#editPanel');
+    var vm = new Vue({
+        el: '#editPanel',
+        data: {
+            panelInfo: {
+                title: '',  //标题
+                type: 0,    //类型 0: 新建模式 1: 编辑模式
+                action: "?action=newData"
+            },
+            data: blankValue,
+            costs: [],
+            isUploading: false
+        },
+        ready: function(){
+            editPanel.modal({
+                closable: false,
+                onApprove : function() {
+                    $('.ui.form').submit();
+                    return false;
+                },
+                onDeny: function(){
+                    editPanel.form('reset');
+                    uploaderManager.cancelAll();
+                }
+            });
+            $('.ui.radio.checkbox').checkbox();
+            $("#dataForm").form({
+                fields: {
+                    name: 'empty',
+                    desc: 'empty',
+                    headURL: 'empty'
+                }
+            });
+
+            var self = this;
+            uploaderManager.newUploader({
+                button: "imgURLSelectFile",
+                container: "imgURLContainer",
+                progressBar: "imgURLProgress",
+                label: "imgURLSelectFile",
+                context: 0,
+                beforeCallback: function(context){
+                    self.isUploading = true;
+                },
+                completedCallback: function(context, url){
+                    self.isUploading = false;
+                    self.data.headURL = url;
+                }
+            });
+        },
+        methods: {
+            addCost: function(cost){
+                if (!cost){
+                    cost = {min: '', max: '', price: ''};
+                }
+                this.costs.push(cost);
+            },
+            deleteCost: function(index){
+                this.costs.splice(index, 1);
+            }
+        }
+    });
+
+    function newData(){
+        var newValue = {};
+        Object.assign(newValue, blankValue);
+        vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=newData"});
+        vm.$set('data', newValue);
+        editPanel.modal('show');
+    }
+
+    function editData(id){
+        $.ajax({
+            type: 'GET',
+            url: 'mrmj?action=getData&id='+ id,
+            success: function(data){
+                var editingData = data.data;
+                vm.$set('data', editingData);
+                vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=editData"});
+                editPanel.modal('show');
+            },error: function(xhr, type){
+                console.log(xhr, type);
+            }
+        });
+    }
+
+</script>

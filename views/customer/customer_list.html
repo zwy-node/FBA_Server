@@ -1,5 +1,5 @@
 <div class="ui small menu" style="margin-bottom: 0;">
-    <a class="active item">客户列表</a>
+    <a class="active item" href="/customer/list">客户列表</a>
     <div class="right menu">
         <form id="queryForm" class="item" method="get" action="">
             <div class="ui action left icon input">
@@ -112,7 +112,7 @@
     </div>
     <form id="dataForm" class="ui form content">
         <input type="hidden" v-model="data.id" :value="data.id" />
-        <input type="hidden" v-model="data.status" :value="1" />
+        <input type="hidden" v-model="data.status" :value="1" v-if="panelInfo.type == 0"/>
         <div class="two fields">
             <div class="field">
                 <label>客户姓名</label>
@@ -133,6 +133,17 @@
                 <label>密码</label>
                 <input type="password" v-model="data.password" :value="data.password" placeholder="输入密码，不少于6位数" v-if="panelInfo.type == 0"/>
                 <input type="password" v-model="data.password" :value="data.password" placeholder="输入密码，不少于6位数" disabled v-else/>
+            </div>
+        </div>
+        <div class="field" v-if="panelInfo.type == 1">
+            <label>状态</label>
+            <div class="field">
+                <select class="ui fluid search dropdown" v-model="data.status">
+                    <option value="">请选择状态</option>
+                    <option value="0">未激活</option>
+                    <option value="1">正常</option>
+                    <option value="2">禁用</option>
+                </select>
             </div>
         </div>
         <div class="field">

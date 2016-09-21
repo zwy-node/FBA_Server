@@ -76,7 +76,7 @@ var doDetail = function*(ctx, next) {
     try {
         let id = ctx.query.id;
         let customerDetail = yield customerAction.customerDetail(id);
-        yield ctx.render('customer/customer_detail', {data: customerDetail});
+        yield ctx.render('customer/customer_detail', {data: customerDetail, status: ['未激活', '正常', '禁用']});
     } catch (e) {
         ctx.render('customer/customer_detail')
     }
