@@ -19,16 +19,13 @@ var doFBAWarehouse = function*(ctx, next) {
 
         let rulesAddress = [
             {key: 'countryID', type: 'number'},
-            {key: 'addressID', type: 'number'},
             {key: 'provinceID', type: 'number'},
             {key: 'cityID', type: 'number'},
-            {key: 'townID', type: 'number'},
-            {key: 'street'}
+            {key: 'address'}
         ];
         let addressInfo = Utils.verifyAndFillObject(postData, rulesAddress);
-
-
         console.log(FBAWarehouseInfo)
+        console.log(addressInfo)
         yield configInfoAction.addFBAWarehouse(FBAWarehouseInfo, addressInfo);
         ctx.response.redirect('configInfo/fba');
     } else if (ctx.query.action == 'update') {
@@ -44,7 +41,6 @@ var doFBAWarehouse = function*(ctx, next) {
 
     } else {
         let result = yield configInfoAction.FBAWarehouseList();
-        console.log(result);
         yield ctx.render('configInfo/fba', {data: result});
     }
 };
@@ -146,7 +142,9 @@ var doSupplier = function*(ctx, next) {
     } else if (ctx.query.action == 'update') {
 
     } else {
-        yield ctx.render('configInfo/supplier', {});
+        let result = yield configInfoAction.supplierList();
+        console.log(result)
+        yield ctx.render('configInfo/supplier', {data: result});
     }
 };
 
@@ -181,7 +179,7 @@ var doAddress = function*(ctx, next) {
             if(cityData) {
                 ctx.body = Utils.createResponse(resCode.RES_Success, null, cityData);
             } else {
-                ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'country not found!');
+                ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'city not found!');
             }
         } catch(e) {
             ctx.body = Utils.createResponse(resCode.RES_BusinessError, e);
@@ -193,13 +191,26 @@ var doAddress = function*(ctx, next) {
             if(townData) {
                 ctx.body = Utils.createResponse(resCode.RES_Success, null, townData);
             } else {
-                ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'country not found!');
+                ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'town not found!');
             }
         } catch(e) {
             ctx.body = Utils.createResponse(resCode.RES_BusinessError, e);
         }
     } else {
-        yield ctx.render('configInfo/localWarehouse', {});
+        //try {
+        //    let param = ctx.query.param;
+        //    let addressData = yield configInfoAction.addressList(param);
+        //    console.log(addressData)
+        //    if(addressData) {
+        //        ctx.body = Utils.createResponse(resCode.RES_Success, null, addressData);
+        //    } else {
+        //        ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'address not found!');
+        //    }
+        //} catch(e) {
+        //    ctx.body = Utils.createResponse(resCode.RES_BusinessError, e);
+        //}
+
+       // yield ctx.render('configInfo/localWarehouse', {});
     }
 };
 
