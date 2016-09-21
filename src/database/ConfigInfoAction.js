@@ -33,7 +33,7 @@ class ConfigInfoAction extends MKODBAction {
 
     *FBAWarehouseList() {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT a.*, b.address, c.`name`, d.`Name` as country, e.`Name` as province FROM YSGJ_FBAWarehouse a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN YSGJ_Supplier c ON a.supplier = c.id INNER JOIN areas d ON b.provinceID = d.ID INNER JOIN areas e ON b.provinceID = e.ID; ';
+        let querySQL = 'SELECT a.*, b.address, c.`name` as supplierName, d.`Name` as country, e.`Name` as province, f.`Name` as city FROM YSGJ_FBAWarehouse a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN YSGJ_Supplier c ON a.supplier = c.id INNER JOIN areas d ON b.countryID = d.ID INNER JOIN areas e ON b.provinceID = e.ID INNER JOIN areas f ON b.cityID = f.ID';
         let result = yield this.execSQL(querySQL, [], dbConnection);
         dbConnection.release();
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
