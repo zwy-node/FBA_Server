@@ -59,7 +59,7 @@ class ConfigInfoAction extends MKODBAction {
 
     *countryList() {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT `ID`, `Name` FROM areas WHERE ParentId = ?;';
+        let querySQL = 'SELECT `ID`, `Name` FROM areas WHERE ParentId = 0;';
         let result = yield this.execSQL(querySQL, [], dbConnection);
         dbConnection.release();
         return result;

@@ -19,33 +19,42 @@
 <table class="ui fixed selectable striped table very compact">
     <thead>
         <tr>
-            <th class="left aligned two wide">仓库编号</th>
+            <th class="left aligned one wide">ID</th>
+            <th class="center aligned one wide">仓库编号</th>
+            <th class="center aligned two wide">供应商</th>
             <th class="center aligned two wide">国家</th>
             <th class="center aligned two wide">州</th>
-            <th class="center aligned three wide">城市</th>
+            <th class="center aligned two wide">城市</th>
             <th class="center aligned two wide">邮编</th>
             <th class="center aligned five wide">地址</th>
             <th class="right aligned two wide">操作</th>
         </tr>
     </thead>
     <tbody>
-        <tr>
-            <td class="left aligned">001</td>
-            <td class="center aligned">USA</td>
-            <td class="center aligned">AZ</td>
-            <td class="center aligned">AZ</td>
-            <td class="center aligned">898989</td>
-            <td class="center aligned">89893 W,Buckey Rd. Phonenix, AZ, 341-Maricopa County</td>
+    <% if (data.datas.length == 0) { %>
+        <tr colspan="8" class="center aligned">暂无数据</tr>
+    <% } %>
+    <% for (var i = 0; i < data.datas.length; i++) { %>
+    <tr id="itemIndex<%= data.datas[i].id %>">
+            <td class="left aligned"><%= data.datas[i].id %></td>
+            <td class="center aligned"><%= data.datas[i].FBAWarehouseID %></td>
+            <td class="center aligned"><%= data.datas[i].supplierName %></td>
+            <td class="center aligned"><%= data.datas[i].country %></td>
+            <td class="center aligned"><%= data.datas[i].province %></td>
+            <td class="center aligned"><%= data.datas[i].city %></td>
+            <td class="center aligned"><%= data.datas[i].postcode %></td>
+            <td class="center aligned"><%= data.datas[i].address %></td>
             <td class="right aligned">
                 <div class="ui small basic icon buttons">
                     <button class="ui button"><i class="edit icon"></i></button>
                 </div>
             </td>
         </tr>
+    <% } %>
     </tbody>
     <tfoot>
         <tr>
-            <th colspan="2">共 1/ 0页，共 0条，每页显示 20条
+            <th colspan="4">共 1/ 0页，共 0条，每页显示 20条
             </th>
             <th colspan="7">
                 <div class="ui right floated pagination menu">
@@ -77,30 +86,27 @@
             <div class="field">
                 <label>国家</label>
                 <div class="field">
-                    <select class="ui fluid search dropdown" name="status">
-                        <option value="0">美国</option>
-                        <option value="1">加拿大</option>
-                        <option value="2">新加坡</option>
+                    <select class="ui fluid search dropdown" v-model="countryID" v-on:change="getCountryID()">
+                        <option value="">请选择国家</option>
+                        <option v-for="item in countries" :value="item.ID">{{item.Name}}</option>
                 </select>
                 </div>
             </div>
             <div class="field">
                 <label>州</label>
                 <div class="field">
-                    <select class="ui fluid search dropdown" name="status">
-                        <option value="0">dfd</option>
-                        <option value="1">ff</option>
-                        <option value="2">zz</option>
+                    <select class="ui fluid search dropdown" v-model="provinceID" v-on:change="getProvinceID()">
+                        <option value="">请选择州</option>
+                        <option v-for="item in provinces" :value="item.ID">{{item.Name}}</option>
                 </select>
                 </div>
             </div>
             <div class="field">
                 <label>城市</label>
                 <div class="field">
-                    <select class="ui fluid search dropdown" name="status">
-                        <option value="0">dfd</option>
-                        <option value="1">ff</option>
-                        <option value="2">zz</option>
+                    <select class="ui fluid search dropdown" v-model="cityID" v-on:change="getCityID()">
+                        <option value="">请选择城市</option>
+                        <option v-for="item in cities" :value="item.ID">{{item.Name}}</option>
                 </select>
                 </div>
             </div>
@@ -147,16 +153,33 @@
                 action: "?action=newData"
             },
             data: blankValue,
+            countries: [],
+            provinces: [],
+            cities: [],
+            countryID: '',
+            provinceID: '',
+            cityID: '',
             isUploading: false
         },
         ready: function(){
+            var self = this;
             editPanel.modal({
                 closable: false,
                 onApprove : function() {
+                    self.provinces = [];
+                    self.cities = [];
+                    self.countryID =  '';
+                    self.provinceID = '';
+                    self.cityID = '';
                     $('.ui.form').submit();
                     return false;
                 },
                 onDeny: function(){
+                    self.provinces = [];
+                    self.cities = [];
+                    self.countryID = '';
+                    self.provinceID = '';
+                    self.cityID = '';
                     editPanel.form('reset');
                     uploaderManager.cancelAll();
                 }
@@ -170,7 +193,19 @@
                 }
             });
 
-            var self = this;
+            $.ajax({
+                type: 'GET',
+                url: '/config/address?action=country',
+                success: function(data){
+                    self.countries = data.response;
+                    self.provinceID = '';
+                    self.cityID = '';
+                },error: function(xhr, type){
+                    self.countries = [];
+                    self.provinceID = '';
+                    self.cityID = '';
+                }
+            });
             uploaderManager.newUploader({
                 button: "imgURLSelectFile",
                 container: "imgURLContainer",
@@ -187,14 +222,43 @@
             });
         },
         methods: {
+            getCountryID: function(){
+                this.provinceID = '';
+                this.cityID = '';
+                var self = this;
+                $.ajax({
+                    type: 'GET',
+                    url: '/config/address?action=province&countryID=' + self.countryID,
+                    success: function(data){
+                        self.provinces = data.response;
+                    },error: function(xhr, type){
+                        self.provinces = [];
+                    }
+                });
+            },
+            getProvinceID: function(){
+                this.cityID = '';
+                var self = this;
+                $.ajax({
+                    type: 'GET',
+                    url: '/config/address?action=city&provinceID=' + self.provinceID,
+                    success: function(data){
+                        self.cities = data.response;
+                    },error: function(xhr, type){
+                        self.cities = [];
+                    }
+                });
+            },
+            getCityID: function(){
 
+            }
         }
     });
 
     function newData(){
         var newValue = {};
         Object.assign(newValue, blankValue);
-        vm.$set('panelInfo', {title: '新增FBA仓库', type: 0, action: "?action=newData"});
+        vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=newData"});
         vm.$set('data', newValue);
         editPanel.modal('show');
     }

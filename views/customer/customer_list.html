@@ -29,7 +29,7 @@
     </thead>
     <tbody>
         <% if (data.datas.length == 0) { %>
-            <td colspan="6" class="center aligned">暂无数据</td>
+            <tr colspan="6" class="center aligned">暂无数据</tr>
             <% } %>
                 <% for (var i = 0; i < data.datas.length; i++) { %>
                 <tr id="itemIndex<%= data.datas[i].id %>">
