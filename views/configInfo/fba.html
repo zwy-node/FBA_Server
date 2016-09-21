@@ -19,33 +19,42 @@
 <table class="ui fixed selectable striped table very compact">
     <thead>
         <tr>
-            <th class="left aligned two wide">仓库编号</th>
+            <th class="left aligned one wide">ID</th>
+            <th class="center aligned one wide">仓库编号</th>
+            <th class="center aligned two wide">供应商</th>
             <th class="center aligned two wide">国家</th>
             <th class="center aligned two wide">州</th>
-            <th class="center aligned three wide">城市</th>
+            <th class="center aligned two wide">城市</th>
             <th class="center aligned two wide">邮编</th>
             <th class="center aligned five wide">地址</th>
             <th class="right aligned two wide">操作</th>
         </tr>
     </thead>
     <tbody>
-        <tr>
-            <td class="left aligned">001</td>
-            <td class="center aligned">USA</td>
-            <td class="center aligned">AZ</td>
-            <td class="center aligned">AZ</td>
-            <td class="center aligned">898989</td>
-            <td class="center aligned">89893 W,Buckey Rd. Phonenix, AZ, 341-Maricopa County</td>
+    <% if (data.datas.length == 0) { %>
+        <tr colspan="8" class="center aligned">暂无数据</tr>
+    <% } %>
+    <% for (var i = 0; i < data.datas.length; i++) { %>
+    <tr id="itemIndex<%= data.datas[i].id %>">
+            <td class="left aligned"><%= data.datas[i].id %></td>
+            <td class="center aligned"><%= data.datas[i].FBAWarehouseID %></td>
+            <td class="center aligned"><%= data.datas[i].supplierName %></td>
+            <td class="center aligned"><%= data.datas[i].country %></td>
+            <td class="center aligned"><%= data.datas[i].province %></td>
+            <td class="center aligned"><%= data.datas[i].province %></td>
+            <td class="center aligned"><%= data.datas[i].postcode %></td>
+            <td class="center aligned"><%= data.datas[i].address %></td>
             <td class="right aligned">
                 <div class="ui small basic icon buttons">
                     <button class="ui button"><i class="edit icon"></i></button>
                 </div>
             </td>
         </tr>
+    <% } %>
     </tbody>
     <tfoot>
         <tr>
-            <th colspan="2">共 1/ 0页，共 0条，每页显示 20条
+            <th colspan="4">共 1/ 0页，共 0条，每页显示 20条
             </th>
             <th colspan="7">
                 <div class="ui right floated pagination menu">
