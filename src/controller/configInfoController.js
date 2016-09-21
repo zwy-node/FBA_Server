@@ -29,7 +29,7 @@ var doFBAWarehouse = function*(ctx, next) {
         console.log(FBAWarehouseInfo)
         console.log(addressInfo)
         yield configInfoAction.addFBAWarehouse(FBAWarehouseInfo, addressInfo);
-        ctx.response.redirect('configInfo/fba');
+        ctx.response.redirect('/config/fba');
     } else if (ctx.query.action == 'update') {
         let postData = ctx.request.body;
         let rules = [
