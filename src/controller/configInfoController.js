@@ -24,6 +24,8 @@ var doFBAWarehouse = function*(ctx, next) {
             {key: 'address'}
         ];
         let addressInfo = Utils.verifyAndFillObject(postData, rulesAddress);
+        addressInfo.type = 2;
+        addressInfo.createDate = new Date();
         console.log(FBAWarehouseInfo)
         console.log(addressInfo)
         yield configInfoAction.addFBAWarehouse(FBAWarehouseInfo, addressInfo);
@@ -86,7 +88,7 @@ var doDriver = function*(ctx, next) {
     }
 };
 
-var doDestinationAddress = function*(ctx, next) {
+var doEndAddress = function*(ctx, next) {
     if (ctx.query.action == 'addDestinationAddress') {
 
     } else if (ctx.query.action == 'update') {
@@ -126,13 +128,22 @@ var doLocalWarehouse = function*(ctx, next) {
     }
 };
 
-var doOriginatingAddress = function*(ctx, next) {
-    if (ctx.query.action == 'addOriginatingAddress') {
-
+var doStartAddress = function*(ctx, next) {
+    if (ctx.query.action == 'addStartAddress') {
+        let postData = ctx.request.body;
+        let rulesAddress = [
+            {key: 'provinceID', type: 'number'},
+            {key: 'cityID', type: 'number'}
+        ];
+        let addressInfo = Utils.verifyAndFillObject(postData, rulesAddress);
+        addressInfo.type = 1;
+        addressInfo.createDate = new Date();
+        yield configInfoAction.addStartAddress(addressInfo);
+        ctx.response.redirect('/config/startAddress');
     } else if (ctx.query.action == 'update') {
 
     } else {
-        yield ctx.render('configInfo/originatingAddress', {});
+        yield ctx.render('/configInfo/originatingAddress', {});
     }
 };
 
@@ -236,16 +247,16 @@ module.exports = co.wrap(function*(ctx, next) {
         yield doExpress(ctx, next);
     } else if (ctx.params.type == 'driver') {
         yield doDriver(ctx, next);
-    } else if (ctx.params.type == 'destinationAddress') {
-        yield doDestinationAddress(ctx, next);
+    } else if (ctx.params.type == 'endAddress') {
+        yield doEndAddress(ctx, next);
     } else if (ctx.params.type == 'goodsType') {
         yield doGoodsType(ctx, next);
     } else if (ctx.params.type == 'localCosts') {
         yield doLocalCosts(ctx, next);
     } else if (ctx.params.type == 'localWarehouse') {
         yield doLocalWarehouse(ctx, next);
-    } else if (ctx.params.type == 'originatingAddress') {
-        yield doOriginatingAddress(ctx, next);
+    } else if (ctx.params.type == 'startAddress') {
+        yield doStartAddress(ctx, next);
     } else if (ctx.params.type == 'supplier') {
         yield doSupplier(ctx, next);
     } else if (ctx.params.type == 'address') {

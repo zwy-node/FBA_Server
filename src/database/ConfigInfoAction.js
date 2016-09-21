@@ -22,7 +22,7 @@ class ConfigInfoAction extends MKODBAction {
 
         let updateSQL = 'UPDATE YSGJ_Address SET ? WHERE `id` = ?';
         yield this.execSQL(updateSQL, [updateOpt, addressID.insertId], dbConnection);
-
+        dbConnection.release();
         return addressID.insertId;
     }
 
@@ -96,6 +96,44 @@ class ConfigInfoAction extends MKODBAction {
         dbConnection.release();
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
     };
+
+    *addStartEndAddress(address) {
+        console.log('addset')
+        console.log(address)
+        let dbConnection = yield this.getDBConnection();
+        let insertSQL = 'INSERT INTO YSGJ_Address SET ?';
+        let addressID = yield this.execSQL(insertSQL, [address], dbConnection);
+        console.log(addressID)
+        return addressID.insertId;
+    }
+
+
+    *addStartAddress(address) {
+        console.log(address)
+        let addressID = yield this.addStartEndAddress(address);
+        console.log(addressID)
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT MAX(sort) as value FROM YSGJ_RouteAddress WHERE type = 1';
+        let max = yield this.execSQL(querySQL, [], dbConnection);
+
+        let maxValue = max[0].value;
+        console.log(maxValue)
+        if(maxValue) {
+            maxValue = maxValue + 1;
+        } else {
+            maxValue = 1;
+        }
+        let opt = {
+            addressID: addressID,
+            sort: maxValue,
+            createDate: new Date()
+        };
+
+        let insertSQL = 'INSERT INTO YSGJ_RouteAddress SET ?';
+        let result = yield this.execSQL(insertSQL, [opt], dbConnection);
+        dbConnection.release();
+        return result.insertId;
+    }
 
     //*addressList(param) {
     //    let dbConnection = yield this.getDBConnection();
