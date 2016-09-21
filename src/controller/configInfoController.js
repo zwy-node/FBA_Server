@@ -141,9 +141,20 @@ var doSupplier = function*(ctx, next) {
 
     } else if (ctx.query.action == 'update') {
 
+    } else if (ctx.query.action == 'update') {
+        try {
+            let result = yield configInfoAction.supplierList();
+            console.log(result)
+            if(result) {
+                ctx.body = Utils.createResponse(resCode.RES_Success, null, result);
+            } else {
+                ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'country not found!');
+            }
+        } catch(e) {
+            ctx.body = Utils.createResponse(resCode.RES_BusinessError, e);
+        }
     } else {
         let result = yield configInfoAction.supplierList();
-        console.log(result)
         yield ctx.render('configInfo/supplier', {data: result});
     }
 };
