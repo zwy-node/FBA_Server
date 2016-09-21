@@ -8,16 +8,28 @@ var doFBAWarehouse = function*(ctx, next) {
     if (ctx.query.action == 'addFBAWarehouse') {
         let postData = ctx.request.body;
         let rules = [
-            {key: 'addressID', type: 'number'},
+            {key: 'FBAWarehouseID'},
             {key: 'postcode', type: 'number'},
             {key: 'supplier', type: 'number'}
         ];
-        let FBAWarehouse = Utils.verifyAndFillObject(postData, rules);
-        FBAWarehouse.status = 1;
-        FBAWarehouse.createDate = new Date();
-        FBAWarehouse.modifiedTime = new Date();
-        console.log(FBAWarehouse)
-        yield configInfoAction.addFBAWarehouse(FBAWarehouse);
+        let FBAWarehouseInfo = Utils.verifyAndFillObject(postData, rules);
+        FBAWarehouseInfo.status = 1;
+        FBAWarehouseInfo.createDate = new Date();
+        FBAWarehouseInfo.modifiedTime = new Date();
+
+        let rulesAddress = [
+            {key: 'countryID', type: 'number'},
+            {key: 'addressID', type: 'number'},
+            {key: 'provinceID', type: 'number'},
+            {key: 'cityID', type: 'number'},
+            {key: 'townID', type: 'number'},
+            {key: 'street'}
+        ];
+        let addressInfo = Utils.verifyAndFillObject(postData, rulesAddress);
+
+
+        console.log(FBAWarehouseInfo)
+        yield configInfoAction.addFBAWarehouse(FBAWarehouseInfo, addressInfo);
         ctx.response.redirect('configInfo/fba');
     } else if (ctx.query.action == 'update') {
         let postData = ctx.request.body;
@@ -38,9 +50,9 @@ var doFBAWarehouse = function*(ctx, next) {
 };
 
 var doDriverCost = function*(ctx, next) {
-    if(ctx.query.action == 'addDriverCost') {
+    if (ctx.query.action == 'addDriverCost') {
 
-    } else if(ctx.query.action == 'update') {
+    } else if (ctx.query.action == 'update') {
 
     } else {
         yield ctx.render('configInfo/driverCosts', {});
@@ -48,9 +60,9 @@ var doDriverCost = function*(ctx, next) {
 };
 
 var doAirTransport = function*(ctx, next) {
-    if(ctx.query.action == 'addAirTransport') {
+    if (ctx.query.action == 'addAirTransport') {
 
-    } else if(ctx.query.action == 'update') {
+    } else if (ctx.query.action == 'update') {
 
     } else {
         yield ctx.render('configInfo/airTransport', {});
@@ -58,9 +70,9 @@ var doAirTransport = function*(ctx, next) {
 };
 
 var doExpress = function*(ctx, next) {
-    if(ctx.query.action == 'addExpress') {
+    if (ctx.query.action == 'addExpress') {
 
-    } else if(ctx.query.action == 'update') {
+    } else if (ctx.query.action == 'update') {
 
     } else {
         yield ctx.render('configInfo/express', {});
@@ -69,9 +81,9 @@ var doExpress = function*(ctx, next) {
 
 
 var doDriver = function*(ctx, next) {
-    if(ctx.query.action == 'addDriver') {
+    if (ctx.query.action == 'addDriver') {
 
-    } else if(ctx.query.action == 'update') {
+    } else if (ctx.query.action == 'update') {
 
     } else {
         yield ctx.render('configInfo/driver', {});
@@ -79,9 +91,9 @@ var doDriver = function*(ctx, next) {
 };
 
 var doDestinationAddress = function*(ctx, next) {
-    if(ctx.query.action == 'addDestinationAddress') {
+    if (ctx.query.action == 'addDestinationAddress') {
 
-    } else if(ctx.query.action == 'update') {
+    } else if (ctx.query.action == 'update') {
 
     } else {
         yield ctx.render('configInfo/destinationAddress', {});
@@ -89,9 +101,9 @@ var doDestinationAddress = function*(ctx, next) {
 };
 
 var doGoodsType = function*(ctx, next) {
-    if(ctx.query.action == 'addGoodsType') {
+    if (ctx.query.action == 'addGoodsType') {
 
-    } else if(ctx.query.action == 'update') {
+    } else if (ctx.query.action == 'update') {
 
     } else {
         yield ctx.render('configInfo/goodsType', {});
@@ -99,19 +111,19 @@ var doGoodsType = function*(ctx, next) {
 };
 
 var doLocalCosts = function*(ctx, next) {
-    if(ctx.query.action == 'addLocalCosts') {
+    if (ctx.query.action == 'addLocalCosts') {
 
-    } else if(ctx.query.action == 'update') {
+    } else if (ctx.query.action == 'update') {
 
     } else {
         yield ctx.render('configInfo/localCosts', {});
     }
 };
 
-var doLocalWarehouse =  function*(ctx, next) {
-    if(ctx.query.action == 'addLocalCosts') {
+var doLocalWarehouse = function*(ctx, next) {
+    if (ctx.query.action == 'addLocalCosts') {
 
-    } else if(ctx.query.action == 'update') {
+    } else if (ctx.query.action == 'update') {
 
     } else {
         yield ctx.render('configInfo/localWarehouse', {});
@@ -119,9 +131,9 @@ var doLocalWarehouse =  function*(ctx, next) {
 };
 
 var doOriginatingAddress = function*(ctx, next) {
-    if(ctx.query.action == 'addOriginatingAddress') {
+    if (ctx.query.action == 'addOriginatingAddress') {
 
-    } else if(ctx.query.action == 'update') {
+    } else if (ctx.query.action == 'update') {
 
     } else {
         yield ctx.render('configInfo/originatingAddress', {});
@@ -129,12 +141,65 @@ var doOriginatingAddress = function*(ctx, next) {
 };
 
 var doSupplier = function*(ctx, next) {
-    if(ctx.query.action == 'addSupplier') {
+    if (ctx.query.action == 'addSupplier') {
 
-    } else if(ctx.query.action == 'update') {
+    } else if (ctx.query.action == 'update') {
 
     } else {
         yield ctx.render('configInfo/supplier', {});
+    }
+};
+
+var doAddress = function*(ctx, next) {
+    if (ctx.query.action == 'country') {
+        try {
+            let countryData = yield configInfoAction.countryList();
+            if(countryData) {
+                ctx.body = Utils.createResponse(resCode.RES_Success, null, countryData);
+            } else {
+                ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'country not found!');
+            }
+        } catch(e) {
+            ctx.body = Utils.createResponse(resCode.RES_BusinessError, e);
+        }
+    } else if (ctx.query.action == 'province') {
+        try {
+            let countryID = ctx.query.countryID;
+            let provinceData = yield configInfoAction.provinceList(countryID);
+            if(provinceData) {
+                ctx.body = Utils.createResponse(resCode.RES_Success, null, provinceData);
+            } else {
+                ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'country not found!');
+            }
+        } catch(e) {
+            ctx.body = Utils.createResponse(resCode.RES_BusinessError, e);
+        }
+    } else if (ctx.query.action == 'city') {
+        try {
+            let provinceID = ctx.query.provinceID;
+            let cityData = yield configInfoAction.cityList(provinceID);
+            if(cityData) {
+                ctx.body = Utils.createResponse(resCode.RES_Success, null, cityData);
+            } else {
+                ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'country not found!');
+            }
+        } catch(e) {
+            ctx.body = Utils.createResponse(resCode.RES_BusinessError, e);
+        }
+    } else if (ctx.query.action == 'town') {
+        try {
+            let cityID = ctx.query.cityID;
+            let townData = yield configInfoAction.townList(cityID);
+            if(townData) {
+                ctx.body = Utils.createResponse(resCode.RES_Success, null, townData);
+            } else {
+                ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'country not found!');
+            }
+        } catch(e) {
+            ctx.body = Utils.createResponse(resCode.RES_BusinessError, e);
+        }
+    } else {
+        yield ctx.render('configInfo/localWarehouse', {});
     }
 };
 
@@ -161,6 +226,8 @@ module.exports = co.wrap(function*(ctx, next) {
         yield doOriginatingAddress(ctx, next);
     } else if (ctx.params.type == 'supplier') {
         yield doSupplier(ctx, next);
+    } else if (ctx.params.type == 'address') {
+        yield doAddress(ctx, next);
     }
     yield next();
 });
