@@ -43,7 +43,7 @@
         <td class="center aligned">443222222222</td>
         <td class="center aligned">
             <div class="ui vertical buttons">
-                <button class="ui button">身份证正面</button>
+                <button class="ui button" onclick="viewImage(); return false;">身份证正面</button>
                 <button class="ui button">身份证反面</button>
                 <button class="ui button">驾驶证</button>
             </div>
@@ -158,6 +158,15 @@
         <div class="ui button deny">取消</div>
     </div>
 </div>
+<div class="ui modal coupled small" id="imagesPanel">
+<div class="header">
+    查看图片
+</div>
+    <img class="ui fluid image" src="/images/wireframe/square-image.png">
+<div class="actions">
+    <div class="ui button deny">取消</div>
+</div>
+</div>
 <script type="text/javascript" src="/static/library/plupload-2.1.2/js/plupload.full.min.js"></script>
 <script type="application/javascript" src="/static/MKOUpload.js"></script>
 <script type="text/javascript">
@@ -165,6 +174,7 @@
     var mkoUpload = null;
     var uploaderManager = new MKOUploaderManager();
     var editPanel = $('#editPanel');
+    var imagesPanel = $("#imagesPanel");
     var vm = new Vue({
         el: '#editPanel',
         data: {
@@ -189,7 +199,9 @@
                     uploaderManager.cancelAll();
                 }
             });
-
+            imagesPanel.modal({
+                closable: false
+            });
             $("#dataForm").form({
                 fields: {
                     name: 'empty',
@@ -248,6 +260,10 @@
                 console.log(xhr, type);
             }
         });
+    }
+
+    function viewImage(){
+        imagesPanel.modal('show');
     }
 
 </script>

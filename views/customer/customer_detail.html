@@ -6,6 +6,13 @@
     <a class="item active" href="/customer/detail?id=<%= data.id%>">基本信息</a>
     <a class="item" href="/customer/order?id=<%= data.id%>">订单</a>
     <div class="right menu"></div>
+    <div class="right menu">
+        <form id="queryForm" class="item">
+            <div class="ui action left icon input">
+                <button class="ui small button"><%= status[data.status] %></button>
+            </div>
+        </form>
+    </div>
 </div>
 <!--SELECT `id`, `userName`, `headURL`, `email`, `mobile`, `company`, `phone`, `createDate`, `loginTime`, `status`, `salesmanID` FROM YSGJ_Users WHERE `id` = ?';-->
 <div class="user-tabular">
