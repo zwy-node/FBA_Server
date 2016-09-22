@@ -192,9 +192,9 @@ var doEndAddress = function*(ctx, next) {
         try {
             let id = ctx.query.id;
             let startAddress = yield configInfoAction.EndAddressInfo(id);
-            ctx.body = Utils.createResponse(resCode.RES_Success, startAddress);
+            ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
         } catch (e) {
-            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'EndAddressInfo not exist!')
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, null, 'EndAddressInfo not exist!')
         }
     } else {
         let result = yield configInfoAction.endAddressList();
