@@ -91,6 +91,16 @@
                 </select>
             </div>
         </div>
+        <div class="field" v-if="panelInfo.type == 1">
+            <label>排序</label>
+            <div class="field">
+                <select class="ui fluid search dropdown" v-model="data.sort">
+                    <% for (var i = 0; i < data.datas.length; i++) { %>
+                    <option value="<%= data.datas[i].sort %>"><%= data.datas[i].sort %></option>
+                    <% } %>
+                </select>
+            </div>
+        </div>
     </form>
     <div class="content" v-if="panelInfo.type == 2">
         <p>确定删除ID为<b>{{deleteAddressID}}</b>的地址吗？</p>
@@ -182,8 +192,10 @@
                     }
                 });
             },
-            cityList: function(){
-                this.data.cityID = '';
+            cityList: function(type){
+                if(type != 1){
+                    this.data.cityID = '';
+                }
                 var self = this;
                 $.ajax({
                     type: 'GET',
@@ -201,7 +213,7 @@
     function doSubmit(){
         var panelInfo = vm.panelInfo;
         var params = vm.data;
-        console.log(params)
+        console.log(params);
 //        添加
         if(panelInfo.type == 0){
             delete params.id;
@@ -252,6 +264,7 @@
         Object.assign(newValue, blankValue);
         vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=addStartAddress"});
         vm.$set('data', newValue);
+        vm.$set('provinces', _isProvinces);
         editPanel.modal('show');
     }
 
@@ -261,10 +274,11 @@
             type: 'GET',
             url: '?action=info&id='+ id,
             success: function(data){
-                console.log(data);
                 var editingData = data.response;
                 self.$set('data', editingData);
-                self.$set('panelInfo', {title: '编辑', type: 1, action: "?action=editData"});
+                self.$set('panelInfo', {title: '编辑', type: 1, action: "?action=update"});
+                self.$set('provinces', _isProvinces);
+                self.cityList(1);
                 editPanel.modal('show');
             },error: function(xhr, type){
                 console.log(xhr, type);
