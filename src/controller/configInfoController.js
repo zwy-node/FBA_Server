@@ -155,12 +155,10 @@ var doStartAddress = function*(ctx, next) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'startAddress not exist!')
         }
     } else {
-        let type = ctx.query.type;
-        let result = yield configInfoAction.startAddressList(type);
+        let result = yield configInfoAction.startAddressList();
         for (let item of result.datas) {
             item.createDate = item.createDate.format('yyyy-MM-dd');
         }
-        console.log(result)
         yield ctx.render('configInfo/originatingAddress', {data: result});
     }
 };
@@ -174,6 +172,7 @@ var doEndAddress = function*(ctx, next) {
         ];
         let addressInfo = Utils.verifyAndFillObject(postData, rulesAddress);
         addressInfo.createDate = new Date();
+        console.log(addressInfo)
         yield configInfoAction.addEndAddress(addressInfo);
         ctx.response.redirect('/config/destinationAddress');
     } else if (ctx.query.action == 'update') {
@@ -193,17 +192,15 @@ var doEndAddress = function*(ctx, next) {
         try {
             let id = ctx.query.id;
             let startAddress = yield configInfoAction.EndAddressInfo(id);
-            ctx.body = Utils.createResponse(resCode.RES_Success, startAddress);
+            ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
         } catch (e) {
-            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'EndAddressInfo not exist!')
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, null, 'EndAddressInfo not exist!')
         }
     } else {
-        let type = ctx.query.type;
-        let result = yield configInfoAction.endAddressList(type);
+        let result = yield configInfoAction.endAddressList();
         for (let item of result.datas) {
             item.createDate = item.createDate.format('yyyy-MM-dd');
         }
-        console.log(result)
         yield ctx.render('configInfo/destinationAddress', {data: result});
     }
 };
@@ -221,7 +218,17 @@ var doSupplier = function*(ctx, next) {
         yield configInfoAction.addSupplier(supplierInfo);
         ctx.response.redirect('/config/supplier');
     } else if (ctx.query.action == 'update') {
-
+        let postData = ctx.request.body;
+        let rules = [
+            {key: 'id', type: 'number'},
+            {key: 'name'},
+            {key: 'contact'},
+            {key: 'phone'}
+        ];
+        let supplierInfo = Utils.verifyAndFillObject(postData, rules);
+        supplierInfo.createDate = new Date();
+        yield configInfoAction.addSupplier(supplierInfo);
+        ctx.response.redirect('/config/supplier');
     } else if (ctx.query.action == 'info') {
 
     } else if (ctx.query.action == 'list') {
