@@ -33,13 +33,13 @@
     <% for (var i = 0; i < data.datas.length; i++) { %>
     <tr>
         <td class="left aligned"><%= data.datas[i].id %></td>
-        <td class="center aligned"><%= data.datas[i].id %></td>
-        <td class="center aligned"><%= data.datas[i].id %></td>
-        <td class="center aligned"><%= data.datas[i].id %></td>
+        <td class="center aligned"><%= data.datas[i].country %></td>
+        <td class="center aligned"><%= data.datas[i].sort %></td>
+        <td class="center aligned"><%= data.datas[i].createDate %></td>
         <td class="center aligned">
             <div class="ui small basic icon buttons">
-                <button class="ui button"><i class="edit icon"></i></button>
-                <button class="ui button"><i class="red remove icon"></i></button>
+                <button class="ui button" onclick="editData(<%= data.datas[i].id %>); return false;"><i class="edit icon"></i></button>
+                <button class="ui button" onclick="removeData(<%= data.datas[i].id %>); return false;"><i class="red remove icon"></i></button>
             </div>
         </td>
     </tr>
@@ -69,36 +69,49 @@
     <div class="header">
         {{panelInfo.title}}
     </div>
-    <form id="dataForm" class="ui form content" method="post" :action="panelInfo.action">
+    <form id="dataForm" class="ui form content" v-if="panelInfo.type != 2">
         <input type="hidden" name="id" :value="data.id" v-if="panelInfo.type == 1">
         <div class="field">
             <label>国家</label>
             <div class="field">
-                <select class="ui fluid search dropdown" v-model="data.countryID" v-on:change="provinceList()">
+                <select class="ui fluid search dropdown" v-model="data.countryID">
                     <option value="">请选择国家</option>
                     <option v-for="item in countries" :value="item.ID">{{item.Name}}</option>
                 </select>
             </div>
         </div>
-        <div class="field">
-            <label>州</label>
+        <!--<div class="field">-->
+            <!--<label>州</label>-->
+            <!--<div class="field">-->
+                <!--<select class="ui fluid search dropdown" v-model="data.provinceID" v-on:change="cityList()">-->
+                    <!--<option value="">请选择州</option>-->
+                    <!--<option v-for="item in provinces" :value="item.ID">{{item.Name}}</option>-->
+                <!--</select>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<div class="field">-->
+            <!--<label>城市</label>-->
+            <!--<div class="field">-->
+                <!--<select class="ui fluid search dropdown" v-model="data.cityID">-->
+                    <!--<option value="">请选择城市</option>-->
+                    <!--<option v-for="item in cities" :value="item.ID">{{item.Name}}</option>-->
+                <!--</select>-->
+            <!--</div>-->
+        <!--</div>-->
+        <div class="field" v-if="panelInfo.type == 1">
+            <label>排序</label>
             <div class="field">
-                <select class="ui fluid search dropdown" v-model="data.provinceID" v-on:change="cityList()">
-                    <option value="">请选择州</option>
-                    <option v-for="item in provinces" :value="item.ID">{{item.Name}}</option>
-                </select>
-            </div>
-        </div>
-        <div class="field">
-            <label>城市</label>
-            <div class="field">
-                <select class="ui fluid search dropdown" v-model="data.cityID">
-                    <option value="">请选择城市</option>
-                    <option v-for="item in cities" :value="item.ID">{{item.Name}}</option>
+                <select class="ui fluid search dropdown" v-model="data.sort">
+                    <% for (var i = 0; i < data.datas.length; i++) { %>
+                    <option value="<%= data.datas[i].sort %>"><%= data.datas[i].sort %></option>
+                    <% } %>
                 </select>
             </div>
         </div>
     </form>
+    <div class="content" v-if="panelInfo.type == 2">
+        <p>确定删除ID为<b>{{deleteAddressID}}</b>的地址吗？</p>
+    </div>
     <div class="actions">
         <div class="ui approve positive button">保存</div>
         <div class="ui button deny">取消</div>
@@ -107,22 +120,22 @@
 <script type="text/javascript" src="/static/library/plupload-2.1.2/js/plupload.full.min.js"></script>
 <script type="application/javascript" src="/static/MKOUpload.js"></script>
 <script type="text/javascript">
-    var blankValue = {countryID: '', provinceID: '', cityID: ''};
+    var blankValue = {countryID: ''};
     var mkoUpload = null;
     var uploaderManager = new MKOUploaderManager();
     var editPanel = $('#editPanel');
+    var _isCountry = [];
+    var _isCountryUpdate = true;
     var vm = new Vue({
         el: '#editPanel',
         data: {
             panelInfo: {
                 title: '',  //标题
                 type: 0,    //类型 0: 新建模式 1: 编辑模式
-                action: "?action=addStartAddress"
+                action: "?action=addEndAddress"
             },
             data: blankValue,
             countries: [],
-            provinces: [],
-            cities: [],
             isUploading: false
         },
         ready: function(){
@@ -130,13 +143,9 @@
                 closable: false,
                 onApprove : function() {
                     doSubmit();
-                    self.provinces = [];
-                    self.cities = [];
                     return false;
                 },
                 onDeny: function(){
-                    self.provinces = [];
-                    self.cities = [];
                     editPanel.form('reset');
                     uploaderManager.cancelAll();
                 }
@@ -149,7 +158,7 @@
                     headURL: 'empty'
                 }
             });
-
+            this.countryList();
             var self = this;
             uploaderManager.newUploader({
                 button: "imgURLSelectFile",
@@ -168,55 +177,61 @@
         },
         methods: {
             countryList: function(){
+                if(!_isCountryUpdate){
+                    this.countries = _isCountry;
+                    return;
+                }
                 var self = this;
                 $.ajax({
                     type: 'GET',
                     url: '/config/address?action=country',
                     success: function(data){
                         self.countries = data.response;
-                        self.data.provinceID = '';
-                        self.data.cityID = '';
+                        _isCountryUpdate = false;
+                        _isCountry = data.response;
                     },error: function(xhr, type){
                         self.countries = [];
-                        self.data.provinceID = '';
-                        self.data.cityID = '';
-                    }
-                });
-            },
-            provinceList: function(){
-                this.data.provinceID = '';
-                this.data.cityID = '';
-                var self = this;
-                $.ajax({
-                    type: 'GET',
-                    url: '/config/address?action=province&countryID=' + self.data.countryID,
-                    success: function(data){
-                        self.provinces = data.response;
-                    },error: function(xhr, type){
-                        self.provinces = [];
-                    }
-                });
-            },
-            cityList: function(){
-                this.data.cityID = '';
-                var self = this;
-                $.ajax({
-                    type: 'GET',
-                    url: '/config/address?action=city&provinceID=' + self.data.provinceID,
-                    success: function(data){
-                        self.cities = data.response;
-                    },error: function(xhr, type){
-                        self.cities = [];
                     }
                 });
             }
+//            provinceList: function(type){
+//                if(type != 1){
+//                    this.data.provinceID = '';
+//                    this.data.cityID = '';
+//                }
+//                var self = this;
+//                $.ajax({
+//                    type: 'GET',
+//                    url: '/config/address?action=province&countryID=' + self.data.countryID,
+//                    success: function(data){
+//                        self.provinces = data.response;
+//                    },error: function(xhr, type){
+//                        self.provinces = [];
+//                    }
+//                });
+//            },
+//            cityList: function(type){
+//                if(type != 1){
+//                    this.data.cityID = '';
+//                }
+//                var self = this;
+//                $.ajax({
+//                    type: 'GET',
+//                    url: '/config/address?action=city&provinceID=' + self.data.provinceID,
+//                    success: function(data){
+//                        self.cities = data.response;
+//                    },error: function(xhr, type){
+//                        self.cities = [];
+//                    }
+//                });
+//            }
         }
     });
 
     function doSubmit(){
         var panelInfo = vm.panelInfo;
         var params = vm.data;
-        console.log(params)
+        console.log(params);
 //        添加
         if(panelInfo.type == 0){
             delete params.id;
@@ -265,20 +280,23 @@
     function newData(){
         var newValue = {};
         Object.assign(newValue, blankValue);
-        vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=addStartAddress"});
+        vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=addEndAddress"});
         vm.$set('data', newValue);
-        vm.countryList();
+        vm.$set('coutries', _isCountry);
         editPanel.modal('show');
     }
 
     function editData(id){
         $.ajax({
             type: 'GET',
-            url: 'mrmj?action=getData&id='+ id,
+            url: '?action=info&id='+ id,
             success: function(data){
-                var editingData = data.data;
+                var editingData = data.response;
                 vm.$set('data', editingData);
-                vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=editData"});
+                vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=update"});
+                vm.$set('countries', _isCountry);
+//                vm.provinceList(1);
+//                vm.cityList(1);
                 editPanel.modal('show');
             },error: function(xhr, type){
                 console.log(xhr, type);
