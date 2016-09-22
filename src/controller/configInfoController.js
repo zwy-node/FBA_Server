@@ -88,16 +88,6 @@ var doDriver = function*(ctx, next) {
     }
 };
 
-var doEndAddress = function*(ctx, next) {
-    if (ctx.query.action == 'addDestinationAddress') {
-
-    } else if (ctx.query.action == 'update') {
-
-    } else {
-        yield ctx.render('configInfo/destinationAddress', {});
-    }
-};
-
 var doGoodsType = function*(ctx, next) {
     if (ctx.query.action == 'addGoodsType') {
 
@@ -162,19 +152,28 @@ var doStartAddress = function*(ctx, next) {
 
 var doSupplier = function*(ctx, next) {
     if (ctx.query.action == 'addSupplier') {
-
+        let postData = ctx.request.body;
+        let rulesAddress = [
+            {key: 'provinceID', type: 'number'},
+            {key: 'cityID', type: 'number'},
+            {key: 'type', type: 'number'}
+        ];
+        let addressInfo = Utils.verifyAndFillObject(postData, rulesAddress);
+        //addressInfo.type = 1;
+        addressInfo.createDate = new Date();
+        yield configInfoAction.addStartAddress(addressInfo);
+        ctx.response.redirect('/config/startAddress');
     } else if (ctx.query.action == 'update') {
 
     } else if (ctx.query.action == 'update') {
         try {
             let result = yield configInfoAction.supplierList();
-            console.log(result)
-            if(result) {
+            if (result) {
                 ctx.body = Utils.createResponse(resCode.RES_Success, null, result);
             } else {
                 ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'country not found!');
             }
-        } catch(e) {
+        } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_BusinessError, e);
         }
     } else {
@@ -187,48 +186,48 @@ var doAddress = function*(ctx, next) {
     if (ctx.query.action == 'country') {
         try {
             let countryData = yield configInfoAction.countryList();
-            if(countryData) {
+            if (countryData) {
                 ctx.body = Utils.createResponse(resCode.RES_Success, null, countryData);
             } else {
                 ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'country not found!');
             }
-        } catch(e) {
+        } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_BusinessError, e);
         }
     } else if (ctx.query.action == 'province') {
         try {
             let countryID = ctx.query.countryID || 100000;
             let provinceData = yield configInfoAction.provinceList(countryID);
-            if(provinceData) {
+            if (provinceData) {
                 ctx.body = Utils.createResponse(resCode.RES_Success, null, provinceData);
             } else {
                 ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'country not found!');
             }
-        } catch(e) {
+        } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_BusinessError, e);
         }
     } else if (ctx.query.action == 'city') {
         try {
             let provinceID = ctx.query.provinceID;
             let cityData = yield configInfoAction.cityList(provinceID);
-            if(cityData) {
+            if (cityData) {
                 ctx.body = Utils.createResponse(resCode.RES_Success, null, cityData);
             } else {
                 ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'city not found!');
             }
-        } catch(e) {
+        } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_BusinessError, e);
         }
     } else if (ctx.query.action == 'town') {
         try {
             let cityID = ctx.query.cityID;
             let townData = yield configInfoAction.townList(cityID);
-            if(townData) {
+            if (townData) {
                 ctx.body = Utils.createResponse(resCode.RES_Success, null, townData);
             } else {
                 ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'town not found!');
             }
-        } catch(e) {
+        } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_BusinessError, e);
         }
     } else {
@@ -245,7 +244,7 @@ var doAddress = function*(ctx, next) {
         //    ctx.body = Utils.createResponse(resCode.RES_BusinessError, e);
         //}
 
-       // yield ctx.render('configInfo/localWarehouse', {});
+        // yield ctx.render('configInfo/localWarehouse', {});
     }
 };
 
@@ -261,7 +260,7 @@ module.exports = co.wrap(function*(ctx, next) {
     } else if (ctx.params.type == 'driver') {
         yield doDriver(ctx, next);
     } else if (ctx.params.type == 'endAddress') {
-        yield doEndAddress(ctx, next);
+        yield doStartAddress(ctx, next);
     } else if (ctx.params.type == 'goodsType') {
         yield doGoodsType(ctx, next);
     } else if (ctx.params.type == 'localCosts') {
