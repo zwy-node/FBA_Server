@@ -41,7 +41,7 @@
         <td class="center aligned">
             <div class="ui small basic icon buttons">
                 <button class="ui button"><i class="edit icon"></i></button>
-                <button class="ui button"><i class="red remove icon"></i></button>
+                <button class="ui button" onclick="removeData(<%= data.datas[i].id %>); return false;"><i class="red remove icon"></i></button>
             </div>
         </td>
     </tr>
@@ -71,7 +71,7 @@
     <div class="header">
         {{panelInfo.title}}
     </div>
-    <form id="dataForm" class="ui form content">
+    <form id="dataForm" class="ui form content" v-if="panelInfo.type != 2">
         <input type="hidden" name="id" :value="data.id" v-if="panelInfo.type == 1">
         <div class="field">
             <label>省份</label>
@@ -91,10 +91,12 @@
                 </select>
             </div>
         </div>
-
     </form>
+    <div class="content" v-if="panelInfo.type == 2">
+        <p>确定删除ID为<b>{{deleteAddressID}}</b>的地址吗？</p>
+    </div>
     <div class="actions">
-        <div class="ui approve positive button">保存</div>
+        <div class="ui approve positive button">确认</div>
         <div class="ui button deny">取消</div>
     </div>
 </div>
@@ -116,6 +118,7 @@
             data: blankValue,
             provinces: [],
             cities: [],
+            deleteAddressID: '',
             isUploading: false
         },
         ready: function(){
@@ -142,15 +145,7 @@
                     headURL: 'empty'
                 }
             });
-            $.ajax({
-                type: 'GET',
-                url: '/config/address?action=province',
-                success: function(data){
-                    self.provinces = data.response;
-                },error: function(xhr, type){
-                    self.provinces = [];
-                }
-            });
+
             uploaderManager.newUploader({
                 button: "imgURLSelectFile",
                 container: "imgURLContainer",
@@ -183,10 +178,24 @@
         }
     });
 
+//    获取省份列表
+    function getprovince(){
+        $.ajax({
+            type: 'GET',
+            url: '/config/address?action=province',
+            success: function(data){
+                vm.$set('provinces', data.response);
+            },error: function(xhr, type){
+                vm.$set('provinces', []);
+            }
+        });
+    }
+
     function doSubmit(){
         var panelInfo = vm.panelInfo;
         var params = vm.data;
         console.log(params)
+//        添加
         if(panelInfo.type == 0){
             delete params.id;
             params.type = 1;  //起运地址类型 1
@@ -205,6 +214,7 @@
                     console.log(xhr, type);
                 }
             });
+//            编辑
         }else if(vm.panelInfo.type == 1){
             $.ajax({
                 type: 'POST',
@@ -216,10 +226,22 @@
                     console.log(xhr, type);
                 }
             });
+//            删除
+        }else if(vm.panelInfo.type == 2){
+            $.ajax({
+                type: 'GET',
+                url: panelInfo.action + '&id=' + vm.deleteAddressID,
+                success: function(data){
+                    window.location.reload();
+                },error: function(xhr, type){
+                    console.log(xhr, type);
+                }
+            });
         }
     }
 
     function newData(){
+        getprovince();
         var newValue = {};
         Object.assign(newValue, blankValue);
         vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=addStartAddress"});
@@ -228,6 +250,7 @@
     }
 
     function editData(id){
+        getprovince();
         $.ajax({
             type: 'GET',
             url: 'mrmj?action=getData&id='+ id,
@@ -240,6 +263,14 @@
                 console.log(xhr, type);
             }
         });
+    }
+
+    function removeData(id){
+        var newValue = {};
+        Object.assign(newValue, blankValue);
+        vm.$set('panelInfo', {title: '删除', type: 2, action: "?action=deletedStartAddress"});
+        vm.$set('deleteAddressID', id);
+        editPanel.modal('show');
     }
 
 </script>
