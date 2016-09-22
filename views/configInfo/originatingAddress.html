@@ -40,7 +40,7 @@
         <td class="center aligned"><%= data.datas[i].createDate %></td>
         <td class="center aligned">
             <div class="ui small basic icon buttons">
-                <button class="ui button" onclick="editData(); return false;"><i class="edit icon"></i></button>
+                <button class="ui button" onclick="editData(<%= data.datas[i].id %>); return false;"><i class="edit icon"></i></button>
                 <button class="ui button" onclick="removeData(<%= data.datas[i].id %>); return false;"><i class="red remove icon"></i></button>
             </div>
         </td>
@@ -76,7 +76,7 @@
         <div class="field">
             <label>省份</label>
             <div class="field">
-                <select class="ui fluid search dropdown" v-model="data.provinceID" v-on:change="getProvinceID()">
+                <select class="ui fluid search dropdown" v-model="data.provinceID" v-on:change="cityList()">
                     <option value="">请选择省份</option>
                     <option v-for="item in provinces" :value="item.ID">{{item.Name}}</option>
                 </select>
@@ -107,6 +107,8 @@
     var mkoUpload = null;
     var uploaderManager = new MKOUploaderManager();
     var editPanel = $('#editPanel');
+    var _isProvinces = [];
+    var _isProvinceUpdate = true;
     var vm = new Vue({
         el: '#editPanel',
         data: {
@@ -145,7 +147,7 @@
                     headURL: 'empty'
                 }
             });
-
+            this.provinceList();
             uploaderManager.newUploader({
                 button: "imgURLSelectFile",
                 container: "imgURLContainer",
@@ -162,7 +164,25 @@
             });
         },
         methods: {
-            getProvinceID: function(){
+            provinceList: function(){
+                if(!_isProvinceUpdate) {
+                    this.provinces = _isProvinces;
+                    return;
+                }
+                var self = this;
+                $.ajax({
+                    type: 'GET',
+                    url: '/config/address?action=province' ,
+                    success: function(data){
+                        self.provinces = data.response;
+                        _isProvinceUpdate = false;
+                        _isProvinces = data.response;
+                    },error: function(xhr, type){
+                        self.provinces = [];
+                    }
+                });
+            },
+            cityList: function(){
                 this.data.cityID = '';
                 var self = this;
                 $.ajax({
@@ -177,19 +197,6 @@
             }
         }
     });
-
-//    获取省份列表
-    function getprovince(){
-        $.ajax({
-            type: 'GET',
-            url: '/config/address?action=province',
-            success: function(data){
-                vm.$set('provinces', data.response);
-            },error: function(xhr, type){
-                vm.$set('provinces', []);
-            }
-        });
-    }
 
     function doSubmit(){
         var panelInfo = vm.panelInfo;
@@ -241,7 +248,6 @@
     }
 
     function newData(){
-        getprovince();
         var newValue = {};
         Object.assign(newValue, blankValue);
         vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=addStartAddress"});
@@ -250,14 +256,15 @@
     }
 
     function editData(id){
-        getprovince();
+        var self = vm;
         $.ajax({
             type: 'GET',
-            url: 'mrmj?action=getData&id='+ id,
+            url: '?action=info&id='+ id,
             success: function(data){
-                var editingData = data.data;
-                vm.$set('data', editingData);
-                vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=editData"});
+                console.log(data);
+                var editingData = data.response;
+                self.$set('data', editingData);
+                self.$set('panelInfo', {title: '编辑', type: 1, action: "?action=editData"});
                 editPanel.modal('show');
             },error: function(xhr, type){
                 console.log(xhr, type);
