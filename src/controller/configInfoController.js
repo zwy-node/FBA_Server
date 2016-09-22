@@ -136,12 +136,14 @@ var doStartAddress = function*(ctx, next) {
         let rulesAddress = [
             {key: 'id', type: 'number'},
             {key: 'provinceID', type: 'number'},
-            {key: 'cityID', type: 'number'}
+            {key: 'cityID', type: 'number'},
+            {key: 'sort', type: 'number'}
         ];
         let addressInfo = Utils.verifyAndFillObject(postData, rulesAddress);
         let id = addressInfo.id;
         delete addressInfo.id;
-        yield configInfoAction.updateAddress(id, addressInfo);
+        console.log(addressInfo)
+        yield configInfoAction.updateStartEndAddress(id, addressInfo);
         ctx.response.redirect('/config/originatingAddress');
     } else {
         let type = ctx.query.type;
@@ -149,6 +151,7 @@ var doStartAddress = function*(ctx, next) {
         for (let item of result.datas) {
             item.createDate = item.createDate.format('yyyy-MM-dd');
         }
+        console.log(result)
         yield ctx.render('configInfo/originatingAddress', {data: result});
     }
 };

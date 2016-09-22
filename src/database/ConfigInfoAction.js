@@ -10,7 +10,12 @@ class ConfigInfoAction extends MKODBAction {
         super();
     }
 
+
+    /*
+     FBA 仓库模块
+     */
     *addAddress(address) {
+        address.type = 3;
         let dbConnection = yield this.getDBConnection();
         let insertSQL = 'INSERT INTO YSGJ_Address SET ?';
         let addressID = yield this.execSQL(insertSQL, [address], dbConnection);
@@ -57,6 +62,9 @@ class ConfigInfoAction extends MKODBAction {
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
     }
 
+    /*
+     地址列表模块, 国家列表, 省/州列表, 市列表, 区/镇/县列表
+     */
     *countryList() {
         let dbConnection = yield this.getDBConnection();
         let querySQL = 'SELECT `ID`, `Name` FROM areas WHERE ParentId = 0;';
@@ -89,28 +97,28 @@ class ConfigInfoAction extends MKODBAction {
         return result;
     }
 
-    *supplierList() {
-        let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT * FROM YSGJ_Supplier';
-        let result = yield this.execSQL(querySQL, [], dbConnection);
-        dbConnection.release();
-        return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
-    };
 
+    /*
+        起运地 与 目的地 模块
+     */
     *addStartEndAddress(address) {
-        console.log('addset')
-        console.log(address)
         let dbConnection = yield this.getDBConnection();
-        let insertSQL = 'INSERT INTO YSGJ_Address SET ?';
-        let addressID = yield this.execSQL(insertSQL, [address], dbConnection);
-        console.log(addressID)
-        return addressID.insertId;
+        let querySQL = 'SELECT * FROM YSGJ_Address WHERE type = ? AND provinceID = ? AND cityID = ?';
+        let startEndAddress = yield this.execSQL(querySQL, [address.type, address.provinceID, address.cityID], dbConnection);
+        if(startEndAddress.length > 0) {
+            return null;
+        } else {
+            let insertSQL = 'INSERT INTO YSGJ_Address SET ?';
+            let addressID = yield this.execSQL(insertSQL, [address], dbConnection);
+            return addressID.insertId;
+        }
     }
 
     *addStartAddress(address) {
-        console.log(address)
         let addressID = yield this.addStartEndAddress(address);
-        console.log(addressID)
+        if(addressID == null) {
+            return null;
+        }
         let dbConnection = yield this.getDBConnection();
         let querySQL = 'SELECT MAX(sort) as value FROM YSGJ_RouteAddress WHERE type = ?';
         let max = yield this.execSQL(querySQL, [address.type], dbConnection);
@@ -134,30 +142,43 @@ class ConfigInfoAction extends MKODBAction {
         return result.insertId;
     }
 
-    *updateAddress(id, opt) {
-        console.log(opt);
+    *updateStartEndAddress(id, opt) {
         let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT * FROM YSGJ_RouteAddress WHERE id = ?';
+        let startEndAddress = yield this.execSQL(querySQL, [id], dbConnection);
+        let addressInfo = startEndAddress[0];
+        if(opt.sort && opt.sort > 0 && addressInfo.sort != opt.sort) {
+            let updateSQL = 'UPDATE YSGJ_RouteAddress set sort = ? WHERE `sort` = ?';
+            yield this.execSQL(updateSQL, [addressInfo.sort, opt.sort], dbConnection);
+            updateSQL = 'UPDATE YSGJ_RouteAddress set sort = ? WHERE `id` = ?';
+            yield this.execSQL(updateSQL, [opt.sort, id], dbConnection);
+        }
+        delete opt.sort;
         let insertSQL = 'UPDATE YSGJ_Address SET ? WHERE `id` = ?';
-        let result = yield this.execSQL(insertSQL, [opt, id], dbConnection);
+        let result = yield this.execSQL(insertSQL, [opt, addressInfo.addressID], dbConnection);
         dbConnection.release();
         return result.insertId;
     }
 
     *startEndAddressList(type) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT a.*, b.countryID, c.`Name` as province, d.`Name` as city FROM YSGJ_RouteAddress a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.provinceID = c.ID INNER JOIN areas d ON b.cityID = d.ID WHERE a.type = ?';
+        let querySQL = 'SELECT a.*, b.countryID, c.`Name` as province, d.`Name` as city FROM YSGJ_RouteAddress a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.provinceID = c.ID INNER JOIN areas d ON b.cityID = d.ID WHERE a.type = ? ORDER BY sort';
         let result = yield this.execSQL(querySQL, [type], dbConnection);
         dbConnection.release();
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
     }
 
-    //*addressList(param) {
-    //    let dbConnection = yield this.getDBConnection();
-    //    let querySQL = 'SELECT `ID`, `Name`, `MergerName` FROM areas WHERE ID = ?';
-    //    let result = yield this.execSQL(querySQL, [param], dbConnection);
-    //    dbConnection.release();
-    //    return result;
-    //}
+
+    /*
+     商家模块
+     */
+    *supplierList() {
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT * FROM YSGJ_Supplier';
+        let result = yield this.execSQL(querySQL, [], dbConnection);
+        dbConnection.release();
+        return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
+    };
 }
 
 module.exports = ConfigInfoAction;
