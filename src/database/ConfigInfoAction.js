@@ -162,7 +162,7 @@ class ConfigInfoAction extends MKODBAction {
 
     *startAddressInfo(id) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT a.*, b.provinceID, c.cityID, c.`Name` as province, d.`Name` as city FROM YSGJ_RouteAddress a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.provinceID = c.ID INNER JOIN areas d ON b.cityID = d.ID WHERE a.type = 1 AND a.id = ?';
+        let querySQL = 'SELECT a.*, b.provinceID, b.cityID, c.`Name` as province, d.`Name` as city FROM YSGJ_RouteAddress a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.provinceID = c.ID INNER JOIN areas d ON b.cityID = d.ID WHERE a.type = 1 AND a.id = ?';
         let startAddressInfo = yield this.execSQL(querySQL, [id], dbConnection);
         dbConnection.release();
         return startAddressInfo[0];

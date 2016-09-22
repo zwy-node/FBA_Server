@@ -147,6 +147,7 @@ var doStartAddress = function*(ctx, next) {
         ctx.response.redirect('/config/originatingAddress');
     } else if (ctx.query.action == 'info') {
         try {
+            console.log('asdfasdfsadfafd')
             let id = ctx.query.id;
             let startAddress = yield configInfoAction.startAddressInfo(id);
             ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
