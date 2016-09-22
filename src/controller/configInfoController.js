@@ -130,7 +130,7 @@ var doStartAddress = function*(ctx, next) {
         //addressInfo.type = 1;
         addressInfo.createDate = new Date();
         yield configInfoAction.addStartAddress(addressInfo);
-        ctx.response.redirect('/config/startAddress');
+        ctx.response.redirect('/config/originatingAddress');
     } else if (ctx.query.action == 'update') {
         let postData = ctx.request.body;
         let rulesAddress = [
@@ -142,11 +142,14 @@ var doStartAddress = function*(ctx, next) {
         let id = addressInfo.id;
         delete addressInfo.id;
         yield configInfoAction.updateAddress(id, addressInfo);
-        ctx.response.redirect('/config/startAddress');
+        ctx.response.redirect('/config/originatingAddress');
     } else {
         let type = ctx.query.type;
         let result = yield configInfoAction.startEndAddressList(type);
-        yield ctx.render('/configInfo/originatingAddress', {data: result});
+        for (let item of result.datas) {
+            item.createDate = item.createDate.format('yyyy-MM-dd');
+        }
+        yield ctx.render('configInfo/originatingAddress', {data: result});
     }
 };
 
@@ -259,7 +262,7 @@ module.exports = co.wrap(function*(ctx, next) {
         yield doExpress(ctx, next);
     } else if (ctx.params.type == 'driver') {
         yield doDriver(ctx, next);
-    } else if (ctx.params.type == 'endAddress') {
+    } else if (ctx.params.type == 'destinationAddress') {
         yield doStartAddress(ctx, next);
     } else if (ctx.params.type == 'goodsType') {
         yield doGoodsType(ctx, next);
@@ -267,7 +270,7 @@ module.exports = co.wrap(function*(ctx, next) {
         yield doLocalCosts(ctx, next);
     } else if (ctx.params.type == 'localWarehouse') {
         yield doLocalWarehouse(ctx, next);
-    } else if (ctx.params.type == 'startAddress') {
+    } else if (ctx.params.type == 'originatingAddress') {
         yield doStartAddress(ctx, next);
     } else if (ctx.params.type == 'supplier') {
         yield doSupplier(ctx, next);

@@ -112,8 +112,8 @@ class ConfigInfoAction extends MKODBAction {
         let addressID = yield this.addStartEndAddress(address);
         console.log(addressID)
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT MAX(sort) as value FROM YSGJ_RouteAddress WHERE type = 1';
-        let max = yield this.execSQL(querySQL, [], dbConnection);
+        let querySQL = 'SELECT MAX(sort) as value FROM YSGJ_RouteAddress WHERE type = ?';
+        let max = yield this.execSQL(querySQL, [address.type], dbConnection);
 
         let maxValue = max[0].value;
         console.log(maxValue)
