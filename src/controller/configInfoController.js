@@ -139,11 +139,11 @@ var doStartAddress = function*(ctx, next) {
         addressInfo.type = 1;
         addressInfo.createDate = new Date();
         yield configInfoAction.addStartAddress(addressInfo);
-        ctx.response.redirect('/config/startAddress');
+        ctx.response.redirect('/config/originatingAddress');
     } else if (ctx.query.action == 'update') {
 
     } else {
-        yield ctx.render('/configInfo/originatingAddress', {});
+        yield ctx.render('configInfo/originatingAddress', {});
     }
 };
 
@@ -247,7 +247,7 @@ module.exports = co.wrap(function*(ctx, next) {
         yield doExpress(ctx, next);
     } else if (ctx.params.type == 'driver') {
         yield doDriver(ctx, next);
-    } else if (ctx.params.type == 'endAddress') {
+    } else if (ctx.params.type == 'destinationAddress') {
         yield doEndAddress(ctx, next);
     } else if (ctx.params.type == 'goodsType') {
         yield doGoodsType(ctx, next);
@@ -255,7 +255,7 @@ module.exports = co.wrap(function*(ctx, next) {
         yield doLocalCosts(ctx, next);
     } else if (ctx.params.type == 'localWarehouse') {
         yield doLocalWarehouse(ctx, next);
-    } else if (ctx.params.type == 'startAddress') {
+    } else if (ctx.params.type == 'originatingAddress') {
         yield doStartAddress(ctx, next);
     } else if (ctx.params.type == 'supplier') {
         yield doSupplier(ctx, next);

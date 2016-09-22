@@ -66,23 +66,23 @@
     <div class="header">
         {{panelInfo.title}}
     </div>
-    <form id="dataForm" class="ui form content" method="post" :action="panelInfo.action">
-        <input type="hidden" name="id" :value="data.id">
+    <form id="dataForm" class="ui form content">
+        <input type="hidden" name="id" :value="data.id" v-if="panelInfo.type == 1">
         <div class="field">
             <label>省份</label>
             <div class="field">
-                <select class="ui fluid search dropdown" name="status">
-                    <option value="0">双清专线</option>
-                    <option value="1">快递</option>
+                <select class="ui fluid search dropdown" v-model="data.provinceID" v-on:change="getProvinceID()">
+                    <option value="">请选择省份</option>
+                    <option v-for="item in provinces" :value="item.ID">{{item.Name}}</option>
                 </select>
             </div>
         </div>
         <div class="field">
             <label>城市</label>
             <div class="field">
-                <select class="ui fluid search dropdown" name="status">
-                    <option value="0">双清专线</option>
-                    <option value="1">快递</option>
+                <select class="ui fluid search dropdown" v-model="data.cityID">
+                    <option value="">请选择城市</option>
+                    <option v-for="item in cities" :value="item.ID">{{item.Name}}</option>
                 </select>
             </div>
         </div>
@@ -96,7 +96,7 @@
 <script type="text/javascript" src="/static/library/plupload-2.1.2/js/plupload.full.min.js"></script>
 <script type="application/javascript" src="/static/MKOUpload.js"></script>
 <script type="text/javascript">
-    var blankValue = {name: '', key: '', desc: '', status: 0, headURL: ''};
+    var blankValue = {id: '', provinceID: '', cityID: '', type: ''};
     var mkoUpload = null;
     var uploaderManager = new MKOUploaderManager();
     var editPanel = $('#editPanel');
@@ -106,25 +106,29 @@
             panelInfo: {
                 title: '',  //标题
                 type: 0,    //类型 0: 新建模式 1: 编辑模式
-                action: "?action=newData"
+                action: "?action=addStartAddress"
             },
             data: blankValue,
-            costs: [],
+            provinces: [],
             isUploading: false
         },
         ready: function(){
+            var self = this;
             editPanel.modal({
                 closable: false,
                 onApprove : function() {
-                    $('.ui.form').submit();
+                    doSubmit();
+                    self.provinces = [];
+                    self.cities = [];
                     return false;
                 },
                 onDeny: function(){
+                    self.provinces = [];
+                    self.cities = [];
                     editPanel.form('reset');
                     uploaderManager.cancelAll();
                 }
             });
-            $('.ui.radio.checkbox').checkbox();
             $("#dataForm").form({
                 fields: {
                     name: 'empty',
@@ -132,8 +136,15 @@
                     headURL: 'empty'
                 }
             });
-
-            var self = this;
+            $.ajax({
+                type: 'GET',
+                url: '/config/address?action=province',
+                success: function(data){
+                    self.provinces = data.response;
+                },error: function(xhr, type){
+                    self.provinces = [];
+                }
+            });
             uploaderManager.newUploader({
                 button: "imgURLSelectFile",
                 container: "imgURLContainer",
@@ -150,22 +161,61 @@
             });
         },
         methods: {
-            addCost: function(cost){
-                if (!cost){
-                    cost = {min: '', max: '', price: ''};
-                }
-                this.costs.push(cost);
-            },
-            deleteCost: function(index){
-                this.costs.splice(index, 1);
+            getProvinceID: function(){
+                this.data.cityID = '';
+                var self = this;
+                $.ajax({
+                    type: 'GET',
+                    url: '/config/address?action=city&provinceID=' + self.data.provinceID,
+                    success: function(data){
+                        self.cities = data.response;
+                    },error: function(xhr, type){
+                        self.cities = [];
+                    }
+                });
             }
         }
     });
 
+    function doSubmit(){
+        var panelInfo = vm.panelInfo;
+        var params = vm.data;
+        console.log(params)
+        if(panelInfo.type == 0){
+            delete params.id;
+            for(var key in params){
+                if(params[key] == null || params[key] == ''){
+                    return false;
+                }
+            }
+            $.ajax({
+                type: 'POST',
+                data: params,
+                url: panelInfo.action,
+                success: function(data){
+                    window.location.reload();
+                },error: function(xhr, type){
+                    console.log(xhr, type);
+                }
+            });
+        }else if(vm.panelInfo.type == 1){
+            $.ajax({
+                type: 'POST',
+                data: params,
+                url: panelInfo.action,
+                success: function(data){
+                    window.location.reload();
+                },error: function(xhr, type){
+                    console.log(xhr, type);
+                }
+            });
+        }
+    }
+
     function newData(){
         var newValue = {};
         Object.assign(newValue, blankValue);
-        vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=newData"});
+        vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=addStartAddress"});
         vm.$set('data', newValue);
         editPanel.modal('show');
     }

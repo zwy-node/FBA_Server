@@ -166,17 +166,11 @@
                     doSubmit();
                     self.provinces = [];
                     self.cities = [];
-                    self.countryID =  '';
-                    self.provinceID = '';
-                    self.cityID = '';
                     return false;
                 },
                 onDeny: function(){
                     self.provinces = [];
                     self.cities = [];
-                    self.countryID = '';
-                    self.provinceID = '';
-                    self.cityID = '';
                     editPanel.form('reset');
                     uploaderManager.cancelAll();
                 }
