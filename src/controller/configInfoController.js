@@ -151,7 +151,7 @@ var doStartAddress = function*(ctx, next) {
             let startAddress = yield configInfoAction.startAddressInfo(id);
             ctx.body = Utils.createResponse(resCode.RES_Success, startAddress);
         } catch (e) {
-            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'customer not exist!')
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'startAddress not exist!')
         }
     } else {
         let type = ctx.query.type;
@@ -194,7 +194,7 @@ var doEndAddress = function*(ctx, next) {
             let startAddress = yield configInfoAction.EndAddressInfo(id);
             ctx.body = Utils.createResponse(resCode.RES_Success, startAddress);
         } catch (e) {
-            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'customer not exist!')
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'EndAddressInfo not exist!')
         }
     } else {
         let type = ctx.query.type;
