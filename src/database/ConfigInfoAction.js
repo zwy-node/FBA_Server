@@ -183,32 +183,35 @@ class ConfigInfoAction extends MKODBAction {
         let startEndAddress = yield this.execSQL(querySQL, [address.countryID], dbConnection);
         if (startEndAddress.length > 0) {
             return null;
-        }
-
-        let insertSQL = 'INSERT INTO YSGJ_Address SET ?';
-        let addressID = yield this.execSQL(insertSQL, [address], dbConnection);
-
-        querySQL = 'SELECT MAX(sort) as value FROM YSGJ_RouteAddress WHERE type = ?';
-        let max = yield this.execSQL(querySQL, [address.type], dbConnection);
-        let maxValue = max[0].value;
-        if (maxValue) {
-            maxValue = maxValue + 1;
         } else {
-            maxValue = 1;
-        }
+            let insertSQL = 'INSERT INTO YSGJ_Address SET ?';
+            let addressID = yield this.execSQL(insertSQL, [address], dbConnection);
 
-        let opt = {
-            addressID: addressID.insertId,
-            sort: maxValue,
-            createDate: new Date()
-        };
-        insertSQL = 'INSERT INTO YSGJ_RouteAddress SET ?';
-        let result = yield this.execSQL(insertSQL, [opt], dbConnection);
-        dbConnection.release();
-        return result.insertId;
+            querySQL = 'SELECT MAX(sort) as value FROM YSGJ_RouteAddress WHERE type = ?';
+            let max = yield this.execSQL(querySQL, [address.type], dbConnection);
+            let maxValue = max[0].value;
+            if (maxValue) {
+                maxValue = maxValue + 1;
+            } else {
+                maxValue = 1;
+            }
+
+            let opt = {
+                addressID: addressID.insertId,
+                sort: maxValue,
+                createDate: new Date(),
+                type: address.type
+            };
+            insertSQL = 'INSERT INTO YSGJ_RouteAddress SET ?';
+            let result = yield this.execSQL(insertSQL, [opt], dbConnection);
+            dbConnection.release();
+            return result.insertId;
+        }
     }
 
     *updateEndAddress(id, opt) {
+        console.log(id)
+        console.log(opt)
         let dbConnection = yield this.getDBConnection();
         let querySQL = 'SELECT * FROM YSGJ_RouteAddress WHERE id = ?';
         let startEndAddress = yield this.execSQL(querySQL, [id], dbConnection);
@@ -236,7 +239,7 @@ class ConfigInfoAction extends MKODBAction {
 
     *endAddressList(type) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT a.*, b.countryID, c.Name as country FROM YSGJ_RouteAddress a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.countryID = c.ID WHERE a.type = ? ORDER BY sort;';
+        let querySQL = 'SELECT a.*, b.countryID, c.Name as country FROM YSGJ_RouteAddress a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.countryID = c.ID WHERE a.type = 2 ORDER BY sort;';
         let result = yield this.execSQL(querySQL, [type], dbConnection);
         dbConnection.release();
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
@@ -245,19 +248,26 @@ class ConfigInfoAction extends MKODBAction {
     /*
      商家模块
      */
-    *addSupplier(Supplier) {
+    *addSupplier(supplier) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT * FROM YSGJ_Address WHERE type = ? AND provinceID = ? AND cityID = ?';
-        let startEndAddress = yield this.execSQL(querySQL, [address.type, address.provinceID, address.cityID], dbConnection);
-        if (startEndAddress.length > 0) {
+        let querySQL = 'SELECT * FROM YSGJ_Supplier WHERE name = ? AND contact = ?';
+        let findSupplier = yield this.execSQL(querySQL, [supplier.name, supplier.contact], dbConnection);
+        if (findSupplier.length > 0) {
             return null;
         } else {
-            let insertSQL = 'INSERT INTO YSGJ_Address SET ?';
-            let addressID = yield this.execSQL(insertSQL, [address], dbConnection);
+            let insertSQL = 'INSERT INTO YSGJ_Supplier SET ?';
+            let addressID = yield this.execSQL(insertSQL, [supplier], dbConnection);
             return addressID.insertId;
         }
     }
 
+    *UpdateSupplier(supplier) {
+        let dbConnection = yield this.getDBConnection();
+        let updateSQL = 'UPDATE YSGJ_Users SET ? WHERE `id` = ?';
+        let result = yield this.execSQL(updateSQL, [data, id], dbConnection);
+        dbConnection.release();
+        return result;
+    }
 
     *supplierList() {
         let dbConnection = yield this.getDBConnection();
