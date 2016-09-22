@@ -156,6 +156,9 @@ var doStartAddress = function*(ctx, next) {
     } else {
         let type = ctx.query.type;
         let result = yield configInfoAction.startEndAddressList(type);
+        for (let item of result.datas) {
+            item.createDate = item.createDate.format('yyyy-MM-dd');
+        }
         yield ctx.render('configInfo/originatingAddress', {data: result});
     }
 };
