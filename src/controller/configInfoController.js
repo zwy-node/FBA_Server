@@ -149,7 +149,7 @@ var doStartAddress = function*(ctx, next) {
         try {
             let id = ctx.query.id;
             let startAddress = yield configInfoAction.startAddressInfo(id);
-            ctx.body = Utils.createResponse(resCode.RES_Success, startAddress);
+            ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'customer not exist!')
         }
