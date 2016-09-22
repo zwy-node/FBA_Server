@@ -168,10 +168,10 @@ class ConfigInfoAction extends MKODBAction {
         return startAddressInfo[0];
     }
 
-    *startAddressList(type) {
+    *startAddressList() {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT a.*, c.`Name` as province, d.`Name` as city FROM YSGJ_RouteAddress a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.provinceID = c.ID INNER JOIN areas d ON b.cityID = d.ID WHERE a.type = ? ORDER BY sort';
-        let result = yield this.execSQL(querySQL, [type], dbConnection);
+        let querySQL = 'SELECT a.*, c.`Name` as province, d.`Name` as city FROM YSGJ_RouteAddress a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.provinceID = c.ID INNER JOIN areas d ON b.cityID = d.ID WHERE a.type = 1 ORDER BY sort';
+        let result = yield this.execSQL(querySQL, [], dbConnection);
         dbConnection.release();
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
     }
@@ -210,12 +210,16 @@ class ConfigInfoAction extends MKODBAction {
     }
 
     *updateEndAddress(id, opt) {
-        console.log(id)
-        console.log(opt)
         let dbConnection = yield this.getDBConnection();
         let querySQL = 'SELECT * FROM YSGJ_RouteAddress WHERE id = ?';
         let startEndAddress = yield this.execSQL(querySQL, [id], dbConnection);
         let addressInfo = startEndAddress[0];
+        querySQL = 'SELECT * FROM YSGJ_Address WHERE countryID = ? AND type = 2';
+        let isExist = yield this.execSQL(querySQL, [opt.countryID], dbConnection);
+        if(isExist.length > 0) {
+            return null;
+        }
+
         if (opt.sort && opt.sort > 0 && addressInfo.sort != opt.sort) {
             let updateSQL = 'UPDATE YSGJ_RouteAddress set sort = ? WHERE `sort` = ? AND type = 2';
             yield this.execSQL(updateSQL, [addressInfo.sort, opt.sort], dbConnection);
@@ -240,7 +244,7 @@ class ConfigInfoAction extends MKODBAction {
     *endAddressList(type) {
         let dbConnection = yield this.getDBConnection();
         let querySQL = 'SELECT a.*, b.countryID, c.Name as country FROM YSGJ_RouteAddress a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.countryID = c.ID WHERE a.type = 2 ORDER BY sort;';
-        let result = yield this.execSQL(querySQL, [type], dbConnection);
+        let result = yield this.execSQL(querySQL, [], dbConnection);
         dbConnection.release();
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
     }
