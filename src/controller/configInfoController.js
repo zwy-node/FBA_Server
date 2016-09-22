@@ -222,7 +222,9 @@ var doSupplier = function*(ctx, next) {
         ctx.response.redirect('/config/startAddress');
     } else if (ctx.query.action == 'update') {
 
-    } else if (ctx.query.action == 'update') {
+    } else if (ctx.query.action == 'info') {
+
+    } else if (ctx.query.action == 'list') {
         try {
             let result = yield configInfoAction.supplierList();
             ctx.body = Utils.createResponse(resCode.RES_Success, null, result);
