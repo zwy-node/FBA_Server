@@ -153,6 +153,13 @@ class ConfigInfoAction extends MKODBAction {
             updateSQL = 'UPDATE YSGJ_RouteAddress set sort = ? WHERE `id` = ?';
             yield this.execSQL(updateSQL, [opt.sort, id], dbConnection);
         }
+
+        querySQL = 'SELECT * FROM YSGJ_Address WHERE type = 1 AND provinceID = ? AND cityID = ?';
+        let isExist = yield this.execSQL(querySQL, [opt.provinceID, opt.cityID], dbConnection);
+        if(isExist.length > 0) {
+            return null;
+        }
+
         delete opt.sort;
         let insertSQL = 'UPDATE YSGJ_Address SET ? WHERE `id` = ?';
         let result = yield this.execSQL(insertSQL, [opt, addressInfo.addressID], dbConnection);
@@ -214,17 +221,17 @@ class ConfigInfoAction extends MKODBAction {
         let querySQL = 'SELECT * FROM YSGJ_RouteAddress WHERE id = ?';
         let startEndAddress = yield this.execSQL(querySQL, [id], dbConnection);
         let addressInfo = startEndAddress[0];
-        querySQL = 'SELECT * FROM YSGJ_Address WHERE countryID = ? AND type = 2';
-        let isExist = yield this.execSQL(querySQL, [opt.countryID], dbConnection);
-        if(isExist.length > 0) {
-            return null;
-        }
-
         if (opt.sort && opt.sort > 0 && addressInfo.sort != opt.sort) {
             let updateSQL = 'UPDATE YSGJ_RouteAddress set sort = ? WHERE `sort` = ? AND type = 2';
             yield this.execSQL(updateSQL, [addressInfo.sort, opt.sort], dbConnection);
             updateSQL = 'UPDATE YSGJ_RouteAddress set sort = ? WHERE `id` = ?';
             yield this.execSQL(updateSQL, [opt.sort, id], dbConnection);
+        }
+
+        querySQL = 'SELECT * FROM YSGJ_Address WHERE countryID = ? AND type = 2';
+        let isExist = yield this.execSQL(querySQL, [opt.countryID], dbConnection);
+        if(isExist.length > 0) {
+            return null;
         }
         delete opt.sort;
         let insertSQL = 'UPDATE YSGJ_Address SET ? WHERE `id` = ?';
