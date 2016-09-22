@@ -166,7 +166,7 @@ var doStartAddress = function*(ctx, next) {
 };
 
 var doEndAddress = function*(ctx, next) {
-    if (ctx.query.action == 'addStartAddress') {
+    if (ctx.query.action == 'addEndAddress') {
         let postData = ctx.request.body;
         let rulesAddress = [
             {key: 'countryID', type: 'number'},
@@ -175,7 +175,7 @@ var doEndAddress = function*(ctx, next) {
         let addressInfo = Utils.verifyAndFillObject(postData, rulesAddress);
         addressInfo.createDate = new Date();
         yield configInfoAction.addEndAddress(addressInfo);
-        ctx.response.redirect('/config/originatingAddress');
+        ctx.response.redirect('/config/destinationAddress');
     } else if (ctx.query.action == 'update') {
         let postData = ctx.request.body;
         let rulesAddress = [
@@ -188,7 +188,7 @@ var doEndAddress = function*(ctx, next) {
         delete addressInfo.id;
         console.log(addressInfo)
         yield configInfoAction.updateEndAddress(id, addressInfo);
-        ctx.response.redirect('/config/originatingAddress');
+        ctx.response.redirect('/config/destinationAddress');
     } else if (ctx.query.action == 'info') {
         try {
             let id = ctx.query.id;
@@ -211,16 +211,15 @@ var doEndAddress = function*(ctx, next) {
 var doSupplier = function*(ctx, next) {
     if (ctx.query.action == 'addSupplier') {
         let postData = ctx.request.body;
-        let rulesAddress = [
-            {key: 'provinceID', type: 'number'},
-            {key: 'cityID', type: 'number'},
-            {key: 'type', type: 'number'}
+        let rules = [
+            {key: 'name'},
+            {key: 'contact'},
+            {key: 'phone'}
         ];
-        let addressInfo = Utils.verifyAndFillObject(postData, rulesAddress);
-        //addressInfo.type = 1;
-        addressInfo.createDate = new Date();
-        yield configInfoAction.addStartAddress(addressInfo);
-        ctx.response.redirect('/config/startAddress');
+        let supplierInfo = Utils.verifyAndFillObject(postData, rules);
+        supplierInfo.createDate = new Date();
+        yield configInfoAction.addSupplier(supplierInfo);
+        ctx.response.redirect('/config/supplier');
     } else if (ctx.query.action == 'update') {
 
     } else if (ctx.query.action == 'info') {

@@ -245,8 +245,17 @@ class ConfigInfoAction extends MKODBAction {
     /*
      商家模块
      */
-    *addSupplier() {
-
+    *addSupplier(Supplier) {
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT * FROM YSGJ_Address WHERE type = ? AND provinceID = ? AND cityID = ?';
+        let startEndAddress = yield this.execSQL(querySQL, [address.type, address.provinceID, address.cityID], dbConnection);
+        if (startEndAddress.length > 0) {
+            return null;
+        } else {
+            let insertSQL = 'INSERT INTO YSGJ_Address SET ?';
+            let addressID = yield this.execSQL(insertSQL, [address], dbConnection);
+            return addressID.insertId;
+        }
     }
 
 
