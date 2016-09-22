@@ -133,17 +133,30 @@ var doStartAddress = function*(ctx, next) {
         let postData = ctx.request.body;
         let rulesAddress = [
             {key: 'provinceID', type: 'number'},
-            {key: 'cityID', type: 'number'}
+            {key: 'cityID', type: 'number'},
+            {key: 'type', type: 'number'}
         ];
         let addressInfo = Utils.verifyAndFillObject(postData, rulesAddress);
-        addressInfo.type = 1;
+        //addressInfo.type = 1;
         addressInfo.createDate = new Date();
         yield configInfoAction.addStartAddress(addressInfo);
         ctx.response.redirect('/config/startAddress');
     } else if (ctx.query.action == 'update') {
-
+        let postData = ctx.request.body;
+        let rulesAddress = [
+            {key: 'id', type: 'number'},
+            {key: 'provinceID', type: 'number'},
+            {key: 'cityID', type: 'number'}
+        ];
+        let addressInfo = Utils.verifyAndFillObject(postData, rulesAddress);
+        let id = addressInfo.id;
+        delete addressInfo.id;
+        yield configInfoAction.updateAddress(id, addressInfo);
+        ctx.response.redirect('/config/startAddress');
     } else {
-        yield ctx.render('/configInfo/originatingAddress', {});
+        let type = ctx.query.type;
+        let result = yield configInfoAction.startEndAddressList(type);
+        yield ctx.render('/configInfo/originatingAddress', {data: result});
     }
 };
 
@@ -184,7 +197,7 @@ var doAddress = function*(ctx, next) {
         }
     } else if (ctx.query.action == 'province') {
         try {
-            let countryID = ctx.query.countryID;
+            let countryID = ctx.query.countryID || 100000;
             let provinceData = yield configInfoAction.provinceList(countryID);
             if(provinceData) {
                 ctx.body = Utils.createResponse(resCode.RES_Success, null, provinceData);

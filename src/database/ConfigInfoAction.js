@@ -107,7 +107,6 @@ class ConfigInfoAction extends MKODBAction {
         return addressID.insertId;
     }
 
-
     *addStartAddress(address) {
         console.log(address)
         let addressID = yield this.addStartEndAddress(address);
@@ -133,6 +132,23 @@ class ConfigInfoAction extends MKODBAction {
         let result = yield this.execSQL(insertSQL, [opt], dbConnection);
         dbConnection.release();
         return result.insertId;
+    }
+
+    *updateAddress(id, opt) {
+        console.log(opt);
+        let dbConnection = yield this.getDBConnection();
+        let insertSQL = 'UPDATE YSGJ_Address SET ? WHERE `id` = ?';
+        let result = yield this.execSQL(insertSQL, [opt, id], dbConnection);
+        dbConnection.release();
+        return result.insertId;
+    }
+
+    *startEndAddressList(type) {
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT a.*, b.countryID, c.`Name` as province, d.`Name` as city FROM YSGJ_RouteAddress a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.provinceID = c.ID INNER JOIN areas d ON b.cityID = d.ID WHERE a.type = ?';
+        let result = yield this.execSQL(querySQL, [type], dbConnection);
+        dbConnection.release();
+        return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
     }
 
     //*addressList(param) {
