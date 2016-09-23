@@ -96,7 +96,7 @@ var doGoodsType = function*(ctx, next) {
             {key: 'goodsType', type: 'number'}, // 品名分类, 1:普货 2: 特殊货物
             {key: 'name', type: 'number'},
             {key: 'property', type: 'number'}, // 属性, 1:带点, 2:不带电, 3:其他
-            {key: 'desc', type: 'number'}
+            {key: 'desc'}
         ];
         let goodsType = Utils.verifyAndFillObject(postData, rulesAddress);
         goodsType.createDate = new Date();
@@ -113,7 +113,7 @@ var doGoodsType = function*(ctx, next) {
             {key: 'name', type: 'number'},
             {key: 'property', type: 'number'}, // 属性, 1:带点, 2:不带电, 3:其他
             {key: 'desc', type: 'number'},
-            {key: 'status', type: 'number'}    // 状态, 1:启动, 2:停用
+            {key: 'status'}    // 状态, 1:启动, 2:停用
         ];
         let goodsType = Utils.verifyAndFillObject(postData, rulesAddress);
         let id = goodsType.id;
