@@ -240,7 +240,7 @@ class ConfigInfoAction extends MKODBAction {
         return result.insertId;
     }
 
-    *EndAddressInfo(id) {
+    *endAddressInfo(id) {
         let dbConnection = yield this.getDBConnection();
         let querySQL = 'SELECT a.*, b.countryID, c.Name as country FROM YSGJ_RouteAddress a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.countryID = c.ID WHERE a.type = 2 AND a.id = ?';
         let startAddressInfo = yield this.execSQL(querySQL, [id], dbConnection);
@@ -296,6 +296,48 @@ class ConfigInfoAction extends MKODBAction {
         dbConnection.release();
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
     };
+
+
+    /*
+     货品类型
+     */
+    *addGoodsType(goodsType) {
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT * FROM YSGJ_TypeGoods WHERE logistics = ? AND goodsType = ? AND property = ?';
+        let findSupplier = yield this.execSQL(querySQL, [goodsType.logistics, goodsType.goodsType, goodsType.property], dbConnection);
+        console.log(findSupplier)
+        if (findSupplier.length > 0) {
+            return null;
+        } else {
+            let insertSQL = 'INSERT INTO YSGJ_TypeGoods SET ?';
+            let addressID = yield this.execSQL(insertSQL, [goodsType], dbConnection);
+            return addressID.insertId;
+        }
+    }
+
+    *updateGoodsType(id, goodsType) {
+        let dbConnection = yield this.getDBConnection();
+        let updateSQL = 'UPDATE YSGJ_TypeGoods SET ? WHERE `id` = ?';
+        let result = yield this.execSQL(updateSQL, [goodsType, id], dbConnection);
+        dbConnection.release();
+        return result;
+    }
+
+    *goodsTypeInfo(id) {
+        let dbConnection = yield this.getDBConnection();
+        let updateSQL = 'SELECT * FROM YSGJ_TypeGoods WHERE `id` = ?';
+        let result = yield this.execSQL(updateSQL, [id], dbConnection);
+        dbConnection.release();
+        return result[0];
+    }
+
+    *goodsTypeList() {
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT * FROM YSGJ_TypeGoods';
+        let result = yield this.execSQL(querySQL, [], dbConnection);
+        dbConnection.release();
+        return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
+    }
 }
 
 module.exports = ConfigInfoAction;
