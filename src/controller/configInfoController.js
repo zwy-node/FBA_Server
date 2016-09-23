@@ -135,7 +135,7 @@ var doGoodsType = function*(ctx, next) {
             item.createDate = item.createDate.format('yyyy-MM-dd');
         }
         console.log(result)
-        yield ctx.render('configInfo/goodsType', {data: result});
+        yield ctx.render('configInfo/goodsType', {data: result, status: ['禁用', '启用'], logistics: ['', '双清费用', '快递'], goodsType: ['', '普货', '特殊货物'], property: ['', '带电', '不带电', '其他']});
     }
 };
 

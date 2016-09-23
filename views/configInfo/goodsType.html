@@ -20,20 +20,28 @@
     <thead>
     <tr>
         <th class="left aligned three wide">ID</th>
-        <th class="center aligned three wide">货品名称</th>
-        <th class="center aligned two wide">带电</th>
+        <th class="center aligned two wide">渠道</th>
+        <th class="center aligned two wide">货品分类</th>
+        <th class="center aligned three wide">中文名</th>
+        <th class="center aligned three wide">属性</th>
+        <th class="center aligned two wide">状态</th>
         <th class="center aligned three wide">备注</th>
-        <th class="center aligned three wide">创建时间</th>
         <th class="center aligned two wide">操作</th>
     </tr>
     </thead>
     <tbody>
+    <% if (data.datas.length == 0) { %>
+    <td colspan="6" class="center aligned">暂无数据</td>
+    <% } %>
+    <% for (var i = 0; i < data.datas.length; i++) { %>
     <tr>
-        <td class="left aligned">001</td>
-        <td class="center aligned">USA</td>
-        <td class="center aligned">AZ</td>
-        <td class="center aligned">AZ</td>
-        <td class="center aligned">AZ</td>
+        <td class="left aligned"><%= data.datas[i].id %></td>
+        <td class="center aligned"><%= logistics[data.datas[i].logistics] %></td>
+        <td class="center aligned"><%= goodsType[data.datas[i].goodsType]%></td>
+        <td class="center aligned"><%= data.datas[i].name %></td>
+        <td class="center aligned"><%= property[data.datas[i].property] %></td>
+        <td class="center aligned"><%= status[data.datas[i].status] %></td>
+        <td class="center aligned"><%= data.datas[i].desc %></td>
         <td class="center aligned">
             <div class="ui small basic icon buttons">
                 <button class="ui button" onclick="editData(<%= data.datas[i].id %>); return false;"><i class="edit icon"></i></button>
@@ -41,6 +49,7 @@
             </div>
         </td>
     </tr>
+    <% } %>
     </tbody>
     <!--<tfoot>-->
     <!--<tr>-->
@@ -66,62 +75,82 @@
     <div class="header">
         {{panelInfo.title}}
     </div>
-    <form id="dataForm" class="ui form content" method="post" :action="panelInfo.action">
-        <input type="hidden" name="id" :value="data.id">
+    <form id="dataForm" class="ui form content" v-if="panelInfo.type != 2">
+        <input type="hidden" name="id" :value="data.id" v-if="panelInfo.type == 1">
         <div class="two fields">
             <div class="field">
                 <label>渠道</label>
                 <div class="field">
-                    <select class="ui fluid search dropdown" name="status">
+                    <select class="ui fluid search dropdown" v-model="data.logistics">
                         <option value="">请选择渠道</option>
-                        <option value="0">双清专线</option>
-                        <option value="1">快递</option>
+                        <option value="1">双清专线</option>
+                        <option value="2">快递</option>
                     </select>
                 </div>
             </div>
             <div class="field">
-                <label>品名分类</label>
+                <label>货品分类</label>
                 <div class="field">
-                    <select class="ui fluid search dropdown" name="status">
-                        <option value="">请选择品名分类</option>
-                        <option value="0">普货</option>
-                        <option value="1">特殊物品</option>
+                    <select class="ui fluid search dropdown" v-model="data.goodsType">
+                        <option value="">请选择货品分类</option>
+                        <option value="1">普货</option>
+                        <option value="2">特殊货物</option>
                     </select>
                 </div>
             </div>
         </div>
         <div class="field">
             <label>中文名</label>
-            <input type="text" placeholder="输入中文名"/>
+            <input type="text" placeholder="输入中文名" v-model="data.name"/>
         </div>
         <div class="ui form">
             <div class="inline fields">
                 <label>属性</label>
                 <div class="field">
                     <div class="ui radio checkbox">
-                        <input type="radio" name="fruit" checked="" tabindex="0" class="hidden">
+                        <input type="radio" name="property" value="1" v-model="data.property" class="hidden">
                         <label>带电</label>
                     </div>
                 </div>
                 <div class="field">
                     <div class="ui radio checkbox">
-                        <input type="radio" name="fruit" tabindex="0" class="hidden">
+                        <input type="radio" name="property" value="2" v-model="data.property" class="hidden">
                         <label>不带电</label>
                     </div>
                 </div>
                 <div class="field">
                     <div class="ui radio checkbox">
-                        <input type="radio" name="fruit" tabindex="0" class="hidden">
+                        <input type="radio" name="property" value="3" v-model="data.property" class="hidden">
                         <label>其他</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ui form" v-show="panelInfo.type == 1">
+            <div class="inline fields">
+                <label>状态</label>
+                <div class="field">
+                    <div class="ui radio checkbox">
+                        <input type="radio" name="status" value="0" v-model="data.status" class="hidden">
+                        <label>禁用</label>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui radio checkbox">
+                        <input type="radio" name="status" value="1" v-model="data.status" class="hidden">
+                        <label>启用</label>
                     </div>
                 </div>
             </div>
         </div>
         <div class="field">
             <label>备注</label>
-            <textarea placeholder="输入备注" rows="2"></textarea>
+            <textarea placeholder="输入备注" rows="2" v-model="data.desc"></textarea>
         </div>
     </form>
+    <div class="content" v-if="panelInfo.type == 2">
+        <p>确定删除ID为<b>{{deleteAddressID}}</b>的货物类型吗？</p>
+    </div>
     <div class="actions">
         <div class="ui approve positive button">保存</div>
         <div class="ui button deny">取消</div>
@@ -130,7 +159,7 @@
 <script type="text/javascript" src="/static/library/plupload-2.1.2/js/plupload.full.min.js"></script>
 <script type="application/javascript" src="/static/MKOUpload.js"></script>
 <script type="text/javascript">
-    var blankValue = {name: '', key: '', desc: '', status: 0, headURL: ''};
+    var blankValue = {logistics: '', goodsType: '', name: '', property: '', desc: ''};
     var mkoUpload = null;
     var uploaderManager = new MKOUploaderManager();
     var editPanel = $('#editPanel');
@@ -140,17 +169,16 @@
             panelInfo: {
                 title: '',  //标题
                 type: 0,    //类型 0: 新建模式 1: 编辑模式
-                action: "?action=newData"
+                action: "?action=addGoodsType"
             },
             data: blankValue,
-            costs: [],
             isUploading: false
         },
         ready: function(){
             editPanel.modal({
                 closable: false,
                 onApprove : function() {
-                    $('.ui.form').submit();
+                    doSubmit();
                     return false;
                 },
                 onDeny: function(){
@@ -158,7 +186,6 @@
                     uploaderManager.cancelAll();
                 }
             });
-            $('.ui.radio.checkbox').checkbox();
             $("#dataForm").form({
                 fields: {
                     name: 'empty',
@@ -184,39 +211,89 @@
             });
         },
         methods: {
-            addCost: function(cost){
-                if (!cost){
-                    cost = {min: '', max: '', price: ''};
-                }
-                this.costs.push(cost);
-            },
-            deleteCost: function(index){
-                this.costs.splice(index, 1);
-            }
+
         }
     });
+
+    function doSubmit(){
+        var panelInfo = vm.panelInfo;
+        var params = vm.data;
+        console.log(params);
+//        添加
+        if(panelInfo.type == 0){
+            delete params.id;
+            for(var key in params){
+                if(params[key] == null || params[key] == ''){
+                    return false;
+                }
+            }
+            $.ajax({
+                type: 'POST',
+                data: params,
+                url: panelInfo.action,
+                success: function(data){
+                    window.location.reload();
+                },error: function(xhr, type){
+                    console.log(xhr, type);
+                }
+            });
+//            编辑
+        }else if(vm.panelInfo.type == 1){
+            $.ajax({
+                type: 'POST',
+                data: params,
+                url: panelInfo.action,
+                success: function(data){
+                    window.location.reload();
+                },error: function(xhr, type){
+                    console.log(xhr, type);
+                }
+            });
+//            删除
+        }else if(vm.panelInfo.type == 2){
+            $.ajax({
+                type: 'GET',
+                url: panelInfo.action + '&id=' + vm.deleteAddressID,
+                success: function(data){
+                    window.location.reload();
+                },error: function(xhr, type){
+                    console.log(xhr, type);
+                }
+            });
+        }
+    }
 
     function newData(){
         var newValue = {};
         Object.assign(newValue, blankValue);
-        vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=newData"});
+        vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=addGoodsType"});
         vm.$set('data', newValue);
+        $('.ui.radio.checkbox').checkbox();
         editPanel.modal('show');
     }
 
     function editData(id){
         $.ajax({
             type: 'GET',
-            url: 'mrmj?action=getData&id='+ id,
+            url: '?action=info&id='+ id,
             success: function(data){
-                var editingData = data.data;
+                var editingData = data.response;
                 vm.$set('data', editingData);
-                vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=editData"});
+                vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=update"});
+                $('.ui.radio.checkbox').checkbox();
                 editPanel.modal('show');
             },error: function(xhr, type){
                 console.log(xhr, type);
             }
         });
+    }
+
+    function removeData(id){
+        var newValue = {};
+        Object.assign(newValue, blankValue);
+        vm.$set('panelInfo', {title: '删除', type: 2, action: "?action=delete"});
+        vm.$set('deleteAddressID', id);
+        editPanel.modal('show');
     }
 
 </script>
