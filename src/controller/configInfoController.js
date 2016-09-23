@@ -90,11 +90,52 @@ var doDriver = function*(ctx, next) {
 
 var doGoodsType = function*(ctx, next) {
     if (ctx.query.action == 'addGoodsType') {
-
+        let postData = ctx.request.body;
+        let rulesAddress = [
+            {key: 'logistics', type: 'number'}, // 渠道, 1:双清费用 2:快递
+            {key: 'goodsType', type: 'number'}, // 品名分类, 1:普货 2: 特殊货物
+            {key: 'name', type: 'number'},
+            {key: 'property', type: 'number'}, // 属性, 1:带点, 2:不带电, 3:其他
+            {key: 'desc', type: 'number'}
+        ];
+        let goodsType = Utils.verifyAndFillObject(postData, rulesAddress);
+        goodsType.createDate = new Date();
+        goodsType.status = 1;
+        console.log(goodsType)
+        yield configInfoAction.addGoodsType(goodsType);
+        ctx.response.redirect('/config/goodsType');
     } else if (ctx.query.action == 'update') {
-
+        let postData = ctx.request.body;
+        let rulesAddress = [
+            {key: 'id', type: 'number'},
+            {key: 'logistics', type: 'number'}, // 渠道, 1:双清费用 2:快递
+            {key: 'goodsType', type: 'number'}, // 品名分类, 1:普货 2: 特殊货物
+            {key: 'name', type: 'number'},
+            {key: 'property', type: 'number'}, // 属性, 1:带点, 2:不带电, 3:其他
+            {key: 'desc', type: 'number'},
+            {key: 'status', type: 'number'}    // 状态, 1:启动, 2:停用
+        ];
+        let goodsType = Utils.verifyAndFillObject(postData, rulesAddress);
+        let id = goodsType.id;
+        delete goodsType.id;
+        console.log(goodsType)
+        yield configInfoAction.updateGoodsType(id, goodsType);
+        ctx.response.redirect('/config/goodsType');
+    } else if (ctx.query.action == 'info') {
+        try {
+            let id = ctx.query.id;
+            let startAddress = yield configInfoAction.goodsTypeInfo(id);
+            ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
+        } catch (e) {
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'EndAddressInfo not exist!')
+        }
     } else {
-        yield ctx.render('configInfo/goodsType', {});
+        let result = yield configInfoAction.goodsTypeList();
+        for (let item of result.datas) {
+            item.createDate = item.createDate.format('yyyy-MM-dd');
+        }
+        console.log(result)
+        yield ctx.render('configInfo/goodsType', {data: result});
     }
 };
 
@@ -190,7 +231,7 @@ var doEndAddress = function*(ctx, next) {
     } else if (ctx.query.action == 'info') {
         try {
             let id = ctx.query.id;
-            let startAddress = yield configInfoAction.EndAddressInfo(id);
+            let startAddress = yield configInfoAction.endAddressInfo(id);
             ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'EndAddressInfo not exist!')
@@ -249,6 +290,9 @@ var doSupplier = function*(ctx, next) {
         }
     } else {
         let result = yield configInfoAction.supplierList();
+        for (let item of result.datas) {
+            item.createDate = item.createDate.format('yyyy-MM-dd');
+        }
         yield ctx.render('configInfo/supplier', {data: result});
     }
 };
