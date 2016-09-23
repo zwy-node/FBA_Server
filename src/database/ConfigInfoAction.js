@@ -263,6 +263,7 @@ class ConfigInfoAction extends MKODBAction {
         let dbConnection = yield this.getDBConnection();
         let querySQL = 'SELECT * FROM YSGJ_Supplier WHERE name = ? AND contact = ?';
         let findSupplier = yield this.execSQL(querySQL, [supplier.name, supplier.contact], dbConnection);
+            console.log(findSupplier)
         if (findSupplier.length > 0) {
             return null;
         } else {
@@ -272,12 +273,20 @@ class ConfigInfoAction extends MKODBAction {
         }
     }
 
-    *UpdateSupplier(supplier) {
+    *updateSupplier(id, supplier) {
         let dbConnection = yield this.getDBConnection();
-        let updateSQL = 'UPDATE YSGJ_Users SET ? WHERE `id` = ?';
-        let result = yield this.execSQL(updateSQL, [data, id], dbConnection);
+        let updateSQL = 'UPDATE YSGJ_Supplier SET ? WHERE `id` = ?';
+        let result = yield this.execSQL(updateSQL, [supplier, id], dbConnection);
         dbConnection.release();
         return result;
+    }
+
+    *supplierInfo(id) {
+        let dbConnection = yield this.getDBConnection();
+        let updateSQL = 'SELECT * FROM YSGJ_Supplier WHERE `id` = ?';
+        let result = yield this.execSQL(updateSQL, [id], dbConnection);
+        dbConnection.release();
+        return result[0];
     }
 
     *supplierList() {

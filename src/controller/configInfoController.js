@@ -225,11 +225,21 @@ var doSupplier = function*(ctx, next) {
             {key: 'phone'}
         ];
         let supplierInfo = Utils.verifyAndFillObject(postData, rules);
-        supplierInfo.createDate = new Date();
-        yield configInfoAction.addSupplier(supplierInfo);
+        let id = supplierInfo.id;
+        delete supplierInfo.id;
+        yield configInfoAction.updateSupplier(id, supplierInfo);
         ctx.response.redirect('/config/supplier');
     } else if (ctx.query.action == 'info') {
-
+        try {
+            let id = ctx.query.id;
+            let startAddress = yield configInfoAction.supplierInfo(id);
+            if(startAddress) {
+                startAddress.createDate = startAddress.createDate.format('yyyy-MM-dd');
+            }
+            ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
+        } catch (e) {
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'EndAddressInfo not exist!')
+        }
     } else if (ctx.query.action == 'list') {
         try {
             let result = yield configInfoAction.supplierList();
