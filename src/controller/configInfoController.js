@@ -103,7 +103,7 @@ var doGoodsType = function*(ctx, next) {
         goodsType.status = 1;
         console.log(goodsType)
         yield configInfoAction.addGoodsType(goodsType);
-        ctx.response.redirect('/config/destinationAddress');
+        ctx.response.redirect('/config/goodsType');
     } else if (ctx.query.action == 'update') {
         let postData = ctx.request.body;
         let rulesAddress = [
@@ -120,7 +120,7 @@ var doGoodsType = function*(ctx, next) {
         delete goodsType.id;
         console.log(goodsType)
         yield configInfoAction.updateGoodsType(id, goodsType);
-        ctx.response.redirect('/config/destinationAddress');
+        ctx.response.redirect('/config/goodsType');
     } else if (ctx.query.action == 'info') {
         try {
             let id = ctx.query.id;
@@ -134,7 +134,8 @@ var doGoodsType = function*(ctx, next) {
         for (let item of result.datas) {
             item.createDate = item.createDate.format('yyyy-MM-dd');
         }
-        yield ctx.render('configInfo/destinationAddress', {data: result});
+        console.log(result)
+        yield ctx.render('configInfo/goodsType', {data: result});
     }
 };
 
