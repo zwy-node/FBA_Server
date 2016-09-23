@@ -304,4 +304,12 @@
         });
     }
 
+    function removeData(id){
+        var newValue = {};
+        Object.assign(newValue, blankValue);
+        vm.$set('panelInfo', {title: '删除', type: 2, action: "?action=deletedStartAddress"});
+        vm.$set('deleteAddressID', id);
+        editPanel.modal('show');
+    }
+
 </script>
