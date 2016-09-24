@@ -151,11 +151,51 @@ var doLocalCosts = function*(ctx, next) {
 
 var doLocalWarehouse = function*(ctx, next) {
     if (ctx.query.action == 'addLocalCosts') {
-
+        let postData = ctx.request.body;
+        let rulesAddress = [
+            {key: 'warehouseID'},
+            {key: 'name'},
+            {key: 'contact'},
+            {key: 'phone'},
+            {key: 'addressID', type: 'number'},
+            {key: 'supplier', type: 'number'}
+        ];
+        let localCostsInfo = Utils.verifyAndFillObject(postData, rulesAddress);
+        localCostsInfo.createDate = new Date();
+        localCostsInfo.modifiedTime = new Date();
+        yield configInfoAction.addLocalWarehouse(localCostsInfo);
+        ctx.response.redirect('/config/localWarehouse');
     } else if (ctx.query.action == 'update') {
-
+        let postData = ctx.request.body;
+        let rulesAddress = [
+            {key: 'id', type: 'number'},
+            {key: 'warehouseID'},
+            {key: 'name'},
+            {key: 'contact'},
+            {key: 'phone'},
+            {key: 'addressID', type: 'number'},
+            {key: 'supplier', type: 'number'}
+        ];
+        let addressInfo = Utils.verifyAndFillObject(postData, rulesAddress);
+        let id = addressInfo.id;
+        delete addressInfo.id;
+        yield configInfoAction.updateLocalWarehouse(addressInfo);
+        ctx.response.redirect('/config/localWarehouse');
+    } else if (ctx.query.action == 'info') {
+        try {
+            let id = ctx.query.id;
+            let startAddress = yield configInfoAction.localWarehouseInfo(id);
+            ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
+        } catch (e) {
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'localWarehouse not exist!')
+        }
     } else {
-        yield ctx.render('configInfo/localWarehouse', {});
+        let result = yield configInfoAction.localWarehouseList();
+        for (let item of result.datas) {
+            item.createDate = item.createDate.format('yyyy-MM-dd');
+        }
+        console.log(result)
+        yield ctx.render('configInfo/localWarehouse', {data: result});
     }
 };
 
