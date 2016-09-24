@@ -94,7 +94,7 @@ var doGoodsType = function*(ctx, next) {
         let rulesAddress = [
             {key: 'logistics', type: 'number'}, // 渠道, 1:双清费用 2:快递
             {key: 'goodsType', type: 'number'}, // 品名分类, 1:普货 2: 特殊货物
-            {key: 'name', type: 'number'},
+            {key: 'name'},
             {key: 'property', type: 'number'}, // 属性, 1:带点, 2:不带电, 3:其他
             {key: 'desc'}
         ];
@@ -110,10 +110,10 @@ var doGoodsType = function*(ctx, next) {
             {key: 'id', type: 'number'},
             {key: 'logistics', type: 'number'}, // 渠道, 1:双清费用 2:快递
             {key: 'goodsType', type: 'number'}, // 品名分类, 1:普货 2: 特殊货物
-            {key: 'name', type: 'number'},
+            {key: 'name'},
             {key: 'property', type: 'number'}, // 属性, 1:带点, 2:不带电, 3:其他
-            {key: 'desc', type: 'number'},
-            {key: 'status'}    // 状态, 1:启动, 2:停用
+            {key: 'desc'},
+            {key: 'status', type: 'number'}    // 状态, 1:启动, 2:停用
         ];
         let goodsType = Utils.verifyAndFillObject(postData, rulesAddress);
         let id = goodsType.id;
@@ -135,7 +135,7 @@ var doGoodsType = function*(ctx, next) {
             item.createDate = item.createDate.format('yyyy-MM-dd');
         }
         console.log(result)
-        yield ctx.render('configInfo/goodsType', {data: result});
+        yield ctx.render('configInfo/goodsType', {data: result, status: ['禁用', '启用'], logistics: ['', '双清费用', '快递'], goodsType: ['', '普货', '特殊货物'], property: ['', '带电', '不带电', '其他']});
     }
 };
 
