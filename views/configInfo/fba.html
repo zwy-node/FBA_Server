@@ -20,10 +20,10 @@
     <thead>
         <tr>
             <th class="left aligned one wide">ID</th>
-            <th class="center aligned one wide">仓库编号</th>
+            <th class="center aligned two wide">仓库编号</th>
             <th class="center aligned two wide">供应商</th>
             <th class="center aligned two wide">国家</th>
-            <th class="center aligned two wide">州</th>
+            <th class="center aligned one wide">州</th>
             <th class="center aligned two wide">城市</th>
             <th class="center aligned two wide">邮编</th>
             <th class="center aligned five wide">地址</th>
@@ -120,10 +120,9 @@
                 <label>供应商</label>
                 <div class="field">
                     <select class="ui fluid search dropdown" v-model="data.supplier">
-                        <option value="0">Tony</option>
-                        <option value="1">天骄</option>
-                        <option value="2">曾哥哥</option>
-                </select>
+                        <option value="">请选择供应商</option>
+                        <option v-for="item in suppliers.datas" :value="item.id">{{item.name}}</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -137,12 +136,8 @@
         <div class="ui button deny">取消</div>
     </div>
 </div>
-<script type="text/javascript" src="/static/library/plupload-2.1.2/js/plupload.full.min.js"></script>
-<script type="application/javascript" src="/static/MKOUpload.js"></script>
 <script type="text/javascript">
     var blankValue = {FBAWarehouseID: '', postcode: '', supplier: '', address: '', countryID: '', provinceID: '', cityID: ''};
-    var mkoUpload = null;
-    var uploaderManager = new MKOUploaderManager();
     var editPanel = $('#editPanel');
     var vm = new Vue({
         el: '#editPanel',
@@ -156,7 +151,7 @@
             countries: [],
             provinces: [],
             cities: [],
-            isUploading: false
+            suppliers: []
         },
         ready: function(){
             var self = this;
@@ -172,7 +167,6 @@
                     self.provinces = [];
                     self.cities = [];
                     editPanel.form('reset');
-                    uploaderManager.cancelAll();
                 }
             });
 
@@ -183,7 +177,7 @@
                     headURL: 'empty'
                 }
             });
-
+            this.supplierList();
             $.ajax({
                 type: 'GET',
                 url: '/config/address?action=country',
@@ -195,20 +189,6 @@
                     self.countries = [];
                     self.data.provinceID = '';
                     self.data.cityID = '';
-                }
-            });
-            uploaderManager.newUploader({
-                button: "imgURLSelectFile",
-                container: "imgURLContainer",
-                progressBar: "imgURLProgress",
-                label: "imgURLSelectFile",
-                context: 0,
-                beforeCallback: function(context){
-                    self.isUploading = true;
-                },
-                completedCallback: function(context, url){
-                    self.isUploading = false;
-                    self.data.headURL = url;
                 }
             });
         },
@@ -242,6 +222,18 @@
             },
             getCityID: function(){
 
+            },
+            supplierList: function(){
+                var self = this;
+                $.ajax({
+                    type: 'GET',
+                    url: '/config/supplier?action=list',
+                    success: function(data){
+                        self.suppliers = data.response;
+                    },error: function(xhr, type){
+                        self.suppliers = [];
+                    }
+                });
             }
         }
     });

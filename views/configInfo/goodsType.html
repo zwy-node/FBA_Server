@@ -156,12 +156,8 @@
         <div class="ui button deny">取消</div>
     </div>
 </div>
-<script type="text/javascript" src="/static/library/plupload-2.1.2/js/plupload.full.min.js"></script>
-<script type="application/javascript" src="/static/MKOUpload.js"></script>
 <script type="text/javascript">
     var blankValue = {logistics: '', goodsType: '', name: '', property: '', desc: ''};
-    var mkoUpload = null;
-    var uploaderManager = new MKOUploaderManager();
     var editPanel = $('#editPanel');
     var vm = new Vue({
         el: '#editPanel',
@@ -171,8 +167,7 @@
                 type: 0,    //类型 0: 新建模式 1: 编辑模式
                 action: "?action=addGoodsType"
             },
-            data: blankValue,
-            isUploading: false
+            data: blankValue
         },
         ready: function(){
             editPanel.modal({
@@ -183,7 +178,6 @@
                 },
                 onDeny: function(){
                     editPanel.form('reset');
-                    uploaderManager.cancelAll();
                 }
             });
             $("#dataForm").form({
@@ -191,22 +185,6 @@
                     name: 'empty',
                     desc: 'empty',
                     headURL: 'empty'
-                }
-            });
-
-            var self = this;
-            uploaderManager.newUploader({
-                button: "imgURLSelectFile",
-                container: "imgURLContainer",
-                progressBar: "imgURLProgress",
-                label: "imgURLSelectFile",
-                context: 0,
-                beforeCallback: function(context){
-                    self.isUploading = true;
-                },
-                completedCallback: function(context, url){
-                    self.isUploading = false;
-                    self.data.headURL = url;
                 }
             });
         },

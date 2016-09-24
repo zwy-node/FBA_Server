@@ -169,7 +169,7 @@ class ConfigInfoAction extends MKODBAction {
 
     *startAddressInfo(id) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT a.*, b.provinceID, b.cityID, c.`Name` as province, d.`Name` as city FROM YSGJ_RouteAddress a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.provinceID = c.ID INNER JOIN areas d ON b.cityID = d.ID WHERE a.type = 1 AND a.id = ?';
+        let querySQL = 'SELECT a.*, b.provinceID, b.cityID, c.`Name` as province, d.`Name` as city FROM YSGJ_LocalWarehouse a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.provinceID = c.ID INNER JOIN areas d ON b.cityID = d.ID WHERE a.id = ?';
         let startAddressInfo = yield this.execSQL(querySQL, [id], dbConnection);
         dbConnection.release();
         return startAddressInfo[0];
@@ -363,10 +363,10 @@ class ConfigInfoAction extends MKODBAction {
         let insertSQL = 'INSERT INTO YSGJ_Address SET ?';
         let addressID = yield this.execSQL(insertSQL, [address], dbConnection);
 
-        let querySQL = 'SELECT b.address, d.`Name` as country, e.`Name` as province, f.`Name` as city, g.Name as town FROM YSGJ_Address b INNER JOIN areas d ON b.countryID = d.ID INNER JOIN areas e ON b.provinceID = e.ID INNER JOIN areas f ON b.cityID = f.ID INNER JOIN areas g ON b.townID = g.ID WHERE b.id = ?';
+        let querySQL = 'SELECT b.street, d.`Name` as country, e.`Name` as province, f.`Name` as city, g.Name as town FROM YSGJ_Address b INNER JOIN areas d ON b.countryID = d.ID INNER JOIN areas e ON b.provinceID = e.ID INNER JOIN areas f ON b.cityID = f.ID INNER JOIN areas g ON b.townID = g.ID WHERE b.id = ?';
         let addressInfo = yield this.execSQL(querySQL, [addressID.insertId], dbConnection);
         let updateOpt = {};
-        updateOpt.fullAddress = addressInfo[0].country + ',' + addressInfo[0].province + ',' + addressInfo[0].city + ',' + addressInfo[0].town + ',' + addressInfo[0].address  ;
+        updateOpt.fullAddress = addressInfo[0].country + ',' + addressInfo[0].province + ',' + addressInfo[0].city + ',' + addressInfo[0].town + ',' + addressInfo[0].street  ;
 
         let updateSQL = 'UPDATE YSGJ_Address SET ? WHERE `id` = ?';
         yield this.execSQL(updateSQL, [updateOpt, addressID.insertId], dbConnection);
@@ -386,7 +386,7 @@ class ConfigInfoAction extends MKODBAction {
         } else {
             let addressID = yield this.LWAddress(address);
             localWarehouse.addressID = addressID;
-            let insertSQL = 'INSERT INTO YSGJ_TypeGoods SET ?';
+            let insertSQL = 'INSERT INTO YSGJ_LocalWarehouse SET ?';
             let result = yield this.execSQL(insertSQL, [localWarehouse], dbConnection);
             dbConnection.release();
             return result.insertId;
@@ -395,24 +395,24 @@ class ConfigInfoAction extends MKODBAction {
 
     *updateLWAddress(id, address) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT b.address, d.`Name` as country, e.`Name` as province, f.`Name` as city, g.Name as town FROM YSGJ_Address b INNER JOIN areas d ON b.countryID = d.ID INNER JOIN areas e ON b.provinceID = e.ID INNER JOIN areas f ON b.cityID = f.ID INNER JOIN areas g ON b.townID = g.ID WHERE b.id = ?';
+        let querySQL = 'SELECT b.street, d.`Name` as country, e.`Name` as province, f.`Name` as city, g.Name as town FROM YSGJ_Address b INNER JOIN areas d ON b.countryID = d.ID INNER JOIN areas e ON b.provinceID = e.ID INNER JOIN areas f ON b.cityID = f.ID INNER JOIN areas g ON b.townID = g.ID WHERE b.id = ?';
         let addressInfo = yield this.execSQL(querySQL, [id], dbConnection);
-        address.fullAddress = addressInfo[0].country + ',' + addressInfo[0].province + ',' + addressInfo[0].city + ',' + addressInfo[0].town + ',' + addressInfo[0].address  ;
+        address.fullAddress = addressInfo[0].country + ',' + addressInfo[0].province + ',' + addressInfo[0].city + ',' + addressInfo[0].town + ',' + addressInfo[0].street  ;
         let updateSQL = 'UPDATE YSGJ_Address SET ? WHERE `id` = ?';
         yield this.execSQL(updateSQL, [address, id], dbConnection);
         dbConnection.release();
-        return addressID.insertId;
+        return updateSQL;
     }
 
     *updateLocalWarehouse(id, localWarehouse, address) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT * FROM YSGJ_TypeGoods WHERE id = ?';
+        let querySQL = 'SELECT * FROM YSGJ_LocalWarehouse WHERE id = ?';
         let addressID = yield this.execSQL(querySQL, [id], dbConnection);
             console.log(addressID[0])
-        if(addressID[0]) {
+        if(addressID.length > 0) {
             yield this.updateLWAddress(addressID[0].addressID, address);
         }
-        querySQL = 'SELECT * FROM YSGJ_TypeGoods WHERE `name`= ? AND phone = ? OR supplier = ?';
+        querySQL = 'SELECT * FROM YSGJ_LocalWarehouse WHERE `name`= ? AND phone = ? OR supplier = ?';
         let findGoodsType = yield this.execSQL(querySQL, [localWarehouse.name, localWarehouse.phone, localWarehouse.supplier], dbConnection);
         console.log(findGoodsType);
         if (findGoodsType.length > 0) {
