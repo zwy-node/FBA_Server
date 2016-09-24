@@ -386,9 +386,9 @@ class ConfigInfoAction extends MKODBAction {
             let addressID = yield this.LWAddress(address);
             localWarehouse.addressID = addressID;
             let insertSQL = 'INSERT INTO YSGJ_TypeGoods SET ?';
-            let addressID = yield this.execSQL(insertSQL, [localWarehouse], dbConnection);
+            let result = yield this.execSQL(insertSQL, [localWarehouse], dbConnection);
             dbConnection.release();
-            return addressID.insertId;
+            return result.insertId;
         }
     }
 
@@ -405,11 +405,11 @@ class ConfigInfoAction extends MKODBAction {
 
     *updateLocalWarehouse(id, localWarehouse, address) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT * FROM YSGJ_TypeGoods WHERE `name`= ? AND phone = ? OR supplier = ?';
-        let findGoodsType = yield this.execSQL(querySQL, [localWarehouse.name, localWarehouse.phone, localWarehouse.supplier], dbConnection);
-            console.log(findGoodsType[0])
-        if(findGoodsType[0]) {
-            yield this.updateLWAddress(findGoodsType[0].id, address);
+        let querySQL = 'SELECT * FROM YSGJ_TypeGoods WHERE id = ?';
+        let addressID = yield this.execSQL(querySQL, [id], dbConnection);
+            console.log(addressID[0])
+        if(addressID[0]) {
+            yield this.updateLWAddress(addressID[0].addressID, address);
         }
         querySQL = 'SELECT * FROM YSGJ_TypeGoods WHERE `name`= ? AND phone = ? OR supplier = ?';
         let findGoodsType = yield this.execSQL(querySQL, [localWarehouse.name, localWarehouse.phone, localWarehouse.supplier], dbConnection);
