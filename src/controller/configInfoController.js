@@ -152,7 +152,6 @@ var doLocalWarehouse = function*(ctx, next) {
     if (ctx.query.action == 'addLocalWarehouse') {
         let postData = ctx.request.body;
         let rules = [
-            {key: 'warehouseID'},
             {key: 'name'},
             {key: 'contact'},
             {key: 'phone'},

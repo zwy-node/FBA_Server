@@ -376,6 +376,7 @@ class ConfigInfoAction extends MKODBAction {
 
 
     *addLocalWarehouse(localWarehouse, address) {
+        localWarehouse.warehouseID = "LW003";
         let dbConnection = yield this.getDBConnection();
         let querySQL = 'SELECT * FROM YSGJ_LocalWarehouse WHERE `name`= ? AND phone = ? OR supplier = ?';
         let findLocalWarehouse = yield this.execSQL(querySQL, [localWarehouse.name, localWarehouse.phone, localWarehouse.supplier], dbConnection);
@@ -431,7 +432,7 @@ class ConfigInfoAction extends MKODBAction {
 
     *localWarehouseInfo(id) {
         let dbConnection = yield this.getDBConnection();
-        let updateSQL = 'SELECT a.*, b.fullAddress, c.`name` as supplierName FROM YSGJ_LocalWarehouse a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN YSGJ_Supplier c ON a.supplier = c.id WHERE a.id = ?';
+        let updateSQL = 'SELECT a.*, b.`name` as supplierName, c.countryID, c.provinceID, c.cityID, c.townID, c.street FROM YSGJ_LocalWarehouse a INNER JOIN YSGJ_Supplier b ON a.supplier = b.id INNER JOIN YSGJ_Address c  ON a.addressID = c.id WHERE a.id = ?';
         let result = yield this.execSQL(updateSQL, [id], dbConnection);
         dbConnection.release();
         return result[0];
