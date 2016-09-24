@@ -150,6 +150,7 @@
 <script type="text/javascript">
     var blankValue = {name: '', countryID: 100000, provinceID: '', cityID: '', townID: '', street: '', contact: '', phone: '', supplier: ''};
     var editPanel = $('#editPanel');
+    var _isInfoData = {};
     var _isProvinces = [];
     var _isProvincesUpdate = true;
     var vm = new Vue({
@@ -316,6 +317,7 @@
             url: '?action=info&id='+ id,
             success: function(data){
                 var editingData = data.response;
+                _isInfoData = editingData;
                 vm.$set('data', editingData);
                 vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=update"});
                 vm.$set('provinces', _isProvinces);
