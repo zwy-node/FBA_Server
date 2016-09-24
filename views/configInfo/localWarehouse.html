@@ -43,7 +43,7 @@
         <td class="center aligned">
             <div class="ui small basic icon buttons">
                 <button class="ui button" onclick="editData(<%= data.datas[i].id %>); return false;"><i class="edit icon"></i></button>
-                <button class="ui button" onclick="removeData(<%= data.datas[i].id %>); return false;"><i class="red remove icon"></i></button>
+                <button class="ui button" onclick="removeData('<%= data.datas[i].name %>'); return false;"><i class="red remove icon"></i></button>
             </div>
         </td>
     </tr>
@@ -140,7 +140,7 @@
         </div>
     </form>
     <div class="content" v-if="panelInfo.type == 2">
-        <p>确定删除ID为<b>{{deleteAddressID}}</b>的地址吗？</p>
+        <p>确定删除<b>{{deleteName}}</b>仓库吗？</p>
     </div>
     <div class="actions">
         <div class="ui approve positive button">保存</div>
@@ -334,7 +334,7 @@
         var newValue = {};
         Object.assign(newValue, blankValue);
         vm.$set('panelInfo', {title: '删除', type: 2, action: "?action=deletedStartAddress"});
-        vm.$set('deleteAddressID', id);
+        vm.$set('deleteName', id);
         editPanel.modal('show');
     }
 
