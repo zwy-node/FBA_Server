@@ -63,6 +63,33 @@ class ConfigInfoAction extends MKODBAction {
     }
 
     /*
+     FBA 仓库模块
+     */
+    *addFBACost(opt) {
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT * FROM YSGJ_FBACost where `startID` = ? AND `endID` = ?';
+        let findFBACost = yield this.execSQL(querySQL, [opt.startID, opt.endID], dbConnection);
+        console.log(findFBACost);
+        if (findFBACost.length > 0) {
+            dbConnection.release();
+            return findFBACost;
+        } else {
+            let insertSQL = 'INSERT INTO YSGJ_FBACost SET ?';
+            let result = yield this.execSQL(insertSQL, opt, dbConnection);
+            dbConnection.release();
+            return result.insertId;
+        }
+    }
+
+    *FBACostList() {
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT a.*, e.`Name` as startAddress, h.`Name` as endAddress, i.goodsType FROM YSGJ_FBACost a INNER JOIN YSGJ_RouteAddress b ON a.startID = b.id INNER JOIN YSGJ_Address c ON b.addressID = c.id INNER JOIN areas e ON c.cityID = e.ID INNER JOIN YSGJ_RouteAddress f ON a.endID = f.id INNER JOIN YSGJ_Address g ON f.addressID = g.id INNER JOIN areas h ON g.countryID = h.ID INNER JOIN YSGJ_TypeGoods i ON a.kindOfGoodsID = i.id';
+        let result = yield this.execSQL(querySQL, [], dbConnection);
+        dbConnection.release();
+        return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
+    }
+
+    /*
      地址列表模块, 国家列表, 省/州列表, 市列表, 区/镇/县列表
      */
     *countryList() {
