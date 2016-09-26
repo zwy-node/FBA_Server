@@ -91,7 +91,7 @@ var doAirTransport = function*(ctx, next) {
     } else {
         let result = yield configInfoAction.FBACostList();
         console.log(result)
-        yield ctx.render('configInfo/airTransport', {data: result});
+        yield ctx.render('configInfo/airTransport', {data: result,goodsType: ['', '普货', '特殊货物'],});
     }
 };
 
