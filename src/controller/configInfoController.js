@@ -64,14 +64,16 @@ var doAirTransport = function*(ctx, next) {
             {key: 'endID', type: 'number'},         //目的地ID
             {key: 'zipCodeHead', type: 'number'},   //邮编开头
             {key: 'kindOfGoodsID', type: 'number'}, //货品类型ID
-            {key: 'prices', type: 'object', cb: function(value, cb) {
+            {
+                key: 'prices', type: 'object', cb: function (value, cb) {
                 try {
                     let result = JSON.stringify(value);
                     cb(result)
                 } catch (e) {
                     console.log(e)
                 }
-            }},        //价格
+            }
+            },        //价格
             {key: 'fastestDay', type: 'number'},    //最快天
             {key: 'slowestDay', type: 'number'},    //最慢天
             {key: 'logistics', type: 'number'},     //1:双清, 2:快递
@@ -153,7 +155,14 @@ var doGoodsType = function*(ctx, next) {
             let startAddress = yield configInfoAction.goodsTypeInfo(id);
             ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
         } catch (e) {
-            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'EndAddressInfo not exist!')
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'goodsType not exist!')
+        }
+    } else if (ctx.query.action == 'list') {
+        try {
+            let result = yield configInfoAction.goodsTypeList();
+            ctx.body = Utils.createResponse(resCode.RES_Success, null, result);
+        } catch (e) {
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'goodsType not found!');
         }
     } else {
         let result = yield configInfoAction.goodsTypeList();
@@ -161,7 +170,13 @@ var doGoodsType = function*(ctx, next) {
             item.createDate = item.createDate.format('yyyy-MM-dd');
         }
         console.log(result)
-        yield ctx.render('configInfo/goodsType', {data: result, status: ['禁用', '启用'], logistics: ['', '双清费用', '快递'], goodsType: ['', '普货', '特殊货物'], property: ['', '带电', '不带电', '其他']});
+        yield ctx.render('configInfo/goodsType', {
+            data: result,
+            status: ['禁用', '启用'],
+            logistics: ['', '双清费用', '快递'],
+            goodsType: ['', '普货', '特殊货物'],
+            property: ['', '带电', '不带电', '其他']
+        });
     }
 };
 
@@ -280,6 +295,13 @@ var doStartAddress = function*(ctx, next) {
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'startAddress not exist!')
         }
+    } else if (ctx.query.action == 'list') {
+        try {
+            let result = yield configInfoAction.startAddressList();
+            ctx.body = Utils.createResponse(resCode.RES_Success, null, result);
+        } catch (e) {
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'startAddress not found!');
+        }
     } else {
         let result = yield configInfoAction.startAddressList();
         for (let item of result.datas) {
@@ -320,7 +342,14 @@ var doEndAddress = function*(ctx, next) {
             let startAddress = yield configInfoAction.endAddressInfo(id);
             ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
         } catch (e) {
-            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'EndAddressInfo not exist!')
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'endAddressInfo not exist!')
+        }
+    } else if (ctx.query.action == 'list') {
+        try {
+            let result = yield configInfoAction.endAddressList();
+            ctx.body = Utils.createResponse(resCode.RES_Success, null, result);
+        } catch (e) {
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'endAddress not found!');
         }
     } else {
         let result = yield configInfoAction.endAddressList();
@@ -360,7 +389,7 @@ var doSupplier = function*(ctx, next) {
         try {
             let id = ctx.query.id;
             let startAddress = yield configInfoAction.supplierInfo(id);
-            if(startAddress) {
+            if (startAddress) {
                 startAddress.createDate = startAddress.createDate.format('yyyy-MM-dd');
             }
             ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
