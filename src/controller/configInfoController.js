@@ -87,9 +87,47 @@ var doAirTransport = function*(ctx, next) {
         yield configInfoAction.addFBACost(FBACostInfo);
         ctx.response.redirect('/config/fba');
     } else if (ctx.query.action == 'update') {
-
+        let postData = ctx.request.body;
+        let rules = [
+            {key: 'id', type: 'number'},
+            {key: 'startID', type: 'number'},       //起运地ID
+            {key: 'endID', type: 'number'},         //目的地ID
+            {key: 'zipCodeHead', type: 'number'},   //邮编开头
+            {key: 'kindOfGoodsID', type: 'number'}, //货品类型ID
+            {
+                key: 'prices', type: 'object', cb: function (value, cb) {
+                try {
+                    let result = JSON.stringify(value);
+                    cb(result)
+                } catch (e) {
+                    console.log(e)
+                }
+            }
+            },        //价格
+            {key: 'fastestDay', type: 'number'},    //最快天
+            {key: 'slowestDay', type: 'number'},    //最慢天
+            {key: 'logistics', type: 'number'},     //1:双清, 2:快递
+            {key: 'expires'}                        //过期日期
+        ];
+        let FBACostInfo = Utils.verifyAndFillObject(postData, rules);
+        FBACostInfo.status = 1;
+        FBACostInfo.createDate = new Date();
+        FBACostInfo.modifiedTime = new Date();
+        console.log(FBACostInfo)
+        yield configInfoAction.updateFBACost(FBACostInfo);
+        ctx.response.redirect('/config/fba');
+    } else if(ctx.query.action == 'info') {
+        try {
+            let logistics = 1;
+            let id = ctx.query.id;
+            let startAddress = yield configInfoAction.FBACostInfo(logistics, id);
+            ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
+        } catch (e) {
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'goodsType not exist!')
+        }
     } else {
-        let result = yield configInfoAction.FBACostList();
+        let logistics = ctx.query.logistics || 1;
+        let result = yield configInfoAction.FBACostList(logistics);
         console.log(result)
         yield ctx.render('configInfo/airTransport', {data: result,goodsType: ['', '普货', '特殊货物'],});
     }

@@ -81,10 +81,33 @@ class ConfigInfoAction extends MKODBAction {
         }
     }
 
-    *FBACostList() {
+    *updateFBACost(id, opt) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT a.*, e.`Name` as startAddress, h.`Name` as endAddress, i.goodsType FROM YSGJ_FBACost a INNER JOIN YSGJ_RouteAddress b ON a.startID = b.id INNER JOIN YSGJ_Address c ON b.addressID = c.id INNER JOIN areas e ON c.cityID = e.ID INNER JOIN YSGJ_RouteAddress f ON a.endID = f.id INNER JOIN YSGJ_Address g ON f.addressID = g.id INNER JOIN areas h ON g.countryID = h.ID INNER JOIN YSGJ_TypeGoods i ON a.kindOfGoodsID = i.id';
-        let result = yield this.execSQL(querySQL, [], dbConnection);
+        //let querySQL = 'SELECT * FROM YSGJ_FBACost where `startID` = ? AND `endID` = ?';
+        //let findFBACost = yield this.execSQL(querySQL, [opt.startID, opt.endID], dbConnection);
+        //console.log(findFBACost);
+        //if (findFBACost.length > 0) {
+        //    dbConnection.release();
+        //    return findFBACost;
+        //} else {
+        let insertSQL = 'UPDATE YSGJ_Address SET ? WHERE `id` = ?';
+        let result = yield this.execSQL(insertSQL, [opt, id], dbConnection);
+        dbConnection.release();
+        return result.insertId;
+    }
+
+    *FBACostInfo(logistics, id) {
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT a.*, e.`Name` as startAddress, h.`Name` as endAddress, i.goodsType FROM YSGJ_FBACost a INNER JOIN YSGJ_RouteAddress b ON a.startID = b.id INNER JOIN YSGJ_Address c ON b.addressID = c.id INNER JOIN areas e ON c.cityID = e.ID INNER JOIN YSGJ_RouteAddress f ON a.endID = f.id INNER JOIN YSGJ_Address g ON f.addressID = g.id INNER JOIN areas h ON g.countryID = h.ID INNER JOIN YSGJ_TypeGoods i ON a.kindOfGoodsID = i.id WHERE a.logistics = ? AND a.id = ?';
+        let result = yield this.execSQL(querySQL, [logistics, id], dbConnection);
+        dbConnection.release();
+        return result[0];
+    }
+
+    *FBACostList(id) {
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT a.*, e.`Name` as startAddress, h.`Name` as endAddress, i.goodsType FROM YSGJ_FBACost a INNER JOIN YSGJ_RouteAddress b ON a.startID = b.id INNER JOIN YSGJ_Address c ON b.addressID = c.id INNER JOIN areas e ON c.cityID = e.ID INNER JOIN YSGJ_RouteAddress f ON a.endID = f.id INNER JOIN YSGJ_Address g ON f.addressID = g.id INNER JOIN areas h ON g.countryID = h.ID INNER JOIN YSGJ_TypeGoods i ON a.kindOfGoodsID = i.id WHERE logistics = ?';
+        let result = yield this.execSQL(querySQL, [id], dbConnection);
         dbConnection.release();
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
     }
