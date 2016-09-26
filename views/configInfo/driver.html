@@ -94,63 +94,148 @@
         <input type="hidden" name="id" :value="data.id">
         <div class="two fields">
             <div class="field">
-                <label>起始地</label>
-                <div class="field">
-                    <select class="ui fluid search dropdown" name="status">
-                        <option value="0">美国</option>
-                        <option value="1">加拿大</option>
-                        <option value="2">新加坡</option>
-                    </select>
-                </div>
+                <label>司机姓名</label>
+                <input type="text" placeholder="输入司机姓名">
             </div>
             <div class="field">
-                <label>&nbsp;</label>
-                <div class="field">
-                    <select class="ui fluid search dropdown" name="status">
-                        <option value="0">美国</option>
-                        <option value="1">加拿大</option>
-                        <option value="2">新加坡</option>
-                    </select>
-                </div>
-            </div>
-            <div class="field">
-                <label>&nbsp;</label>
-                <div class="field">
-                    <select class="ui fluid search dropdown" name="status">
-                        <option value="0">美国</option>
-                        <option value="1">加拿大</option>
-                        <option value="2">新加坡</option>
-                    </select>
-                </div>
-            </div>
-            <div class="field">
-                <label>&nbsp;</label>
-                <div class="field">
-                    <select class="ui fluid search dropdown" name="status">
-                        <option value="0">美国</option>
-                        <option value="1">加拿大</option>
-                        <option value="2">新加坡</option>
-                    </select>
-                </div>
+                <label>司机电话</label>
+                <input type="tel" placeholder="输入司机电话" maxlength="11">
             </div>
         </div>
         <div class="field">
-            <label>目的地</label>
+            <label>身份证号码</label>
+            <input type="number" placeholder="输入司机身份证号码">
+        </div>
+        <div class="two fields">
             <div class="field">
-                <select class="ui fluid search dropdown" name="status">
-                    <option value="0">dfd</option>
-                    <option value="1">ff</option>
-                    <option value="2">zz</option>
-                </select>
+                <label>车牌号码</label>
+                <input type="text" placeholder="输入车牌号码">
+            </div>
+            <div class="field">
+                <label>车型</label>
+                <div class="field">
+                    <select class="ui fluid search dropdown" name="status">
+                        <option value="0">小面包车</option>
+                        <option value="1">中面包车</option>
+                        <option value="2">小货车</option>
+                        <option value="3">中货车</option>
+                    </select>
+                </div>
             </div>
         </div>
-        <div class="field">
-            <label>有效期</label>
-            <input type="date" placeholder="输入有效期">
+        <div class="two fields">
+            <div class="field" id="driverImgURLContainer0">
+                <label>司机照片</label>
+                <input v-model="data.headURL" type="hidden" value="http://cdn.steamstatic.com.8686c.com/steam/apps/466500/header.jpg?t=1468763225">
+                <div class="field imageURL-field">
+                    <div class="ui card ">
+                        <div class="image image-item">
+                            <img :src="data.headURL || '/static/images/blank_image.jpg'">
+                        </div>
+                        <div class="ui bottom attached buttons">
+                            <div id="driverImageURLSelectFile0" class="ui button">选择文件</div>
+                        </div>
+                        <div class="ui bottom attached progress" data-percent="100" id="driverImgURLProgress0">
+                            <div class="bar" v-show="isUploading0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="field" id="driverImgURLContainer1">
+                <label>身份证正面照</label>
+                <input v-model="data.headURL" type="hidden" value="http://cdn.steamstatic.com.8686c.com/steam/apps/466500/header.jpg?t=1468763225">
+                <div class="field imageURL-field">
+                    <div class="ui card ">
+                        <div class="image image-item">
+                            <img :src="data.headURL || '/static/images/blank_image.jpg'">
+                        </div>
+                        <div class="ui bottom attached buttons">
+                            <div id="driverImageURLSelectFile1" class="ui button">选择文件</div>
+                        </div>
+                        <div class="ui bottom attached progress" data-percent="100" id="driverImgURLProgress1">
+                            <div class="bar" v-show="isUploading1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <% include costsTemplate.html %>
-        <div class="wide field">
-            <button class="ui button" type="button" id="addCost" @click="addCost()">添加费用</button>
+        <div class="two fields">
+            <div class="field" id="driverImgURLContainer2">
+                <label>身份证背面照</label>
+                <input v-model="data.headURL" type="hidden" value="http://cdn.steamstatic.com.8686c.com/steam/apps/466500/header.jpg?t=1468763225">
+                <div class="field imageURL-field">
+                    <div class="ui card ">
+                        <div class="image image-item">
+                            <img :src="data.headURL || '/static/images/blank_image.jpg'">
+                        </div>
+                        <div class="ui bottom attached buttons">
+                            <div id="driverImageURLSelectFile2" class="ui button">选择文件</div>
+                        </div>
+                        <div class="ui bottom attached progress" data-percent="100" id="driverImgURLProgress2">
+                            <div class="bar" v-show="isUploading2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="field" id="driverImgURLContainer3">
+                <label>驾驶证照片</label>
+                <input v-model="data.headURL" type="hidden" value="http://cdn.steamstatic.com.8686c.com/steam/apps/466500/header.jpg?t=1468763225">
+                <div class="field imageURL-field">
+                    <div class="ui card ">
+                        <div class="image image-item">
+                            <img :src="data.headURL || '/static/images/blank_image.jpg'">
+                        </div>
+                        <div class="ui bottom attached buttons">
+                            <div id="driverImageURLSelectFile3" class="ui button">选择文件</div>
+                        </div>
+                        <div class="ui bottom attached progress" data-percent="100" id="driverImgURLProgress3">
+                            <div class="bar" v-show="isUploading3">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="two fields">
+            <div class="field" id="driverImgURLContainer4">
+                <label>车照</label>
+                <input v-model="data.headURL" type="hidden" value="http://cdn.steamstatic.com.8686c.com/steam/apps/466500/header.jpg?t=1468763225">
+                <div class="field imageURL-field">
+                    <div class="ui card ">
+                        <div class="image image-item">
+                            <img :src="data.headURL || '/static/images/blank_image.jpg'">
+                        </div>
+                        <div class="ui bottom attached buttons">
+                            <div id="driverImageURLSelectFile4" class="ui button">选择文件</div>
+                        </div>
+                        <div class="ui bottom attached progress" data-percent="100" id="driverImgURLProgress4">
+                            <div class="bar" v-show="isUploading4">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="field" id="driverImgURLContainer5">
+                <label>行驶证照片</label>
+                <input v-model="data.headURL" type="hidden" value="http://cdn.steamstatic.com.8686c.com/steam/apps/466500/header.jpg?t=1468763225">
+                <div class="field imageURL-field">
+                    <div class="ui card ">
+                        <div class="image image-item">
+                            <img :src="data.headURL || '/static/images/blank_image.jpg'">
+                        </div>
+                        <div class="ui bottom attached buttons">
+                            <div id="driverImageURLSelectFile5" class="ui button">选择文件</div>
+                        </div>
+                        <div class="ui bottom attached progress" data-percent="100" id="driverImgURLProgress5">
+                            <div class="bar" v-show="isUploading5">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </form>
     <div class="actions">
@@ -184,8 +269,12 @@
                 action: "?action=newData"
             },
             data: blankValue,
-            costs: [],
-            isUploading: false
+            isUploading0: false,
+            isUploading1: false,
+            isUploading2: false,
+            isUploading3: false,
+            isUploading4: false,
+            isUploading5: false
         },
         ready: function(){
             editPanel.modal({
@@ -209,32 +298,25 @@
                     headURL: 'empty'
                 }
             });
-
-            var self = this;
-            uploaderManager.newUploader({
-                button: "imgURLSelectFile",
-                container: "imgURLContainer",
-                progressBar: "imgURLProgress",
-                label: "imgURLSelectFile",
-                context: 0,
-                beforeCallback: function(context){
-                    self.isUploading = true;
-                },
-                completedCallback: function(context, url){
-                    self.isUploading = false;
-                    self.data.headURL = url;
-                }
-            });
         },
         methods: {
-            addCost: function(cost){
-                if (!cost){
-                    cost = {min: '', max: '', price: ''};
+            driverImages: function(){
+                for(var i = 0; i < 6; i++){
+                    uploaderManager.newUploader({
+                        button: "driverImageURLSelectFile" + i,
+                        container: "driverImgURLContainer" + i,
+                        progressBar: "driverImgURLProgress"+ i,
+                        label: "driverImageURLSelectFile" + i,
+                        context: i,
+                        beforeCallback: function(context){
+                            vm.$set('isUploading' + i, true);
+                        },
+                        completedCallback: function(context, url){
+                            vm.$set('isUploading' + i, false);
+//                            self.data.headURL = url;
+                        }
+                    });
                 }
-                this.costs.push(cost);
-            },
-            deleteCost: function(index){
-                this.costs.splice(index, 1);
             }
         }
     });
@@ -244,6 +326,7 @@
         Object.assign(newValue, blankValue);
         vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=newData"});
         vm.$set('data', newValue);
+        vm.driverImages();
         editPanel.modal('show');
     }
 
