@@ -196,8 +196,19 @@ var doDriver = function*(ctx, next) {
         console.log(driverInfo)
         yield configInfoAction.updateDriver(driverInfo);
         ctx.response.redirect('/config/driver');
-    } else if (ctx.query.action == 'update') {
-
+    } else if (ctx.query.action == 'remove') {
+        let postData = ctx.request.body;
+        let rules = [
+            {key: 'id', type: 'number'},       //ID
+            {key: 'status', type: 'number'}    //0:删除, 1:正常
+        ];
+        let driverInfo = Utils.verifyAndFillObject(postData, rules);
+        let id = driverInfo.id;
+        driverInfo.modifiedTime = new Date();
+        delete driverInfo.id;
+        console.log(driverInfo)
+        yield configInfoAction.removeDriver(id, driverInfo);
+        ctx.response.redirect('/config/driver');
     } else if (ctx.query.action == 'info') {
         try {
             let id = ctx.query.id;

@@ -447,12 +447,18 @@ class ConfigInfoAction extends MKODBAction {
     }
 
     *driverList() {
-        console.log('asdfsdg')
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT * FROM YSGJ_Driver';
+        let querySQL = 'SELECT * FROM YSGJ_Driver WHERE status = 1';
         let result = yield this.execSQL(querySQL, [], dbConnection);
         dbConnection.release();
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
+    }
+
+    *removeDriver(id, status) {
+        let dbConnection = yield this.getDBConnection();
+        let insertSQL = 'INSERT INTO YSGJ_Driver SET ? WHERE id = ?';
+        let addressID = yield this.execSQL(insertSQL, [status, id], dbConnection);
+        return addressID.insertId;
     }
 
     /*
