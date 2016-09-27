@@ -342,6 +342,19 @@ var doLocalCosts = function*(ctx, next) {
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'startAddress not found!');
         }
+    } else if (ctx.query.action == 'remove') {
+        let postData = ctx.request.body;
+        let rules = [
+            {key: 'id', type: 'number'},       //ID
+            {key: 'status', type: 'number'}    //0:删除, 1:正常
+        ];
+        let driverInfo = Utils.verifyAndFillObject(postData, rules);
+        let id = driverInfo.id;
+        driverInfo.modifiedTime = new Date();
+        delete driverInfo.id;
+        console.log(driverInfo)
+        yield configInfoAction.removeLocalCost(id, driverInfo);
+        ctx.response.redirect('/config/driver');
     } else if (ctx.query.action == 'list') {
         try {
             let result = yield configInfoAction.localCostList();
@@ -394,7 +407,6 @@ var doLocalWarehouse = function*(ctx, next) {
         ];
         let localWarehouseInfo = Utils.verifyAndFillObject(postData, rules);
         localWarehouseInfo.modifiedTime = new Date();
-
         let rulesAddress = [
             {key: 'countryID', type: 'number'},
             {key: 'provinceID', type: 'number'},
