@@ -113,14 +113,17 @@ var doAirTransport = function*(ctx, next) {
         FBACostInfo.status = 1;
         FBACostInfo.createDate = new Date();
         FBACostInfo.modifiedTime = new Date();
+        let id = FBACostInfo.id;
+        delete  FBACostInfo.id;
         console.log(FBACostInfo)
-        yield configInfoAction.updateFBACost(FBACostInfo);
+        yield configInfoAction.updateFBACost(id, FBACostInfo);
         ctx.response.redirect('/config/fba');
     } else if(ctx.query.action == 'info') {
         try {
             let logistics = 1;
             let id = ctx.query.id;
             let startAddress = yield configInfoAction.FBACostInfo(logistics, id);
+            startAddress.expires = startAddress.expires.format('yyyy-MM-dd');
             ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'goodsType not exist!')
@@ -128,6 +131,9 @@ var doAirTransport = function*(ctx, next) {
     } else {
         let logistics = ctx.query.logistics || 1;
         let result = yield configInfoAction.FBACostList(logistics);
+        for (let item of result.datas) {
+            item.expires = item.expires.format('yyyy-MM-dd');
+        }
         console.log(result)
         yield ctx.render('configInfo/airTransport', {data: result,goodsType: ['', '普货', '特殊货物'],});
     }
