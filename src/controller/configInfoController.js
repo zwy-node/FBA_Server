@@ -146,11 +146,74 @@ var doExpress = function*(ctx, next) {
 
 var doDriver = function*(ctx, next) {
     if (ctx.query.action == 'addDriver') {
-
+        let postData = ctx.request.body;
+        let rules = [
+            {key: 'headImage'},                //司机照片
+            {key: 'name'},                     //名称
+            {key: 'mobile'},                   //联系电话
+            {key: 'idCard'},                   //身份证
+            {key: 'idCardImageFront'},         //最快天
+            {key: 'idCardImageBack'},          //最慢天
+            {key: 'driverIDImage'},            //驾驶证
+            {key: 'carID'},                    //车牌
+            {key: 'models'},                   //车型
+            {key: 'carImage'},                 //车照
+            {key: 'carIDImage'}                //车证
+        ];
+        let driverInfo = Utils.verifyAndFillObject(postData, rules);
+        driverInfo.status = 1;
+        driverInfo.createDate = new Date();
+        driverInfo.modifiedTime = new Date();
+        console.log(driverInfo)
+        yield configInfoAction.addDriver(driverInfo);
+        ctx.response.redirect('/config/driver');
+    } else if (ctx.query.action == 'update') {
+        let postData = ctx.request.body;
+        let rules = [
+            {key: 'id', type: 'number'},       //ID
+            {key: 'headImage'},                //司机照片
+            {key: 'name'},                     //名称
+            {key: 'mobile'},                   //联系电话
+            {key: 'idCard'},                   //身份证
+            {key: 'idCardImageFront'},         //最快天
+            {key: 'idCardImageBack'},          //最慢天
+            {key: 'driverIDImage'},            //驾驶证
+            {key: 'carID'},                    //车牌
+            {key: 'models'},                   //车型
+            {key: 'carImage'},                 //车照
+            {key: 'carIDImage'}                //车证
+        ];
+        let driverInfo = Utils.verifyAndFillObject(postData, rules);
+        driverInfo.status = 1;
+        driverInfo.createDate = new Date();
+        driverInfo.modifiedTime = new Date();
+        console.log(driverInfo)
+        yield configInfoAction.updateDriver(driverInfo);
+        ctx.response.redirect('/config/driver');
     } else if (ctx.query.action == 'update') {
 
+    } else if (ctx.query.action == 'info') {
+        try {
+            let id = ctx.query.id;
+            let startAddress = yield configInfoAction.driverInfo(id);
+            ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
+        } catch (e) {
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'driver not exist!')
+        }
+    } else if (ctx.query.action == 'list') {
+        try {
+            let startAddress = yield configInfoAction.driverList();
+            ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
+        } catch (e) {
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'driver not exist!')
+        }
     } else {
-        yield ctx.render('configInfo/driver', {});
+        let result = yield configInfoAction.driverList();
+        for (let item of result.datas) {
+            item.createDate = item.createDate.format('yyyy-MM-dd');
+        }
+        console.log(result)
+        yield ctx.render('configInfo/driver', {data: result});
     }
 };
 

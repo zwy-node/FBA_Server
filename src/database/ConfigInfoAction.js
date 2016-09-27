@@ -407,6 +407,57 @@ class ConfigInfoAction extends MKODBAction {
     /*
      本地仓库
      */
+    *addDriver(driver) {
+        driver.driverID = 'DR100002';
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT * FROM YSGJ_Driver WHERE mobile = ? OR idCard = ?';
+        let driverData = yield this.execSQL(querySQL, [driver.mobile, driver.idCard], dbConnection);
+        console.log(driverData)
+        if (driverData.length > 0) {
+            return null;
+        } else {
+            let insertSQL = 'INSERT INTO YSGJ_Driver SET ?';
+            let addressID = yield this.execSQL(insertSQL, [driver], dbConnection);
+            return addressID.insertId;
+        }
+    }
+
+    *updateDriver(id, driver) {
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT * FROM YSGJ_Driver WHERE mobile = ? OR idCard = ?';
+        let driverData = yield this.execSQL(querySQL, [driver.mobile, driver.idCard], dbConnection);
+        console.log(driverData)
+        if (driver.mobile) {
+            delete driver.mobile;
+        }
+        if (driver.idCard) {
+            delete driver.idCard;
+        }
+        let insertSQL = 'INSERT INTO YSGJ_Driver SET ? WHERE id = ?';
+        let addressID = yield this.execSQL(insertSQL, [driver, id], dbConnection);
+        return addressID.insertId;
+    }
+
+    *driverInfo(id) {
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT * FROM YSGJ_Driver WHERE id = ?';
+        let result = yield this.execSQL(querySQL, [id], dbConnection);
+        dbConnection.release();
+        return result[0];
+    }
+
+    *driverList() {
+        console.log('asdfsdg')
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT * FROM YSGJ_Driver';
+        let result = yield this.execSQL(querySQL, [], dbConnection);
+        dbConnection.release();
+        return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
+    }
+
+    /*
+     本地仓库
+     */
     *LWAddress(address) {
         address.type = 4;
         let dbConnection = yield this.getDBConnection();
