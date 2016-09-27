@@ -474,7 +474,7 @@ class ConfigInfoAction extends MKODBAction {
 
     *updateLocalCost(id, localCost){
         let dbConnection = yield this.getDBConnection();
-        let insertSQL = 'INSERT INTO YSGJ_LocalCost SET ? WHERE id = ?';
+        let insertSQL = 'UPDATE YSGJ_LocalCost SET ? WHERE id = ?';
         let addressID = yield this.execSQL(insertSQL, [localCost, id], dbConnection);
         return addressID.insertId;
     }
@@ -492,6 +492,14 @@ class ConfigInfoAction extends MKODBAction {
         let result = yield this.execSQL(insertSQL, [], dbConnection);
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
     }
+
+    *removeLocalCost(id, status) {
+        let dbConnection = yield this.getDBConnection();
+        let updateSQL = 'UPDATE YSGJ_LocalCost SET ? WHERE id = ?';
+        let result = yield this.execSQL(updateSQL, [status, id], dbConnection);
+        return result.insertId;
+    }
+
 
     /*
      本地仓库
