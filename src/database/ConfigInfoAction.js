@@ -405,7 +405,7 @@ class ConfigInfoAction extends MKODBAction {
 
 
     /*
-     本地仓库
+     司机模块
      */
     *addDriver(driver) {
         driver.driverID = 'DR100002';
@@ -459,6 +459,38 @@ class ConfigInfoAction extends MKODBAction {
         let insertSQL = 'INSERT INTO YSGJ_Driver SET ? WHERE id = ?';
         let addressID = yield this.execSQL(insertSQL, [status, id], dbConnection);
         return addressID.insertId;
+    }
+
+    /*
+     本地费用
+     */
+    *addLocalCost(localCosts) {
+        localCosts.localCostID = "LC100001";
+        let dbConnection = yield this.getDBConnection();
+        let insertSQL = 'INSERT INTO YSGJ_LocalCost SET ?';
+        let addressID = yield this.execSQL(insertSQL, [localCosts], dbConnection);
+        return addressID.insertId;
+    }
+
+    *updateLocalCost(id, localCost){
+        let dbConnection = yield this.getDBConnection();
+        let insertSQL = 'INSERT INTO YSGJ_LocalCost SET ? WHERE id = ?';
+        let addressID = yield this.execSQL(insertSQL, [localCost, id], dbConnection);
+        return addressID.insertId;
+    }
+
+    *localCostInfo(id) {
+        let dbConnection = yield this.getDBConnection();
+        let insertSQL = 'SELECT * FROM YSGJ_LocalCost WHERE id = ?';
+        let result = yield this.execSQL(insertSQL, [id], dbConnection);
+        return result[0];
+    }
+
+    *localCostList() {
+        let dbConnection = yield this.getDBConnection();
+        let insertSQL = 'SELECT * FROM YSGJ_LocalCost WHERE status = 1 AND status = 2';
+        let result = yield this.execSQL(insertSQL, [], dbConnection);
+        return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
     }
 
     /*

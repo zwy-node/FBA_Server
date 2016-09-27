@@ -191,7 +191,6 @@ var doDriver = function*(ctx, next) {
         ];
         let driverInfo = Utils.verifyAndFillObject(postData, rules);
         driverInfo.status = 1;
-        driverInfo.createDate = new Date();
         driverInfo.modifiedTime = new Date();
         console.log(driverInfo)
         yield configInfoAction.updateDriver(driverInfo);
@@ -299,12 +298,58 @@ var doGoodsType = function*(ctx, next) {
 };
 
 var doLocalCosts = function*(ctx, next) {
-    if (ctx.query.action == 'addLocalCosts') {
-
+    if (ctx.query.action == 'addLocalCost') {
+        let postData = ctx.request.body;
+        let rules = [
+            {key: 'cname'},                //中文名
+            {key: 'ename'},                //名称
+            {key: 'unit', type: 'number'}, //单元, 1:BL, 2:KG
+            {key: 'currency'},             //币种
+            {key: 'price', type: 'number'} //最快天
+        ];
+        let localCostsInfo = Utils.verifyAndFillObject(postData, rules);
+        localCostsInfo.status = 1;
+        localCostsInfo.createDate = new Date();
+        localCostsInfo.modifiedTime = new Date();
+        console.log(localCostsInfo)
+        yield configInfoAction.addLocalCost(localCostsInfo);
+        ctx.response.redirect('/config/localCosts');
     } else if (ctx.query.action == 'update') {
-
+        let postData = ctx.request.body;
+        let rules = [
+            {key: 'id', type: 'number'},   //id
+            {key: 'cname'},                //中文名
+            {key: 'ename'},                //名称
+            {key: 'unit', type: 'number'}, //单元, 1:BL, 2:KG
+            {key: 'currency'},             //币种
+            {key: 'price', type: 'number'} //最快天
+        ];
+        let localCostsInfo = Utils.verifyAndFillObject(postData, rules);
+        let id = localCostsInfo.id;
+        localCostsInfo.status = 1;
+        localCostsInfo.modifiedTime = new Date();
+        delete localCostsInfo.id;
+        console.log(localCostsInfo)
+        yield configInfoAction.updateLocalCost(id, localCostsInfo);
+        ctx.response.redirect('/config/localCosts');
+    } else if (ctx.query.action == 'info') {
+        try {
+            let id = ctx.query.id;
+            let result = yield configInfoAction.localCostInfo(id);
+            ctx.body = Utils.createResponse(resCode.RES_Success, null, result);
+        } catch (e) {
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'startAddress not found!');
+        }
+    } else if (ctx.query.action == 'list') {
+        try {
+            let result = yield configInfoAction.localCostList();
+            ctx.body = Utils.createResponse(resCode.RES_Success, null, result);
+        } catch (e) {
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'startAddress not found!');
+        }
     } else {
-        yield ctx.render('configInfo/localCosts', {});
+        let result =  yield configInfoAction.localCostList();
+        yield ctx.render('configInfo/localCosts', {data: result});
     }
 };
 
