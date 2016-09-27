@@ -190,10 +190,12 @@ var doDriver = function*(ctx, next) {
             {key: 'carIDImage'}                //车证
         ];
         let driverInfo = Utils.verifyAndFillObject(postData, rules);
+        let id = driverInfo.id;
         driverInfo.status = 1;
         driverInfo.modifiedTime = new Date();
+        delete driverInfo.id;
         console.log(driverInfo)
-        yield configInfoAction.updateDriver(driverInfo);
+        yield configInfoAction.updateDriver(id, driverInfo);
         ctx.response.redirect('/config/driver');
     } else if (ctx.query.action == 'remove') {
         let postData = ctx.request.body;

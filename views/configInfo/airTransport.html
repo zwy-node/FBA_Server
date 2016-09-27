@@ -163,7 +163,7 @@
             </div>
             <div class="field">
                 <label>有效期</label>
-                <input type="date" placeholder="输入有效期" v-model="data.expires">
+                <input type="date" placeholder="输入有效期" v-model="data.expires" name="expires">
             </div>
         </div>
         <% include costsTemplate.html %>
@@ -216,10 +216,9 @@
             });
             $('.ui.radio.checkbox').checkbox();
             $("#dataForm").form({
+                on: 'blur',
                 fields: {
-                    name: 'empty',
-                    desc: 'empty',
-                    headURL: 'empty'
+                    expires: 'empty'
                 }
             });
             this.startAddressList();

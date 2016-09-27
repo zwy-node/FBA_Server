@@ -433,9 +433,9 @@ class ConfigInfoAction extends MKODBAction {
         if (driver.idCard) {
             delete driver.idCard;
         }
-        let insertSQL = 'INSERT INTO YSGJ_Driver SET ? WHERE id = ?';
-        let addressID = yield this.execSQL(insertSQL, [driver, id], dbConnection);
-        return addressID.insertId;
+        let updateSQL = 'UPDATE YSGJ_Driver SET ? WHERE id = ?';
+        let result = yield this.execSQL(updateSQL, [driver, id], dbConnection);
+        return result.insertId;
     }
 
     *driverInfo(id) {
@@ -456,7 +456,7 @@ class ConfigInfoAction extends MKODBAction {
 
     *removeDriver(id, status) {
         let dbConnection = yield this.getDBConnection();
-        let insertSQL = 'INSERT INTO YSGJ_Driver SET ? WHERE id = ?';
+        let insertSQL = 'UPDATE YSGJ_Driver SET ? WHERE id = ?';
         let addressID = yield this.execSQL(insertSQL, [status, id], dbConnection);
         return addressID.insertId;
     }
