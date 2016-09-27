@@ -364,7 +364,7 @@ var doLocalCosts = function*(ctx, next) {
         }
     } else {
         let result =  yield configInfoAction.localCostList();
-        yield ctx.render('configInfo/localCosts', {data: result, status: ['删除','正常','禁用']});
+        yield ctx.render('configInfo/localCosts', {data: result, status: ['删除','正常','禁用'], unit: ['','BL','KG']});
     }
 };
 

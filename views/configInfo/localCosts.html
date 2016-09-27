@@ -38,7 +38,7 @@
         <td class="left aligned"><%= data.datas[i].localCostID %></td>
         <td class="center aligned"><%= data.datas[i].cname %></td>
         <td class="center aligned"><%= data.datas[i].ename %></td>
-        <td class="center aligned"><%= data.datas[i].unit %></td>
+        <td class="center aligned"><%= unit[data.datas[i].unit] %></td>
         <td class="center aligned"><%= data.datas[i].currency %></td>
         <td class="center aligned"><%= data.datas[i].price %></td>
         <td class="center aligned"><%= status[data.datas[i].status] %></td>
@@ -75,56 +75,53 @@
     <div class="header">
         {{panelInfo.title}}
     </div>
-    <form id="dataForm" class="ui form content" method="post" :action="panelInfo.action">
+    <form id="dataForm" class="ui form content" v-if="panelInfo.type != 2">
         <input type="hidden" name="id" :value="data.id">
         <div class="two fields">
             <div class="field">
                 <label>中文名</label>
-                <input type="text" placeholder="输入中文名"/>
+                <input type="text" placeholder="输入中文名" v-model="data.cname"/>
             </div>
             <div class="field">
                 <label>英文名</label>
-                <input type="text" placeholder="输入英文名"/>
+                <input type="text" placeholder="输入英文名" v-model="data.ename"/>
             </div>
         </div>
         <div class="two fields">
             <div class="field">
                 <label>单位</label>
                 <div class="field">
-                    <select class="ui fluid search dropdown" name="status">
-                        <option value="0">美国</option>
-                        <option value="1">加拿大</option>
-                        <option value="2">新加坡</option>
+                    <select class="ui fluid search dropdown" v-model="data.unit">
+                        <option value="">请选择单位</option>
+                        <option value="1">BL</option>
+                        <option value="2">KG</option>
                     </select>
                 </div>
             </div>
             <div class="field">
                 <label>金额</label>
-                <input type="number" placeholder="输入金额"/>
+                <input type="number" placeholder="输入金额" v-model="data.price"/>
             </div>
         </div>
         <div class="field">
             <label>币种</label>
-            <div class="field">
-                <select class="ui fluid search dropdown" name="status">
-                    <option value="0">美国</option>
-                    <option value="1">加拿大</option>
-                    <option value="2">新加坡</option>
-                </select>
-            </div>
+            <input type="text" placeholder="输入币种" v-model="data.currency"/>
         </div>
         <div class="field">
             <label>说明</label>
-            <textarea placeholder="输入说明" rows="2"></textarea>
+            <textarea placeholder="输入说明" rows="2" v-model="data.desc"></textarea>
         </div>
     </form>
+    <div class="content" v-if="panelInfo.type == 2">
+        <p>确定删除ID为<b>{{deleteName}}</b>的费用吗？</p>
+    </div>
     <div class="actions">
         <div class="ui approve positive button">保存</div>
         <div class="ui button deny">取消</div>
     </div>
 </div>
 <script type="text/javascript">
-    var blankValue = {name: '', key: '', desc: '', status: 0, headURL: ''};
+    var blankValue = {cname: '', ename: '', unit: '', currency: '', price: '', desc: ''};
     var editPanel = $('#editPanel');
     var vm = new Vue({
         el: '#editPanel',
@@ -132,7 +129,7 @@
             panelInfo: {
                 title: '',  //标题
                 type: 0,    //类型 0: 新建模式 1: 编辑模式
-                action: "?action=newData"
+                action: "?action=addLocalCost"
             },
             data: blankValue
         },
@@ -140,7 +137,7 @@
             editPanel.modal({
                 closable: false,
                 onApprove : function() {
-                    $('.ui.form').submit();
+                    doSubmit();
                     return false;
                 },
                 onDeny: function(){
@@ -161,10 +158,57 @@
         }
     });
 
+    function doSubmit(){
+        var panelInfo = vm.panelInfo;
+        var params = vm.data;
+//        添加
+        if(panelInfo.type == 0){
+            delete params.id;
+            for(var key in params){
+                if(params[key] == null || params[key] == ''){
+                    return false;
+                }
+            }
+            $.ajax({
+                type: 'POST',
+                data: params,
+                url: panelInfo.action,
+                success: function(data){
+                    window.location.reload();
+                },error: function(xhr, type){
+                    console.log(xhr, type);
+                }
+            });
+//            编辑
+        }else if(vm.panelInfo.type == 1){
+            $.ajax({
+                type: 'POST',
+                data: params,
+                url: panelInfo.action,
+                success: function(data){
+                    window.location.reload();
+                },error: function(xhr, type){
+                    console.log(xhr, type);
+                }
+            });
+//            删除
+        }else if(vm.panelInfo.type == 2){
+            $.ajax({
+                type: 'GET',
+                url: panelInfo.action + '&id=' + vm.deleteAddressID,
+                success: function(data){
+                    window.location.reload();
+                },error: function(xhr, type){
+                    console.log(xhr, type);
+                }
+            });
+        }
+    }
+
     function newData(){
         var newValue = {};
         Object.assign(newValue, blankValue);
-        vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=newData"});
+        vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=addLocalCost"});
         vm.$set('data', newValue);
         editPanel.modal('show');
     }
@@ -172,11 +216,27 @@
     function editData(id){
         $.ajax({
             type: 'GET',
-            url: 'mrmj?action=getData&id='+ id,
+            url: '?action=info&id='+ id,
             success: function(data){
-                var editingData = data.data;
+                var editingData = data.response;
                 vm.$set('data', editingData);
-                vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=editData"});
+                vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=update"});
+                editPanel.modal('show');
+            },error: function(xhr, type){
+                console.log(xhr, type);
+            }
+        });
+    }
+
+    function removeData(id){
+        $.ajax({
+            type: 'GET',
+            url: '?action=info&id='+ id,
+            success: function(data){
+                var editingData = data.response;
+                vm.$set('data', editingData);
+                vm.$set('panelInfo', {title: '删除', type: 2, action: "?action=remove"});
+                vm.$set('deleteName', editingData.localCostID);
                 editPanel.modal('show');
             },error: function(xhr, type){
                 console.log(xhr, type);
