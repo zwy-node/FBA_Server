@@ -96,10 +96,10 @@ class ConfigInfoAction extends MKODBAction {
         return result.insertId;
     }
 
-    *FBACostInfo(logistics, id) {
+    *FBACostInfo(id) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT a.*, e.`Name` as startAddress, h.`Name` as endAddress, i.goodsType FROM YSGJ_FBACost a INNER JOIN YSGJ_RouteAddress b ON a.startID = b.id INNER JOIN YSGJ_Address c ON b.addressID = c.id INNER JOIN areas e ON c.cityID = e.ID INNER JOIN YSGJ_RouteAddress f ON a.endID = f.id INNER JOIN YSGJ_Address g ON f.addressID = g.id INNER JOIN areas h ON g.countryID = h.ID INNER JOIN YSGJ_TypeGoods i ON a.kindOfGoodsID = i.id WHERE a.logistics = ? AND a.id = ?';
-        let result = yield this.execSQL(querySQL, [logistics, id], dbConnection);
+        let querySQL = 'SELECT a.*, e.`Name` as startAddress, h.`Name` as endAddress, i.goodsType FROM YSGJ_FBACost a INNER JOIN YSGJ_RouteAddress b ON a.startID = b.id INNER JOIN YSGJ_Address c ON b.addressID = c.id INNER JOIN areas e ON c.cityID = e.ID INNER JOIN YSGJ_RouteAddress f ON a.endID = f.id INNER JOIN YSGJ_Address g ON f.addressID = g.id INNER JOIN areas h ON g.countryID = h.ID INNER JOIN YSGJ_TypeGoods i ON a.kindOfGoodsID = i.id WHERE a.id = ?';
+        let result = yield this.execSQL(querySQL, [id], dbConnection);
         dbConnection.release();
         return result[0];
     }

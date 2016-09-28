@@ -46,16 +46,6 @@ var doFBAWarehouse = function*(ctx, next) {
     }
 };
 
-var doDriverCost = function*(ctx, next) {
-    if (ctx.query.action == 'addDriverCost') {
-
-    } else if (ctx.query.action == 'update') {
-
-    } else {
-        yield ctx.render('configInfo/driverCosts', {});
-    }
-};
-
 var doAirTransport = function*(ctx, next) {
     if (ctx.query.action == 'addAirTransport') {
         let postData = ctx.request.body;
@@ -120,9 +110,8 @@ var doAirTransport = function*(ctx, next) {
         ctx.response.redirect('/config/fba');
     } else if(ctx.query.action == 'info') {
         try {
-            let logistics = 1;
             let id = ctx.query.id;
-            let startAddress = yield configInfoAction.FBACostInfo(logistics, id);
+            let startAddress = yield configInfoAction.FBACostInfo(id);
             startAddress.expires = startAddress.expires.format('yyyy-MM-dd');
             ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
         } catch (e) {
@@ -134,20 +123,63 @@ var doAirTransport = function*(ctx, next) {
         for (let item of result.datas) {
             item.expires = item.expires.format('yyyy-MM-dd');
         }
-        console.log(result)
-        yield ctx.render('configInfo/airTransport', {data: result,goodsType: ['', '普货', '特殊货物'],});
+        if(logistics == 1) {
+            console.log(result)
+            yield ctx.render('configInfo/airTransport', {data: result,goodsType: ['', '普货', '特殊货物'],});
+        } else {
+            console.log(result)
+            yield ctx.render('configInfo/express', {data: result,goodsType: ['', '普货', '特殊货物'],});
+        }
     }
 };
 
-var doExpress = function*(ctx, next) {
-    if (ctx.query.action == 'addExpress') {
 
+var doDriverCost = function*(ctx, next) {
+    if (ctx.query.action == 'addDriverCost') {
+        let postData = ctx.request.body;
+        let rules = [
+            {key: 'startID', type: 'number'},       //起运地ID
+            {key: 'endID', type: 'number'},         //目的地ID
+            {key: 'zipCodeHead', type: 'number'},   //邮编开头
+            {key: 'kindOfGoodsID', type: 'number'}, //货品类型ID
+            {
+                key: 'prices', type: 'object', cb: function (value, cb) {
+                try {
+                    let result = JSON.stringify(value);
+                    cb(result)
+                } catch (e) {
+                    console.log(e)
+                }
+            }
+            },        //价格
+            {key: 'fastestDay', type: 'number'},    //最快天
+            {key: 'slowestDay', type: 'number'},    //最慢天
+            {key: 'logistics', type: 'number'},     //1:双清, 2:快递
+            {key: 'expires'}                        //过期日期
+        ];
+        let FBACostInfo = Utils.verifyAndFillObject(postData, rules);
+        FBACostInfo.status = 1;
+        FBACostInfo.createDate = new Date();
+        FBACostInfo.modifiedTime = new Date();
+        console.log(FBACostInfo)
+        yield configInfoAction.addFBACost(FBACostInfo);
+        ctx.response.redirect('/config/fba');
     } else if (ctx.query.action == 'update') {
 
     } else {
-        yield ctx.render('configInfo/express', {});
+        yield ctx.render('configInfo/driverCosts', {});
     }
 };
+
+//var doExpress = function*(ctx, next) {
+//    if (ctx.query.action == 'addExpress') {
+//
+//    } else if (ctx.query.action == 'update') {
+//
+//    } else {
+//        yield ctx.render('configInfo/express', {});
+//    }
+//};
 
 
 var doDriver = function*(ctx, next) {
@@ -646,8 +678,8 @@ module.exports = co.wrap(function*(ctx, next) {
         yield doDriverCost(ctx, next);
     } else if (ctx.params.type == 'airTransport') {
         yield doAirTransport(ctx, next);
-    } else if (ctx.params.type == 'express') {
-        yield doExpress(ctx, next);
+    //} else if (ctx.params.type == 'express') {
+    //    yield doExpress(ctx, next);
     } else if (ctx.params.type == 'driver') {
         yield doDriver(ctx, next);
     } else if (ctx.params.type == 'destinationAddress') {
