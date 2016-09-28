@@ -488,7 +488,7 @@ class ConfigInfoAction extends MKODBAction {
 
     *localCostList() {
         let dbConnection = yield this.getDBConnection();
-        let insertSQL = 'SELECT * FROM YSGJ_LocalCost WHERE status = 1 AND status = 2';
+        let insertSQL = 'SELECT * FROM YSGJ_LocalCost WHERE status = 1 OR status = 2';
         let result = yield this.execSQL(insertSQL, [], dbConnection);
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
     }
