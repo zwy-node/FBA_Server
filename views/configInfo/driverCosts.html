@@ -363,7 +363,31 @@
             type: 'GET',
             url: '?action=info&id='+ id,
             success: function(data){
-                var editingData = data.response;
+                var response = data.response;
+                var editingData = {};
+                editingData['expires'] = response.expires;
+                editingData['startAddress'] =  {
+                    countryID: 100000,
+                    provinceID: response.provinceID,
+                    cityID: response.cityID,
+                    townID: response.townID,
+                    street: response.street
+                };
+                editingData['endAddress'] =  {
+                    countryID: 100000,
+                    provinceID: response.provinceDestID,
+                    cityID: response.cityDestID,
+                    townID: response.townDestID,
+                    street: response.streetDest
+                };
+                var prices = JSON.parse(response.prices);
+                var costs = [];
+                for(var key in prices){
+                    var arr = key.split('-');
+                    costs.push({min: arr[0], max: arr[1], price: prices[key]});
+                }
+                delete editingData.prices;
+                editingData.costs = costs;
                 vm.$set('data', editingData);
                 vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=update"});
                 editPanel.modal('show');
