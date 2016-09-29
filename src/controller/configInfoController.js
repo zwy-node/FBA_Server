@@ -515,7 +515,7 @@ var doLocalWarehouse = function*(ctx, next) {
     } else if (ctx.query.action == 'info') {
         try {
             let id = ctx.query.id;
-            let startAddress = yield configInfoAction.localWarehouseInfo(id);
+            let startAddress = yield configInfoAction.driverCostInfo(id);
             ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'localWarehouse not exist!')
