@@ -113,3 +113,8 @@ var getParams = function(){
     });
     return params;
 }
+
+
+var format = function(){
+    return '';
+}

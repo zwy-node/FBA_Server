@@ -62,8 +62,9 @@ class ConfigInfoAction extends MKODBAction {
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
     }
 
+
     /*
-     FBA 仓库模块
+     FBA运费
      */
     *addFBACost(opt) {
         let dbConnection = yield this.getDBConnection();
@@ -472,7 +473,7 @@ class ConfigInfoAction extends MKODBAction {
         return addressID.insertId;
     }
 
-    *updateLocalCost(id, localCost){
+    *updateLocalCost(id, localCost) {
         let dbConnection = yield this.getDBConnection();
         let insertSQL = 'UPDATE YSGJ_LocalCost SET ? WHERE id = ?';
         let addressID = yield this.execSQL(insertSQL, [localCost, id], dbConnection);
@@ -504,7 +505,7 @@ class ConfigInfoAction extends MKODBAction {
     /*
      本地仓库
      */
-    *LWAddress(address) {
+    *addAddressByStartOrEnd(address) {
         address.type = 4;
         let dbConnection = yield this.getDBConnection();
         let insertSQL = 'INSERT INTO YSGJ_Address SET ?';
@@ -531,7 +532,7 @@ class ConfigInfoAction extends MKODBAction {
         if (findLocalWarehouse.length > 0) {
             return null;
         } else {
-            let addressID = yield this.LWAddress(address);
+            let addressID = yield this.addAddressByStartOrEnd(address);
             localWarehouse.addressID = addressID;
             let insertSQL = 'INSERT INTO YSGJ_LocalWarehouse SET ?';
             let result = yield this.execSQL(insertSQL, [localWarehouse], dbConnection);
@@ -597,6 +598,49 @@ class ConfigInfoAction extends MKODBAction {
     *localWarehouseList() {
         let dbConnection = yield this.getDBConnection();
         let querySQL = 'SELECT a.*, b.fullAddress, c.`name` as supplierName FROM YSGJ_LocalWarehouse a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN YSGJ_Supplier c ON a.supplier = c.id;';
+        let result = yield this.execSQL(querySQL, [], dbConnection);
+        dbConnection.release();
+        return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
+    }
+
+    /*
+     * 提货费用
+     */
+    *addDriverCost(truckCostInfo, startAddress, endAddress) {
+        let startID = yield this.addAddressByStartOrEnd(startAddress);
+        let endID = yield this.addAddressByStartOrEnd(endAddress);
+        truckCostInfo.addressID = startID;
+        truckCostInfo.destination = endID;
+        let dbConnection = yield this.getDBConnection();
+        let insertSQL = 'INSERT INTO YSGJ_TruckCost SET ?';
+        let result = yield this.execSQL(insertSQL, truckCostInfo, dbConnection);
+        dbConnection.release();
+        return result.insertId;
+    }
+
+    *updateDriverCost(truckCostInfo, startAddress, endAddress) {
+        let startID = yield this.addAddressByStartOrEnd(startAddress);
+        let endID = yield this.addAddressByStartOrEnd(endAddress);
+        truckCostInfo.addressID = startID;
+        truckCostInfo.destination = endID;
+        let dbConnection = yield this.getDBConnection();
+        let insertSQL = 'INSERT INTO YSGJ_TruckCost SET ?';
+        let result = yield this.execSQL(insertSQL, truckCostInfo, dbConnection);
+        dbConnection.release();
+        return result.insertId;
+    }
+
+    *driverCostInfo(id) {
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT a.*, c.`Name` as country, d.`Name` as province, e.`Name` as city, f.`Name` as town, h.`Name` as countryDest, i.`Name` as provinceDest, j.`Name` as cityDest, k.`Name` as townDest FROM YSGJ_TruckCost a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.countryID = c.ID INNER JOIN areas d ON b.provinceID = d.ID INNER JOIN areas e ON b.cityID = e.ID INNER JOIN areas f ON b.townID = f.ID INNER JOIN YSGJ_Address g ON a.destination = g.id INNER JOIN areas h ON g.countryID = h.ID INNER JOIN areas i ON g.provinceID = i.ID INNER JOIN areas j ON g.cityID = j.ID INNER JOIN areas k ON g.townID = k.ID WHERE id = ?;';
+        let result = yield this.execSQL(querySQL, [id], dbConnection);
+        dbConnection.release();
+        return result[0];
+    }
+
+    *driverCostList() {
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT a.*, c.`Name` as country, d.`Name` as province, e.`Name` as city, f.`Name` as town, h.`Name` as countryDest, i.`Name` as provinceDest, j.`Name` as cityDest, k.`Name` as townDest FROM YSGJ_TruckCost a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.countryID = c.ID INNER JOIN areas d ON b.provinceID = d.ID INNER JOIN areas e ON b.cityID = e.ID INNER JOIN areas f ON b.townID = f.ID INNER JOIN YSGJ_Address g ON a.destination = g.id INNER JOIN areas h ON g.countryID = h.ID INNER JOIN areas i ON g.provinceID = i.ID INNER JOIN areas j ON g.cityID = j.ID INNER JOIN areas k ON g.townID = k.ID;';
         let result = yield this.execSQL(querySQL, [], dbConnection);
         dbConnection.release();
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
