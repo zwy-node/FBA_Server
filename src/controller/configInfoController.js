@@ -32,14 +32,36 @@ var doFBAWarehouse = function*(ctx, next) {
     } else if (ctx.query.action == 'update') {
         let postData = ctx.request.body;
         let rules = [
-            {key: 'addressID', type: 'number'},
+            {key: 'id', type: 'number'},
             {key: 'postcode', type: 'number'},
             {key: 'supplier', type: 'number'}
         ];
         let FBAWarehouse = Utils.verifyAndFillObject(postData, rules);
+        FBAWarehouse.modifiedTime = new Date();
+        let id = FBAWarehouse.id;
+        delete FBAWarehouse.id;
 
-    } else if (ctx.query.action == 'update') {
+        let rulesAddress = [
+            {key: 'addressID', type: 'number'},
+            {key: 'countryID', type: 'number'},
+            {key: 'provinceID', type: 'number'},
+            {key: 'cityID', type: 'number'},
+            {key: 'address'}
+        ];
+        let addressInfo = Utils.verifyAndFillObject(postData, rulesAddress);
+        let addressID = addressInfo.addressID;
+        delete addressInfo.addressID;
 
+        yield configInfoAction.updateFBAWarehouse(id, FBAWarehouse, addressID, addressInfo);
+        ctx.response.redirect('/config/fba');
+    } else if (ctx.query.action == 'info') {
+        try {
+            let id = ctx.query.id;
+            let startAddress = yield configInfoAction.FBAWarehouseInfo(id);
+            ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
+        } catch (e) {
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'FBAWarehouse not exist!')
+        }
     } else {
         let result = yield configInfoAction.FBAWarehouseList();
         yield ctx.render('configInfo/fba', {data: result});
