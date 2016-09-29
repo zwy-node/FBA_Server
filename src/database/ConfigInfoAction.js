@@ -661,7 +661,7 @@ class ConfigInfoAction extends MKODBAction {
 
     *driverCostInfo(id) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT a.*, c.`Name` as country , d.`Name` as province , e.`Name` as city , b.street, f.`Name` as town , h.`Name` as countryDest , i.`Name` as provinceDest , j.`Name` as cityDest , k.`Name` as townDest , g.street as streetDest FROM YSGJ_TruckCost a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.countryID = c.ID INNER JOIN areas d ON b.provinceID = d.ID INNER JOIN areas e ON b.cityID = e.ID INNER JOIN areas f ON b.townID = f.ID INNER JOIN YSGJ_Address g ON a.destination = g.id INNER JOIN areas h ON g.countryID = h.ID INNER JOIN areas i ON g.provinceID = i.ID INNER JOIN areas j ON g.cityID = j.ID INNER JOIN areas k ON g.townID = k.ID WHERE a.id = ?';
+        let querySQL = 'SELECT a.*, b.countryID , b.provinceID , b.cityID , b.townID , b.street , g.countryID AS countryDestID , g.provinceID AS provinceDestID , g.cityID AS cityDestID , g.townID AS townDestID , g.street as streetDest FROM YSGJ_TruckCost a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN YSGJ_Address g ON a.destination = g.id WHERE a.id = ?';
         let result = yield this.execSQL(querySQL, [id], dbConnection);
         dbConnection.release();
         return result[0];
