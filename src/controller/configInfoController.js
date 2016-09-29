@@ -112,7 +112,7 @@ var doAirTransport = function*(ctx, next) {
         try {
             let id = ctx.query.id;
             let startAddress = yield configInfoAction.FBACostInfo(id);
-            startAddress.expires = startAddress.expires.format('yyyy-MM-dd');
+            //startAddress.expires = startAddress.expires.format('yyyy-MM-dd');
             ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'goodsType not exist!')
@@ -120,9 +120,9 @@ var doAirTransport = function*(ctx, next) {
     } else {
         let logistics = ctx.query.logistics || 1;
         let result = yield configInfoAction.FBACostList(logistics);
-        for (let item of result.datas) {
-            item.expires = item.expires.format('yyyy-MM-dd');
-        }
+        //for (let item of result.datas) {
+        //    item.expires = item.expires.format('yyyy-MM-dd');
+        //}
         if(logistics == 1) {
             console.log(result)
             yield ctx.render('configInfo/airTransport', {data: result,goodsType: ['', '普货', '特殊货物'],});
@@ -138,36 +138,77 @@ var doDriverCost = function*(ctx, next) {
     if (ctx.query.action == 'addDriverCost') {
         let postData = ctx.request.body;
         let rules = [
-            {key: 'startID', type: 'number'},       //起运地ID
-            {key: 'endID', type: 'number'},         //目的地ID
-            {key: 'zipCodeHead', type: 'number'},   //邮编开头
-            {key: 'kindOfGoodsID', type: 'number'}, //货品类型ID
-            {
-                key: 'prices', type: 'object', cb: function (value, cb) {
+            {key: 'startAddress', type: 'object'},
+            {key: 'endAddress', type: 'object'},
+            {key: 'prices', type: 'object', cb: function (value, cb) {
                 try {
                     let result = JSON.stringify(value);
                     cb(result)
                 } catch (e) {
                     console.log(e)
                 }
-            }
-            },        //价格
-            {key: 'fastestDay', type: 'number'},    //最快天
-            {key: 'slowestDay', type: 'number'},    //最慢天
-            {key: 'logistics', type: 'number'},     //1:双清, 2:快递
-            {key: 'expires'}                        //过期日期
+            }},                 //价格
+            {key: 'expires'}    //过期日期
         ];
-        let FBACostInfo = Utils.verifyAndFillObject(postData, rules);
-        FBACostInfo.status = 1;
-        FBACostInfo.createDate = new Date();
-        FBACostInfo.modifiedTime = new Date();
-        console.log(FBACostInfo)
-        yield configInfoAction.addFBACost(FBACostInfo);
-        ctx.response.redirect('/config/fba');
-    } else if (ctx.query.action == 'update') {
+        let truckCostInfo = Utils.verifyAndFillObject(postData, rules);
+        truckCostInfo.status = 1;
+        truckCostInfo.createDate = new Date();
+        truckCostInfo.modifiedTime = new Date();
 
+        let startAddress = truckCostInfo.startAddress;
+        delete truckCostInfo.startAddress;
+        let endAddress = truckCostInfo.endAddress;
+        delete truckCostInfo.endAddress;
+
+        yield configInfoAction.addDriverCost(truckCostInfo, startAddress, endAddress);
+        ctx.response.redirect('/config/driverCosts');
+    } else if (ctx.query.action == 'update') {
+        let postData = ctx.request.body;
+        let rules = [
+            {key: 'id', type: 'number'},
+            {key: 'addressID', type: 'number'},
+            {key: 'destination', type: 'number'},
+            {key: 'startAddress', type: 'object'},
+            {key: 'endAddress', type: 'object'},
+            {key: 'prices', type: 'object', cb: function (value, cb) {
+                try {
+                    let result = JSON.stringify(value);
+                    cb(result)
+                } catch (e) {
+                    console.log(e)
+                }
+            }},                 //价格
+            {key: 'expires'}    //过期日期
+        ];
+        let truckCostInfo = Utils.verifyAndFillObject(postData, rules);
+        truckCostInfo.status = 1;
+        truckCostInfo.createDate = new Date();
+        truckCostInfo.modifiedTime = new Date();
+
+        let id = truckCostInfo.id;
+        delete truckCostInfo.id;
+        let addressID = truckCostInfo.addressID;
+        delete truckCostInfo.addressID;
+        let destination = truckCostInfo.destination;
+        delete truckCostInfo.destination;
+        let startAddress = truckCostInfo.startAddress;
+        delete truckCostInfo.startAddress;
+        let endAddress = truckCostInfo.endAddress;
+        delete truckCostInfo.endAddress;
+
+        yield configInfoAction.updateDriverCost(id, truckCostInfo, addressID, startAddress, destination, endAddress);
+        ctx.response.redirect('/config/driverCosts');
+    } else if (ctx.query.action == 'info') {
+        try {
+            let id = ctx.query.id;
+            let driverCostInfo = yield configInfoAction.driverCostInfo(id);
+            ctx.body = Utils.createResponse(resCode.RES_Success, null, driverCostInfo);
+        } catch (e) {
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'driverCost not exist!')
+        }
     } else {
-        yield ctx.render('configInfo/driverCosts', {});
+        let result = yield configInfoAction.driverCostList();
+        yield ctx.render('configInfo/driverCosts', {data: result});
     }
 };
 
@@ -259,9 +300,9 @@ var doDriver = function*(ctx, next) {
         }
     } else {
         let result = yield configInfoAction.driverList();
-        for (let item of result.datas) {
-            item.createDate = item.createDate.format('yyyy-MM-dd');
-        }
+        //for (let item of result.datas) {
+        //    item.createDate = item.createDate.format('yyyy-MM-dd');
+        //}
         console.log(result)
         yield ctx.render('configInfo/driver', {data: result});
     }
@@ -317,9 +358,9 @@ var doGoodsType = function*(ctx, next) {
         }
     } else {
         let result = yield configInfoAction.goodsTypeList();
-        for (let item of result.datas) {
-            item.createDate = item.createDate.format('yyyy-MM-dd');
-        }
+        //for (let item of result.datas) {
+        //    item.createDate = item.createDate.format('yyyy-MM-dd');
+        //}
         console.log(result)
         yield ctx.render('configInfo/goodsType', {
             data: result,
@@ -461,9 +502,9 @@ var doLocalWarehouse = function*(ctx, next) {
         }
     } else {
         let result = yield configInfoAction.localWarehouseList();
-        for (let item of result.datas) {
-            item.createDate = item.createDate.format('yyyy-MM-dd');
-        }
+        //for (let item of result.datas) {
+        //    item.createDate = item.createDate.format('yyyy-MM-dd');
+        //}
         console.log(result)
         yield ctx.render('configInfo/localWarehouse', {data: result});
     }
@@ -513,9 +554,9 @@ var doStartAddress = function*(ctx, next) {
         }
     } else {
         let result = yield configInfoAction.startAddressList();
-        for (let item of result.datas) {
-            item.createDate = item.createDate.format('yyyy-MM-dd');
-        }
+        //for (let item of result.datas) {
+        //    item.createDate = item.createDate.format('yyyy-MM-dd');
+        //}
         yield ctx.render('configInfo/originatingAddress', {data: result});
     }
 };
@@ -562,9 +603,9 @@ var doEndAddress = function*(ctx, next) {
         }
     } else {
         let result = yield configInfoAction.endAddressList();
-        for (let item of result.datas) {
-            item.createDate = item.createDate.format('yyyy-MM-dd');
-        }
+        //for (let item of result.datas) {
+        //    item.createDate = item.createDate.format('yyyy-MM-dd');
+        //}
         yield ctx.render('configInfo/destinationAddress', {data: result});
     }
 };
@@ -598,9 +639,9 @@ var doSupplier = function*(ctx, next) {
         try {
             let id = ctx.query.id;
             let startAddress = yield configInfoAction.supplierInfo(id);
-            if (startAddress) {
-                startAddress.createDate = startAddress.createDate.format('yyyy-MM-dd');
-            }
+            //if (startAddress) {
+            //    startAddress.createDate = startAddress.createDate.format('yyyy-MM-dd');
+            //}
             ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'EndAddressInfo not exist!')
@@ -614,9 +655,9 @@ var doSupplier = function*(ctx, next) {
         }
     } else {
         let result = yield configInfoAction.supplierList();
-        for (let item of result.datas) {
-            item.createDate = item.createDate.format('yyyy-MM-dd');
-        }
+        //for (let item of result.datas) {
+        //    item.createDate = item.createDate.format('yyyy-MM-dd');
+        //}
         yield ctx.render('configInfo/supplier', {data: result});
     }
 };

@@ -11,7 +11,8 @@ module.exports = {
         database: 'FBA',
         port: 3306,
         //user: 'YQYD',
-        password: 'MKO--2016'
+        password: 'MKO--2016',
+        dateStrings: true
     },
     redis: {
         RDS_PORT: 6379,
