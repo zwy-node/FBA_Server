@@ -57,6 +57,8 @@ module.exports = co.wrap(function*(ctx, next) {
         yield doAddUser(ctx, next);
     } else if (ctx.params.type == 'login') {
         yield doLogin(ctx, next);
+    } else if (ctx.params.type == 'list') {
+        yield ctx.render('user/user_list', {});
     }
     yield next();
 });
