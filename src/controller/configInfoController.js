@@ -222,6 +222,7 @@ var doDriverCost = function*(ctx, next) {
         try {
             let id = ctx.query.id;
             let driverCostInfo = yield configInfoAction.driverCostInfo(id);
+            driverCostInfo.modifiedTime = driverCostInfo.modifiedTime.format('yyyy-MM-dd');
             ctx.body = Utils.createResponse(resCode.RES_Success, null, driverCostInfo);
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'driverCost not exist!')
