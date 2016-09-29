@@ -63,7 +63,7 @@ class ConfigInfoAction extends MKODBAction {
         }
         let updateSQL = 'UPDATE YSGJ_FBAWarehouse SET ? WHERE `id` = ?';
         let result = yield this.execSQL(updateSQL, [FBAWarehouse, id]);
-        let updateSQL = 'UPDATE YSGJ_Address SET ? WHERE `id` = ?';
+        updateSQL = 'UPDATE YSGJ_Address SET ? WHERE `id` = ?';
         yield this.execSQL(updateSQL, [addressInfo, addressID], dbConnection);
         dbConnection.release();
         return result.insertId;
@@ -643,7 +643,7 @@ class ConfigInfoAction extends MKODBAction {
 
     *updateAddressByStartOrEnd(addressID, startAddress) {
         let dbConnection = yield this.getDBConnection();
-        let updateSQL = 'UPDATE YSGJ_LocalWarehouse SET ? WHERE `id` = ?';
+        let updateSQL = 'UPDATE YSGJ_Address SET ? WHERE `id` = ?';
         let result = yield this.execSQL(updateSQL, [startAddress, addressID], dbConnection);
         dbConnection.release();
         return result;
@@ -651,7 +651,7 @@ class ConfigInfoAction extends MKODBAction {
 
     *updateDriverCost(id, truckCostInfo, addressID, startAddress, destination, endAddress) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'INSERT INTO YSGJ_TruckCost SET ? WHERE id = ?';
+        let querySQL = 'UPDATE YSGJ_TruckCost SET ? WHERE id = ?';
         let result = yield this.execSQL(querySQL, [truckCostInfo, id], dbConnection);
         yield this.updateAddressByStartOrEnd(addressID, startAddress);
         yield this.updateAddressByStartOrEnd(destination, endAddress);

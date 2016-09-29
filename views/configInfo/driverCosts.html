@@ -90,7 +90,7 @@
             <div class="field">
                 <label>起始地址</label>
                 <div class="field">
-                    <select class="ui fluid search dropdown" v-model="data.startAddress.provinceID" v-on:change="cityList(data.startAddress.provinceID, 1)">
+                    <select class="ui fluid search dropdown" v-model="data.startAddress.provinceID" v-on:change="cityList(data.startAddress.provinceID, 1, true)">
                         <option value="">请选择省份</option>
                         <option v-for="item in startProvinces" :value="item.ID">{{item.Name}}</option>
                     </select>
@@ -99,7 +99,7 @@
             <div class="field">
                 <label>&nbsp;</label>
                 <div class="field">
-                    <select class="ui fluid search dropdown" v-model="data.startAddress.cityID" v-on:change="townList(data.startAddress.cityID, 1)">
+                    <select class="ui fluid search dropdown" v-model="data.startAddress.cityID" v-on:change="townList(data.startAddress.cityID, 1, true)">
                         <option value="">请选择城市</option>
                         <option v-for="item in startCities" :value="item.ID">{{item.Name}}</option>
                     </select>
@@ -122,7 +122,7 @@
             <div class="field">
                 <label>目的地址地址</label>
                 <div class="field">
-                    <select class="ui fluid search dropdown" v-model="data.endAddress.provinceID" v-on:change="cityList(data.endAddress.provinceID, 2)">
+                    <select class="ui fluid search dropdown" v-model="data.endAddress.provinceID" v-on:change="cityList(data.endAddress.provinceID, 2, true)">
                         <option value="">请选择省份</option>
                         <option v-for="item in endProvinces" :value="item.ID">{{item.Name}}</option>
                     </select>
@@ -131,7 +131,7 @@
             <div class="field">
                 <label>&nbsp;</label>
                 <div class="field">
-                    <select class="ui fluid search dropdown" v-model="data.endAddress.cityID" v-on:change="townList(data.endAddress.cityID, 2)">
+                    <select class="ui fluid search dropdown" v-model="data.endAddress.cityID" v-on:change="townList(data.endAddress.cityID, 2, true)">
                         <option value="">请选择城市</option>
                         <option v-for="item in endCities" :value="item.ID">{{item.Name}}</option>
                     </select>
@@ -246,13 +246,15 @@
                     }
                 });
             },
-            cityList: function(id, type){
-                if(type == 1){
-                    this.data.startAddress.cityID = '';
-                    this.data.startAddress.townID = '';
-                }else{
-                    this.data.endAddress.cityID = '';
-                    this.data.endAddress.townID = '';
+            cityList: function(id, type, isChange){
+                if(isChange){
+                    if(type == 1){
+                        this.data.startAddress.cityID = '';
+                        this.data.startAddress.townID = '';
+                    }else{
+                        this.data.endAddress.cityID = '';
+                        this.data.endAddress.townID = '';
+                    }
                 }
                 var self = this;
                 $.ajax({
@@ -270,11 +272,13 @@
                     }
                 });
             },
-            townList: function(id, type){
-                if(type == 1){
-                    this.data.startAddress.townID = '';
-                }else{
-                    this.data.endAddress.townID = '';
+            townList: function(id, type, isChange){
+                if(isChange){
+                    if(type == 1){
+                        this.data.startAddress.townID = '';
+                    }else{
+                        this.data.endAddress.townID = '';
+                    }
                 }
                 var self = this;
                 $.ajax({
@@ -363,9 +367,42 @@
             type: 'GET',
             url: '?action=info&id='+ id,
             success: function(data){
-                var editingData = data.response;
+                var response = data.response;
+                var editingData = {
+                    id: response.id,
+                    expires: response.expires,
+                    addressID: response.addressID,
+                    destination: response.destination
+                };
+                editingData['startAddress'] =  {
+                    countryID: 100000,
+                    provinceID: response.provinceID,
+                    cityID: response.cityID,
+                    townID: response.townID,
+                    street: response.street
+                };
+                editingData['endAddress'] =  {
+                    countryID: 100000,
+                    provinceID: response.provinceDestID,
+                    cityID: response.cityDestID,
+                    townID: response.townDestID,
+                    street: response.streetDest
+                };
+                var prices = JSON.parse(response.prices);
+                var costs = [];
+                for(var key in prices){
+                    var arr = key.split('-');
+                    costs.push({min: arr[0], max: arr[1], price: prices[key]});
+                }
+                delete editingData.prices;
+                editingData.costs = costs;
                 vm.$set('data', editingData);
                 vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=update"});
+                vm.cityList(response.provinceID, 1, false);
+                vm.townList(response.cityID, 1, false);
+                vm.cityList(response.provinceDestID, 2, false);
+                vm.townList(response.cityDestID, 2, false);
+                editPanel.modal("refresh");
                 editPanel.modal('show');
             },error: function(xhr, type){
                 console.log(xhr, type);
