@@ -53,6 +53,29 @@ class ConfigInfoAction extends MKODBAction {
         }
     }
 
+    *updateFBAWarehouse(id, FBAWarehouse, addressID, addressInfo) {
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT * FROM YSGJ_FBAWarehouse where `postcode` = ?';
+        let findFBAWarehouse = yield this.execSQL(querySQL, [FBAWarehouse.postcode], dbConnection);
+        console.log(findFBAWarehouse);
+        if (findFBAWarehouse.length > 0) {
+            delete findFBAWarehouse.postcode;
+        }
+        let updateSQL = 'UPDATE YSGJ_FBAWarehouse SET ? WHERE `id` = ?';
+        let result = yield this.execSQL(updateSQL, [FBAWarehouse, id]);
+        let updateSQL = 'UPDATE YSGJ_Address SET ? WHERE `id` = ?';
+        yield this.execSQL(updateSQL, [addressInfo, addressID], dbConnection);
+        dbConnection.release();
+        return result.insertId;
+    }
+
+    *FBAWarehouseInfo(id) {
+        let dbConnection = yield this.getDBConnection();
+        let querySQL = 'SELECT a.*, b.address, c.`name` as supplierName, d.`Name` as country, e.`Name` as province, f.`Name` as city FROM YSGJ_FBAWarehouse a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN YSGJ_Supplier c ON a.supplier = c.id INNER JOIN areas d ON b.countryID = d.ID INNER JOIN areas e ON b.provinceID = e.ID INNER JOIN areas f ON b.cityID = f.ID WHERE a.id = ?';
+        let result = yield this.execSQL(querySQL, [id], dbConnection);
+        dbConnection.release();
+        return result[0];
+    }
 
     *FBAWarehouseList() {
         let dbConnection = yield this.getDBConnection();
