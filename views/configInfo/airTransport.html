@@ -1,6 +1,6 @@
 <div class="ui small menu" style="margin-bottom: 0;">
     <a class="item" href="/config/fba">FBA仓库</a>
-    <a class="active item" href="/config/airTransport">空运费用</a>
+    <a class="active item" href="/config/airTransport?logistics=1">空运费用</a>
     <a class="item" href="/config/driverCosts">提货拖车费用</a>
     <a class="item" href="/config/driver">提货司机</a>
     <a class="item" href="/config/localWarehouse">本地仓库</a>
@@ -16,8 +16,8 @@
     </div>
 </div>
 <div class="ui top attached tabular menu">
-    <a class="active item" href="/config/airTransport">双清专线</a>
-    <a class="item" href="/config/express">快递</a>
+    <a class="active item" href="/config/airTransport?logistics=1">双清专线</a>
+    <a class="item" href="/config/airTransport?logistics=2">快递</a>
 </div>
 <div class="ui bottom attached active tab segment">
     <table class="ui fixed selectable striped table very compact">
@@ -333,6 +333,7 @@
         Object.assign(newValue, blankValue);
         vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=addAirTransport"});
         vm.$set('data', newValue);
+        editPanel.modal("refresh");
         editPanel.modal('show');
     }
 
@@ -352,6 +353,7 @@
                 editingData.costs = costs;
                 vm.$set('data', editingData);
                 vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=update"});
+                editPanel.modal("refresh");
                 editPanel.modal('show');
             },error: function(xhr, type){
                 console.log(xhr, type);

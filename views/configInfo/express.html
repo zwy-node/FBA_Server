@@ -1,6 +1,6 @@
 <div class="ui small menu" style="margin-bottom: 0;">
     <a class="item" href="/config/fba">FBA仓库</a>
-    <a class="active item" href="/config/airTransport">空运费用</a>
+    <a class="active item" href="/config/airTransport?logistics=1">空运费用</a>
     <a class="item" href="/config/driverCosts">提货拖车费用</a>
     <a class="item" href="/config/driver">提货司机</a>
     <a class="item" href="/config/localWarehouse">本地仓库</a>
@@ -16,8 +16,8 @@
     </div>
 </div>
 <div class="ui top attached tabular menu">
-    <a class="item" href="/config/airTransport">双清专线</a>
-    <a class="active item" href="/config/express">快递</a>
+    <a class="item" href="/config/airTransport?logistics=1">双清专线</a>
+    <a class="active item" href="/config/airTransport?logistics=2">快递</a>
 </div>
 <div class="ui bottom attached active tab segment">
     <table class="ui fixed selectable striped table very compact">
@@ -36,46 +36,53 @@
         </tr>
         </thead>
         <tbody>
+        <% if (data.datas.length == 0) { %>
+        <td colspan="6" class="center aligned">暂无数据</td>
+        <% } %>
+        <% for (var i = 0; i < data.datas.length; i++) { %>
         <tr>
-            <td class="left aligned">001</td>
-            <td class="center aligned">USA</td>
-            <td class="center aligned">AZ</td>
-            <td class="center aligned">AZ</td>
-            <td class="center aligned">AZ</td>
+            <td class="left aligned"><%= data.datas[i].id %></td>
+            <td class="center aligned"><%= data.datas[i].startAddress %></td>
+            <td class="center aligned"><%= data.datas[i].endAddress %></td>
+            <td class="center aligned"><%= data.datas[i].zipCodeHead %></td>
+            <td class="center aligned"><%= data.datas[i].goodsType %></td>
             <td class="center aligned">
-                <div class="ui label">0-21KG <div class="detail">$214</div></div>
-                <div class="ui label">21-100KG <div class="detail">$214</div></div>
-                <div class="ui label">100-200KG <div class="detail">$214</div></div>
-                <div class="ui label">200-1t <div class="detail">$214</div></div>
+                <%
+                var prices = JSON.parse(data.datas[i].prices)
+                for (var key in prices) {
+                %>
+                <div class="ui label"><%= key %>KG <div class="detail">￥<%= prices[key] %></div></div>
+                <% } %>
             </td>
-            <td class="center aligned">AZ</td>
-            <td class="center aligned">AZ</td>
-            <td class="center aligned">2016-01-01</td>
+            <td class="center aligned"><%= data.datas[i].fastestDay %></td>
+            <td class="center aligned"><%= data.datas[i].slowestDay %></td>
+            <td class="center aligned"><%= data.datas[i].expires %></td>
             <td class="right aligned">
                 <div class="ui small basic icon buttons">
-                    <button class="ui button"><i class="edit icon"></i></button>
-                    <button class="ui button"><i class="remove red icon"></i></button>
+                    <button class="ui button" onclick="editData(<%= data.datas[i].id %>); return false;"><i class="edit icon"></i></button>
+                    <button class="ui button" onclick="removeData(<%= data.datas[i].id %>); return false;"><i class="red remove icon"></i></button>
                 </div>
             </td>
         </tr>
+        <% } %>
         </tbody>
         <!--<tfoot>-->
         <!--<tr>-->
-            <!--<th colspan="2">共 1/ 0页，共 0条，每页显示 20条-->
-            <!--</th>-->
-            <!--<th colspan="10">-->
-                <!--<div class="ui right floated pagination menu">-->
-                    <!--<a class="icon item">-->
-                        <!--<i class="left chevron icon"></i>-->
-                    <!--</a>-->
-                    <!--<a class="item active">1</a>-->
-                    <!--<a class="item">2</a>-->
-                    <!--<a class="item">3</a>-->
-                    <!--<a class="icon item">-->
-                        <!--<i class="right chevron icon"></i>-->
-                    <!--</a>-->
-                <!--</div>-->
-            <!--</th>-->
+        <!--<th colspan="2">共 1/ 0页，共 0条，每页显示 20条-->
+        <!--</th>-->
+        <!--<th colspan="10">-->
+        <!--<div class="ui right floated pagination menu">-->
+        <!--<a class="icon item">-->
+        <!--<i class="left chevron icon"></i>-->
+        <!--</a>-->
+        <!--<a class="item active">1</a>-->
+        <!--<a class="item">2</a>-->
+        <!--<a class="item">3</a>-->
+        <!--<a class="icon item">-->
+        <!--<i class="right chevron icon"></i>-->
+        <!--</a>-->
+        <!--</div>-->
+        <!--</th>-->
         <!--</tr>-->
         <!--</tfoot>-->
     </table>
@@ -91,43 +98,73 @@
                 <label>类型</label>
                 <div class="field">
                     <div class="ui radio checkbox">
-                        <input type="radio" name='xx' tabindex="0" class="hidden">
+                        <input type="radio" name="xx" tabindex="0" class="hidden" v-model="data.logistics" value="1">
                         <label>双清专线</label>
                     </div>
                 </div>
                 <div class="field">
                     <div class="ui radio checkbox">
-                        <input type="radio" name='xx' tabindex="0" class="hidden">
+                        <input type="radio" name="xx" tabindex="0" class="hidden" v-model="data.logistics" value="2">
                         <label>快递</label>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="field">
+            <label>货品类型</label>
+            <div class="field">
+                <select class="ui fluid search dropdown" v-model="data.kindOfGoodsID">
+                    <option value="">请选择货品类型</option>
+                    <option v-for="item in goodsType" :value="item.id">{{item.name}}</option>
+                </select>
             </div>
         </div>
         <div class="two fields">
             <div class="field">
                 <label>起始地</label>
                 <div class="field">
-                    <select class="ui fluid search dropdown" name="status">
-                        <option value="0">美国</option>
-                        <option value="1">加拿大</option>
-                        <option value="2">新加坡</option>
+                    <select class="ui fluid search dropdown" v-model="data.startID">
+                        <option value="">请选择起始地</option>
+                        <option v-for="item in startAddress" :value="item.id">{{item.province}},{{item.city}}</option>
                     </select>
                 </div>
             </div>
             <div class="field">
                 <label>目的地</label>
                 <div class="field">
-                    <select class="ui fluid search dropdown" name="status">
-                        <option value="0">dfd</option>
-                        <option value="1">ff</option>
-                        <option value="2">zz</option>
+                    <select class="ui fluid search dropdown" v-model="data.endID">
+                        <option value="">请选择目的地</option>
+                        <option v-for="item in endAddress" :value="item.id">{{item.country}}</option>
                     </select>
                 </div>
             </div>
         </div>
-        <div class="field">
-            <label>有效期</label>
-            <input type="date" placeholder="输入有效期">
+        <div class="two fields">
+            <div class="field">
+                <label>最快天数</label>
+                <input type="number" placeholder="请输入最快到达的天数" v-model="data.fastestDay">
+            </div>
+            <div class="field">
+                <label>最慢天数</label>
+                <input type="number" placeholder="请输入最慢到达的天数" v-model="data.slowestDay">
+            </div>
+        </div>
+        <div class="two fields">
+            <div class="field">
+                <label>邮编开头</label>
+                <div class="field">
+                    <select class="ui fluid search dropdown" v-model="data.zipCodeHead">
+                        <option value="">请选择邮编开头</option>
+                        <option value="0">A</option>
+                        <option value="1">K</option>
+                        <option value="2">L</option>
+                    </select>
+                </div>
+            </div>
+            <div class="field">
+                <label>有效期</label>
+                <input type="date" placeholder="输入有效期" v-model="data.expires" name="expires">
+            </div>
         </div>
         <% include costsTemplate.html %>
         <div class="wide field">
@@ -139,8 +176,19 @@
         <div class="ui button deny">取消</div>
     </div>
 </div>
+
 <script type="text/javascript">
-    var blankValue = {name: '', key: '', desc: '', status: 0, headURL: ''};
+    var blankValue = {
+        "startID": '',
+        "endID": '',
+        "zipCodeHead": '',
+        "kindOfGoodsID": '',
+        "costs": [],
+        "fastestDay": '',
+        "slowestDay": '',
+        "logistics": '',
+        "expires": ''
+    };
     var editPanel = $('#editPanel');
     var vm = new Vue({
         el: '#editPanel',
@@ -148,16 +196,18 @@
             panelInfo: {
                 title: '',  //标题
                 type: 0,    //类型 0: 新建模式 1: 编辑模式
-                action: "?action=newData"
+                action: "?action=addAirTransport"
             },
             data: blankValue,
-            costs: []
+            startAddress: [],
+            endAddress: [],
+            goodsType: []
         },
         ready: function(){
             editPanel.modal({
                 closable: false,
                 onApprove : function() {
-                    $('.ui.form').submit();
+                    doSubmit();
                     return false;
                 },
                 onDeny: function(){
@@ -166,30 +216,122 @@
             });
             $('.ui.radio.checkbox').checkbox();
             $("#dataForm").form({
+                on: 'blur',
                 fields: {
-                    name: 'empty',
-                    desc: 'empty',
-                    headURL: 'empty'
+                    expires: 'empty'
                 }
             });
+            this.startAddressList();
+            this.endAddressList();
+            this.goodsTypeList();
         },
         methods: {
             addCost: function(cost){
                 if (!cost){
                     cost = {min: '', max: '', price: ''};
                 }
-                this.costs.push(cost);
+                this.data.costs.push(cost);
             },
             deleteCost: function(index){
-                this.costs.splice(index, 1);
+                this.data.costs.splice(index, 1);
+            },
+            startAddressList: function(){
+                var self = this;
+                $.ajax({
+                    type: 'GET',
+                    url: '/config/originatingAddress?action=list',
+                    success: function(data){
+                        self.startAddress = data.response.datas;
+                    },error: function(xhr, type){
+                        self.startAddress = [];
+                    }
+                });
+            },
+            endAddressList: function(){
+                var self = this;
+                $.ajax({
+                    type: 'GET',
+                    url: '/config/destinationAddress?action=list',
+                    success: function(data){
+                        self.endAddress = data.response.datas;
+                    },error: function(xhr, type){
+                        self.endAddress = [];
+                    }
+                });
+            },
+            goodsTypeList: function(){
+                var self = this;
+                $.ajax({
+                    type: 'GET',
+                    url: '/config/goodsType?action=list',
+                    success: function(data){
+                        self.goodsType = data.response.datas;
+                    },error: function(xhr, type){
+                        self.goodsType = [];
+                    }
+                });
             }
         }
     });
 
+    function doSubmit(){
+        var panelInfo = vm.panelInfo;
+        var params = vm.data;
+        var prices = {};
+        params.costs.forEach(function(item){
+            var key = item.min + '-' + item.max;
+            prices[key] = item.price;
+        });
+        delete params.costs;
+        params.prices = prices;
+//        添加
+        if(panelInfo.type == 0){
+            delete params.id;
+            for(var key in params){
+                if(params[key] == null || params[key] == ''){
+                    return false;
+                }
+            }
+            $.ajax({
+                type: 'POST',
+                data: params,
+                url: panelInfo.action,
+                success: function(data){
+                    window.location.reload();
+                },error: function(xhr, type){
+                    console.log(xhr, type);
+                }
+            });
+//            编辑
+        }else if(vm.panelInfo.type == 1){
+            $.ajax({
+                type: 'POST',
+                data: params,
+                url: panelInfo.action,
+                success: function(data){
+                    window.location.reload();
+                },error: function(xhr, type){
+                    console.log(xhr, type);
+                }
+            });
+//            删除
+        }else if(vm.panelInfo.type == 2){
+            $.ajax({
+                type: 'GET',
+                url: panelInfo.action + '&id=' + vm.deleteAddressID,
+                success: function(data){
+                    window.location.reload();
+                },error: function(xhr, type){
+                    console.log(xhr, type);
+                }
+            });
+        }
+    }
+
     function newData(){
         var newValue = {};
         Object.assign(newValue, blankValue);
-        vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=newData"});
+        vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=addAirTransport"});
         vm.$set('data', newValue);
         editPanel.modal('show');
     }
@@ -197,11 +339,19 @@
     function editData(id){
         $.ajax({
             type: 'GET',
-            url: 'mrmj?action=getData&id='+ id,
+            url: '?action=info&id='+ id,
             success: function(data){
-                var editingData = data.data;
+                var editingData = data.response;
+                var prices = JSON.parse(editingData.prices);
+                var costs = [];
+                for(var key in prices){
+                    var arr = key.split('-');
+                    costs.push({min: arr[0], max: arr[1], price: prices[key]});
+                }
+                delete editingData.prices;
+                editingData.costs = costs;
                 vm.$set('data', editingData);
-                vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=editData"});
+                vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=update"});
                 editPanel.modal('show');
             },error: function(xhr, type){
                 console.log(xhr, type);
