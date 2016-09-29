@@ -181,8 +181,6 @@ var doDriverCost = function*(ctx, next) {
             {key: 'expires'}    //过期日期
         ];
         let truckCostInfo = Utils.verifyAndFillObject(postData, rules);
-        truckCostInfo.status = 1;
-        truckCostInfo.createDate = new Date();
         truckCostInfo.modifiedTime = new Date();
 
         let id = truckCostInfo.id;
