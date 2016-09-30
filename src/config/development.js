@@ -12,7 +12,7 @@ module.exports = {
         port: 3306,
         //user: 'YQYD',
         password: 'MKO--2016',
-        dateStrings: true
+        //dateStrings: true
     },
     redis: {
         RDS_PORT: 6379,

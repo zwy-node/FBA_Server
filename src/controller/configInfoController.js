@@ -64,6 +64,9 @@ var doFBAWarehouse = function*(ctx, next) {
         }
     } else {
         let result = yield configInfoAction.FBAWarehouseList();
+        for (let item of result.datas) {
+            item.createDate = item.createDate.format('yyyy-MM-dd');
+        }
         yield ctx.render('configInfo/fba', {data: result});
     }
 };
@@ -134,7 +137,7 @@ var doAirTransport = function*(ctx, next) {
         try {
             let id = ctx.query.id;
             let startAddress = yield configInfoAction.FBACostInfo(id);
-            //startAddress.expires = startAddress.expires.format('yyyy-MM-dd');
+            startAddress.expires = startAddress.expires.format('yyyy-MM-dd');
             ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'goodsType not exist!')
@@ -142,9 +145,9 @@ var doAirTransport = function*(ctx, next) {
     } else {
         let logistics = ctx.query.logistics || 1;
         let result = yield configInfoAction.FBACostList(logistics);
-        //for (let item of result.datas) {
-        //    item.expires = item.expires.format('yyyy-MM-dd');
-        //}
+        for (let item of result.datas) {
+            item.expires = item.expires.format('yyyy-MM-dd');
+        }
         if(logistics == 1) {
             console.log(result)
             yield ctx.render('configInfo/airTransport', {data: result,goodsType: ['', '普货', '特殊货物'],});
@@ -222,13 +225,16 @@ var doDriverCost = function*(ctx, next) {
         try {
             let id = ctx.query.id;
             let driverCostInfo = yield configInfoAction.driverCostInfo(id);
-            driverCostInfo.modifiedTime = driverCostInfo.modifiedTime.format('yyyy-MM-dd');
+            driverCostInfo.expires = driverCostInfo.expires.format('yyyy-MM-dd');
             ctx.body = Utils.createResponse(resCode.RES_Success, null, driverCostInfo);
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'driverCost not exist!')
         }
     } else {
         let result = yield configInfoAction.driverCostList();
+        for (let item of result.datas) {
+            item.expires = item.expires.format('yyyy-MM-dd');
+        }
         yield ctx.render('configInfo/driverCosts', {data: result});
     }
 };
@@ -321,9 +327,9 @@ var doDriver = function*(ctx, next) {
         }
     } else {
         let result = yield configInfoAction.driverList();
-        //for (let item of result.datas) {
-        //    item.createDate = item.createDate.format('yyyy-MM-dd');
-        //}
+        for (let item of result.datas) {
+            item.createDate = item.createDate.format('yyyy-MM-dd');
+        }
         console.log(result)
         yield ctx.render('configInfo/driver', {data: result});
     }
@@ -379,9 +385,9 @@ var doGoodsType = function*(ctx, next) {
         }
     } else {
         let result = yield configInfoAction.goodsTypeList();
-        //for (let item of result.datas) {
-        //    item.createDate = item.createDate.format('yyyy-MM-dd');
-        //}
+        for (let item of result.datas) {
+            item.createDate = item.createDate.format('yyyy-MM-dd');
+        }
         console.log(result)
         yield ctx.render('configInfo/goodsType', {
             data: result,
@@ -523,9 +529,9 @@ var doLocalWarehouse = function*(ctx, next) {
         }
     } else {
         let result = yield configInfoAction.localWarehouseList();
-        //for (let item of result.datas) {
-        //    item.createDate = item.createDate.format('yyyy-MM-dd');
-        //}
+        for (let item of result.datas) {
+            item.createDate = item.createDate.format('yyyy-MM-dd');
+        }
         console.log(result)
         yield ctx.render('configInfo/localWarehouse', {data: result});
     }
@@ -575,9 +581,9 @@ var doStartAddress = function*(ctx, next) {
         }
     } else {
         let result = yield configInfoAction.startAddressList();
-        //for (let item of result.datas) {
-        //    item.createDate = item.createDate.format('yyyy-MM-dd');
-        //}
+        for (let item of result.datas) {
+            item.createDate = item.createDate.format('yyyy-MM-dd');
+        }
         yield ctx.render('configInfo/originatingAddress', {data: result});
     }
 };
@@ -624,9 +630,9 @@ var doEndAddress = function*(ctx, next) {
         }
     } else {
         let result = yield configInfoAction.endAddressList();
-        //for (let item of result.datas) {
-        //    item.createDate = item.createDate.format('yyyy-MM-dd');
-        //}
+        for (let item of result.datas) {
+            item.createDate = item.createDate.format('yyyy-MM-dd');
+        }
         yield ctx.render('configInfo/destinationAddress', {data: result});
     }
 };
@@ -660,9 +666,9 @@ var doSupplier = function*(ctx, next) {
         try {
             let id = ctx.query.id;
             let startAddress = yield configInfoAction.supplierInfo(id);
-            //if (startAddress) {
-            //    startAddress.createDate = startAddress.createDate.format('yyyy-MM-dd');
-            //}
+            if (startAddress) {
+                startAddress.createDate = startAddress.createDate.format('yyyy-MM-dd');
+            }
             ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'EndAddressInfo not exist!')
@@ -676,9 +682,9 @@ var doSupplier = function*(ctx, next) {
         }
     } else {
         let result = yield configInfoAction.supplierList();
-        //for (let item of result.datas) {
-        //    item.createDate = item.createDate.format('yyyy-MM-dd');
-        //}
+        for (let item of result.datas) {
+            item.createDate = item.createDate.format('yyyy-MM-dd');
+        }
         yield ctx.render('configInfo/supplier', {data: result});
     }
 };

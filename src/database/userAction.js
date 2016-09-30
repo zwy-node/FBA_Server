@@ -25,9 +25,50 @@ class UserAction extends MKODBAction {
         }
     }
 
+    *updateUser(id, opt) {
+        let dbConnection = yield this.getDBConnection();
+        //let querySQL = 'SELECT * FROM YSGJ_AdminUser where `account` = ?';
+        //let findAdmin = yield this.execSQL(querySQL, data.account, dbConnection);
+        //if (findAdmin.length > 0) {
+        //    dbConnection.release();
+        //    return findAdmin;
+        //} else {
+
+        let insertSQL = 'UPDATE YSGJ_AdminUser SET ? WHERE id = ?';
+        let result = yield this.execSQL(insertSQL, [opt, id], dbConnection);
+        dbConnection.release();
+        return result.insertId;
+
+        //}
+    }
+
+    *removeUser(id, status) {
+        let dbConnection = yield this.getDBConnection();
+        let insertSQL = 'UPDATE YSGJ_AdminUser status = ? WHERE id = ?';
+        let result = yield this.execSQL(insertSQL, [status, id], dbConnection);
+        dbConnection.release();
+        return result.insertId;
+    }
+
+    *userList() {
+        let dbConnection = yield this.getDBConnection();
+        let insertSQL = 'SELECT * FROM YSGJ_AdminUser WHERE id = 1';
+        let result = yield this.execSQL(insertSQL, [], dbConnection);
+        dbConnection.release();
+        return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
+    }
+
+    *userInfo(id) {
+        let dbConnection = yield this.getDBConnection();
+        let insertSQL = 'SELECT * FROM YSGJ_AdminUser WHERE id = ?';
+        let result = yield this.execSQL(insertSQL, [], dbConnection);
+        dbConnection.release();
+        return result[0];
+    }
+
     *getRecordByUser(account) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT * FROM YSGJ_AdminUser where `account` = ?';
+        let querySQL = 'SELECT * FROM YSGJ_AdminUser where `account` = ? AND status = 1';
         let resultData = yield this.execSQL(querySQL, account, dbConnection);
         if (resultData.length > 0) {
             resultData = resultData[0];

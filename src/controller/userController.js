@@ -8,19 +8,48 @@ const resCode = require(BASEDIR + '/utils/utils').resCode;
 const co = require('co');
 
 var doAddUser = function*(ctx, next) {
-    let postData = ctx.request.body;
-    let rules = [
-        {key: 'account'},
-        {key: 'name'},
-        {key: 'password'},
-        {key: 'role', type: 'number'}
-    ];
-    let userInfo = Utils.verifyAndFillObject(postData, rules);
-    let result = yield userAction.addUser(userInfo);
-    if (result.length > 0) {
-        ctx.body = Utils.createResponse(resCode.RES_UserExist, 'user exist!');
-    } else {
+    if (ctx.query.action == 'addCustomer') {
+        let postData = ctx.request.body;
+        let rules = [
+            {key: 'account'},
+            {key: 'name'},
+            {key: 'password'},
+            {key: 'role', type: 'number'}
+        ];
+        let userInfo = Utils.verifyAndFillObject(postData, rules);
+        yield userAction.addUser(userInfo);
         ctx.response.redirect('/user/list');
+    } else if (ctx.query.action == 'update') {
+        let postData = ctx.request.body;
+        let rules = [
+            {key: 'id', type: 'number'},
+            //{key: 'account'},
+            {key: 'name'},
+            {key: 'password'},
+            {key: 'role', type: 'number'}
+        ];
+        let userInfo = Utils.verifyAndFillObject(postData, rules);
+        let id = userInfo.id;
+        delete userInfo.id;
+        yield userAction.updateUser(id, userInfo);
+        ctx.response.redirect('/user/list');
+    } else if (ctx.query.action == 'info') {
+        try {
+            let id = ctx.query.id;
+            let userInfo = yield userAction.userInfo(id);
+            ctx.body = Utils.createResponse(resCode.RES_Success, null, userInfo);
+        } catch (e) {
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'userInfo not exist!')
+        }
+    } else if (ctx.query.action == 'remove') {
+        let id = ctx.query.id;
+        let status = ctx.query.status; //0: 表示删除, 1:表示正常
+        let userInfo = Utils.verifyAndFillObject(id, status);
+        yield userAction.removeUser(id, userInfo);
+        ctx.response.redirect('/user/list');
+    } else {
+        let result = yield userAction.userList();
+        ctx.response.redirect('/user/list', {data: result});
     }
 };
 
@@ -41,9 +70,9 @@ var doLogin = function*(ctx, next) {
             };
             ctx.cookies.set('timestamp', ctx.session.date);
             let refer = ctx.query.refer;
-            if (refer){
+            if (refer) {
                 ctx.response.redirect(refer);
-            }else{
+            } else {
                 ctx.response.redirect('/');
             }
         } else {
@@ -57,9 +86,10 @@ module.exports = co.wrap(function*(ctx, next) {
         yield doAddUser(ctx, next);
     } else if (ctx.params.type == 'login') {
         yield doLogin(ctx, next);
-    } else if (ctx.params.type == 'list') {
-        yield ctx.render('user/user_list', {});
     }
+    //else if (ctx.params.type == 'list') {
+    //    yield ctx.render('user/user_list', {});
+    //}
     yield next();
 });
 
