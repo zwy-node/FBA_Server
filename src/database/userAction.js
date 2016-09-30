@@ -52,7 +52,7 @@ class UserAction extends MKODBAction {
 
     *userList() {
         let dbConnection = yield this.getDBConnection();
-        let insertSQL = 'SELECT * FROM YSGJ_AdminUser WHERE id = 1';
+        let insertSQL = 'SELECT id, account, name, role, createDate, status FROM YSGJ_AdminUser WHERE status = 1 OR status = 2';
         let result = yield this.execSQL(insertSQL, [], dbConnection);
         dbConnection.release();
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};
@@ -60,8 +60,8 @@ class UserAction extends MKODBAction {
 
     *userInfo(id) {
         let dbConnection = yield this.getDBConnection();
-        let insertSQL = 'SELECT * FROM YSGJ_AdminUser WHERE id = ?';
-        let result = yield this.execSQL(insertSQL, [], dbConnection);
+        let insertSQL = 'SELECT * FROM YSGJ_AdminUser WHERE id = ? LIMIT 1';
+        let result = yield this.execSQL(insertSQL, [id], dbConnection);
         dbConnection.release();
         return result[0];
     }

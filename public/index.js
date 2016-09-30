@@ -14,35 +14,53 @@ $(document).ready(function(){
     var pathName = window.location.pathname.split("/")[1];
     var menuNavItems = $('#menuNav .item');
     if (pathName == ''){
-        $(menuNavItems[0]).addClass('active');
-        $(menuNavItems[1]).removeClass('active');
-        $(menuNavItems[2]).removeClass('active');
-        $(menuNavItems[3]).removeClass('active');
-        $(menuNavItems[4]).removeClass('active');
+        for(var i = 0; i < 6; i++){
+            if(i == 0){
+                $(menuNavItems[i]).addClass('active');
+            }else{
+                $(menuNavItems[i]).removeClass('active');
+            }
+        }
+    }else if(pathName == 'user'){
+        for(var i = 0; i < 6; i++){
+            if(i == 1){
+                $(menuNavItems[i]).addClass('active');
+            }else{
+                $(menuNavItems[i]).removeClass('active');
+            }
+        }
     }else if(pathName == 'customer'){
-        $(menuNavItems[1]).addClass('active');
-        $(menuNavItems[0]).removeClass('active');
-        $(menuNavItems[2]).removeClass('active');
-        $(menuNavItems[3]).removeClass('active');
-        $(menuNavItems[4]).removeClass('active');
+        for(var i = 0; i < 6; i++){
+            if(i == 2){
+                $(menuNavItems[i]).addClass('active');
+            }else{
+                $(menuNavItems[i]).removeClass('active');
+            }
+        }
     }else if(pathName == 'order'){
-        $(menuNavItems[2]).addClass('active');
-        $(menuNavItems[0]).removeClass('active');
-        $(menuNavItems[1]).removeClass('active');
-        $(menuNavItems[3]).removeClass('active');
-        $(menuNavItems[4]).removeClass('active');
+        for(var i = 0; i < 6; i++){
+            if(i == 3){
+                $(menuNavItems[i]).addClass('active');
+            }else{
+                $(menuNavItems[i]).removeClass('active');
+            }
+        }
     }else if(pathName == 'config'){
-        $(menuNavItems[3]).addClass('active');
-        $(menuNavItems[0]).removeClass('active');
-        $(menuNavItems[1]).removeClass('active');
-        $(menuNavItems[2]).removeClass('active');
-        $(menuNavItems[4]).removeClass('active');
+        for(var i = 0; i < 6; i++){
+            if(i == 4){
+                $(menuNavItems[i]).addClass('active');
+            }else{
+                $(menuNavItems[i]).removeClass('active');
+            }
+        }
     }else{
-        $(menuNavItems[4]).addClass('active');
-        $(menuNavItems[0]).removeClass('active');
-        $(menuNavItems[1]).removeClass('active');
-        $(menuNavItems[2]).removeClass('active');
-        $(menuNavItems[3]).removeClass('active');
+        for(var i = 0; i < 6; i++){
+            if(i == 5){
+                $(menuNavItems[i]).addClass('active');
+            }else{
+                $(menuNavItems[i]).removeClass('active');
+            }
+        }
     }
 
     $(document).ready(function(){
