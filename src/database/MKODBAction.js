@@ -4,10 +4,12 @@
 
 var co = require('co');
 var mysql = require('mysql');
+const config = require(BASEDIR + '/config/development');
 
 var mysqlPool = null;
 if (!mysqlPool) {
-    mysqlPool = mysql.createPool(CONFIG.db);
+    //mysqlPool = mysql.createPool(CONFIG.db);
+    mysqlPool = mysql.createPool(config.db);
 }
 
 class MKODBAction {
