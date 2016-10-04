@@ -527,7 +527,7 @@ var doLocalWarehouse = function*(ctx, next) {
     } else if (ctx.query.action == 'info') {
         try {
             let id = ctx.query.id;
-            let startAddress = yield configInfoAction.driverCostInfo(id);
+            let startAddress = yield configInfoAction.localWarehouseInfo(id);
             ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'localWarehouse not exist!')
@@ -551,7 +551,6 @@ var doStartAddress = function*(ctx, next) {
             {key: 'type', type: 'number'}
         ];
         let addressInfo = Utils.verifyAndFillObject(postData, rulesAddress);
-        //addressInfo.type = 1;
         addressInfo.createDate = new Date();
         yield configInfoAction.addStartAddress(addressInfo);
         ctx.response.redirect('/config/originatingAddress');
