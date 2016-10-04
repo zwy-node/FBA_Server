@@ -2,7 +2,7 @@
  * Created by Fizz on 16/9/14.
  */
 const co = require('co');
-const utils = require('../utils/utils');
+const utils = require('../utils/Utils');
 const userAction = require(BASEDIR + '/database/UserAction');
 
 module.exports.init = co.wrap(function*(opt){

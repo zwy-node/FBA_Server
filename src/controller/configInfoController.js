@@ -62,6 +62,11 @@ var doFBAWarehouse = function*(ctx, next) {
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'FBAWarehouse not exist!')
         }
+    } else if (ctx.query.action == 'remove') {
+        let id = ctx.query.id;
+        let status = ctx.query.status;
+        configInfoAction.removeFBAWarehouse(id, status);
+        ctx.response.redirect('/config/fba');
     } else {
         let result = yield configInfoAction.FBAWarehouseList();
         for (let item of result.datas) {

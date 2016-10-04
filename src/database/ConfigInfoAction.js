@@ -77,9 +77,17 @@ class ConfigInfoAction extends MKODBAction {
         return result[0];
     }
 
+    *removeFBAWarehouse(id, status) {
+        let dbConnection = yield this.getDBConnection();
+        let updateSQL = 'UPDATE YSGJ_FBAWarehouse SET status = ? WHERE id = ?';
+        let result = yield this.execSQL(updateSQL, [status, id], dbConnection);
+        dbConnection.release();
+        return result[0];
+    }
+
     *FBAWarehouseList() {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT a.*, b.address, c.`name` as supplierName, d.`Name` as country, e.`Name` as province, f.`Name` as city FROM YSGJ_FBAWarehouse a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN YSGJ_Supplier c ON a.supplier = c.id INNER JOIN areas d ON b.countryID = d.ID INNER JOIN areas e ON b.provinceID = e.ID INNER JOIN areas f ON b.cityID = f.ID';
+        let querySQL = 'SELECT a.*, b.address, c.`name` as supplierName, d.`Name` as country, e.`Name` as province, f.`Name` as city FROM YSGJ_FBAWarehouse a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN YSGJ_Supplier c ON a.supplier = c.id INNER JOIN areas d ON b.countryID = d.ID INNER JOIN areas e ON b.provinceID = e.ID INNER JOIN areas f ON b.cityID = f.ID WHERE a.status = 1 OR a.status = 2';
         let result = yield this.execSQL(querySQL, [], dbConnection);
         dbConnection.release();
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};

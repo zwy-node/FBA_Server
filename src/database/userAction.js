@@ -66,6 +66,14 @@ class UserAction extends MKODBAction {
         return result[0];
     }
 
+    *changPwd(id, newPassword) {
+        let dbConnection = yield this.getDBConnection();
+        let insertSQL = 'UPDATE YSGJ_AdminUser SET ? WHERE id = ?';
+        let result = yield this.execSQL(insertSQL, [newPassword, id], dbConnection);
+        dbConnection.release();
+        return result.insertId;
+    }
+
     *getRecordByUser(account) {
         let dbConnection = yield this.getDBConnection();
         let querySQL = 'SELECT * FROM YSGJ_AdminUser where `account` = ? AND status = 1';

@@ -81,11 +81,30 @@ var doLogin = function*(ctx, next) {
     }
 };
 
+var doChangPwd = function*(ctx, next) {
+    let account = ctx.query.account;
+    let password = ctx.query.password;
+    let newPassword = ctx.query.newPassword;
+    if (!account && !password) {
+        yield ctx.blockRender('login', {data: {bLoginFail: false}});
+    } else {
+        let userInfo = yield userAction.getRecordByUser(account);
+        if (userInfo && userInfo.password == password) {
+            yield userAction.changPwd(account, newPassword);
+            yield ctx.blockRender('login', {data: {bLoginFail: false}});
+        } else {
+            yield ctx.blockRender('login', {data: {bLoginFail: true}});
+        }
+    }
+};
+
 module.exports = co.wrap(function*(ctx, next) {
     if (ctx.params.type == 'addUser') {
         yield doAddUser(ctx, next);
     } else if (ctx.params.type == 'login') {
         yield doLogin(ctx, next);
+    } else if(ctx.params.type == 'changPwd') {
+        yield doChangPwd(ctx, next);
     }
     //else if (ctx.params.type == 'list') {
     //    yield ctx.render('user/user_list', {});
