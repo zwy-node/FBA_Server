@@ -3,7 +3,7 @@
  */
 const co = require('co');
 const utils = require('../utils/Utils');
-const userAction = require(BASEDIR + '/database/UserAction');
+const userAction = require(BASEDIR + '/database/userAction');
 
 module.exports.init = co.wrap(function*(opt){
     const ROLE = 0;
