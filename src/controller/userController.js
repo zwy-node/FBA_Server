@@ -8,7 +8,7 @@ const resCode = require(BASEDIR + '/utils/utils').resCode;
 const co = require('co');
 
 var doAddUser = function*(ctx, next) {
-    if (ctx.query.action == 'addCustomer') {
+    if (ctx.query.action == 'addUser') {
         let postData = ctx.request.body;
         let rules = [
             {key: 'account'},
@@ -49,7 +49,11 @@ var doAddUser = function*(ctx, next) {
         ctx.response.redirect('/user/list');
     } else {
         let result = yield userAction.userList();
-        ctx.response.redirect('/user/list', {data: result});
+        for (let item of result.datas) {
+            item.createDate = item.createDate.format('yyyy-MM-dd');
+        }
+        console.log(result)
+        yield ctx.render('user/userList', {data: result, status:['', '正常', '禁用'], role: ['管理员', '操作员', '业务员']});
     }
 };
 
@@ -99,7 +103,7 @@ var doChangPwd = function*(ctx, next) {
 };
 
 module.exports = co.wrap(function*(ctx, next) {
-    if (ctx.params.type == 'addUser') {
+    if (ctx.params.type == 'list') {
         yield doAddUser(ctx, next);
     } else if (ctx.params.type == 'login') {
         yield doLogin(ctx, next);
