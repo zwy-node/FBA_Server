@@ -2,7 +2,7 @@
  * Created by Fizz on 16/9/18.
  */
 
-const userAction = require(BASEDIR + '/database/UserAction');
+const userAction = require(BASEDIR + '/database/userAction');
 const Utils = require(BASEDIR + '/utils/utils');
 const resCode = require(BASEDIR + '/utils/utils').resCode;
 const co = require('co');
