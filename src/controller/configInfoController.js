@@ -1,5 +1,5 @@
-const Utils = require(BASEDIR + '/utils/utils');
-const resCode = require(BASEDIR + '/utils/utils').resCode;
+const Utils = require(BASEDIR + '/utils/Utils');
+const resCode = require(BASEDIR + '/utils/Utils').resCode;
 const co = require('co');
 const ConfigInfoAction = require('../database/ConfigInfoAction');
 const configInfoAction = new ConfigInfoAction();

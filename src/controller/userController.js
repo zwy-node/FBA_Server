@@ -3,8 +3,8 @@
  */
 
 const userAction = require(BASEDIR + '/database/userAction');
-const Utils = require(BASEDIR + '/utils/utils');
-const resCode = require(BASEDIR + '/utils/utils').resCode;
+const Utils = require(BASEDIR + '/utils/Utils');
+const resCode = require(BASEDIR + '/utils/Utils').resCode;
 const co = require('co');
 
 var doAddUser = function*(ctx, next) {

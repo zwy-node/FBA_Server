@@ -1,7 +1,7 @@
 const CustomerAction = require('../database/CustomerAction');
 const customerAction = new CustomerAction();
-const Utils = require(BASEDIR + '/utils/utils');
-const resCode = require(BASEDIR + '/utils/utils').resCode;
+const Utils = require(BASEDIR + '/utils/Utils');
+const resCode = require(BASEDIR + '/utils/Utils').resCode;
 const co = require('co');
 
 var doAddCustomer = function*(ctx, next) {
