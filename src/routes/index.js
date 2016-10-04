@@ -2,10 +2,10 @@ const Router = require('koa-router');
 const route = new Router();
 const co = require('co');
 const CustomerController = require('../controller/customerController');
-const OrderController = require(BASEDIR + '/controller/OrderController');
+const OrderController = require(BASEDIR + '/controller/orderController');
 const ConfigInfoController = require(BASEDIR + '/controller/configInfoController');
 const UserController = require(BASEDIR + '/controller/userController');
-const MainController = require(BASEDIR + '/controller/MainController');
+const MainController = require(BASEDIR + '/controller/mainController');
 
 route.get('/', MainController);
 
