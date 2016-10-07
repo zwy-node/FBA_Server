@@ -9,8 +9,8 @@ var doFBAWarehouse = function*(ctx, next) {
         let postData = ctx.request.body;
         let rules = [
             {key: 'FBAWarehouseID'},
-            {key: 'postcode', type: 'number'},
-            {key: 'supplier', type: 'number'}
+            {key: 'postcode', type: 'number'}
+            //{key: 'supplier', type: 'number'}
         ];
         let FBAWarehouseInfo = Utils.verifyAndFillObject(postData, rules);
         FBAWarehouseInfo.status = 1;
@@ -33,8 +33,8 @@ var doFBAWarehouse = function*(ctx, next) {
         let postData = ctx.request.body;
         let rules = [
             {key: 'id', type: 'number'},
-            {key: 'postcode', type: 'number'},
-            {key: 'supplier', type: 'number'}
+            {key: 'postcode', type: 'number'}
+            //{key: 'supplier', type: 'number'}
         ];
         let FBAWarehouse = Utils.verifyAndFillObject(postData, rules);
         FBAWarehouse.modifiedTime = new Date();
@@ -72,6 +72,7 @@ var doFBAWarehouse = function*(ctx, next) {
         for (let item of result.datas) {
             item.createDate = item.createDate.format('yyyy-MM-dd');
         }
+        console.log(result)
         yield ctx.render('configInfo/fba', {data: result});
     }
 };
@@ -94,6 +95,7 @@ var doAirTransport = function*(ctx, next) {
                 }
             }
             },        //价格
+            {key: 'supplier', type: 'number'},      //供应商
             {key: 'fastestDay', type: 'number'},    //最快天
             {key: 'slowestDay', type: 'number'},    //最慢天
             {key: 'logistics', type: 'number'},     //1:双清, 2:快递
@@ -105,7 +107,7 @@ var doAirTransport = function*(ctx, next) {
         FBACostInfo.modifiedTime = new Date();
         console.log(FBACostInfo)
         yield configInfoAction.addFBACost(FBACostInfo);
-        ctx.response.redirect('/config/fba');
+        ctx.response.redirect('/config/airTransport');
     } else if (ctx.query.action == 'update') {
         let postData = ctx.request.body;
         let rules = [
@@ -124,6 +126,7 @@ var doAirTransport = function*(ctx, next) {
                 }
             }
             },        //价格
+            {key: 'supplier', type: 'number'},      //供应商
             {key: 'fastestDay', type: 'number'},    //最快天
             {key: 'slowestDay', type: 'number'},    //最慢天
             {key: 'logistics', type: 'number'},     //1:双清, 2:快递
@@ -137,7 +140,7 @@ var doAirTransport = function*(ctx, next) {
         delete  FBACostInfo.id;
         console.log(FBACostInfo)
         yield configInfoAction.updateFBACost(id, FBACostInfo);
-        ctx.response.redirect('/config/fba');
+        ctx.response.redirect('/config/airTransport');
     } else if(ctx.query.action == 'info') {
         try {
             let id = ctx.query.id;
