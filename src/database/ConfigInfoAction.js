@@ -100,7 +100,7 @@ class ConfigInfoAction extends MKODBAction {
     *addFBACost(opt) {
         let dbConnection = yield this.getDBConnection();
         let querySQL = 'SELECT * FROM YSGJ_FBACost where `startID` = ? AND `endID` = ? AND `logistics` = ? AND `kindOfGoodsID` = ? AND `supplier` = ?';
-        let findFBACost = yield this.execSQL(querySQL, [opt.startID, opt.endID, opt.logistics, opt.supplier], dbConnection);
+        let findFBACost = yield this.execSQL(querySQL, [opt.startID, opt.endID, opt.logistics, opt.kindOfGoodsID, opt.supplier], dbConnection);
         console.log(findFBACost);
         if (findFBACost.length > 0) {
             dbConnection.release();

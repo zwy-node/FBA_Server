@@ -26,8 +26,9 @@
                 <th class="left aligned two wide">费用编号</th>
                 <th class="center aligned two wide">起运地</th>
                 <th class="center aligned two wide">目的地</th>
+                <th class="center aligned two wide">供应商</th>
                 <th class="center aligned one wide">邮编开头</th>
-                <th class="center aligned one wide">货类</th>
+                <th class="center aligned one wide">品名</th>
                 <th class="center aligned five wide">价格区间</th>
                 <th class="center aligned one wide">最快（天）</th>
                 <th class="center aligned one wide">最慢（天）</th>
@@ -44,8 +45,9 @@
                 <td class="left aligned"><%= data.datas[i].id %></td>
                 <td class="center aligned"><%= data.datas[i].startAddress %></td>
                 <td class="center aligned"><%= data.datas[i].endAddress %></td>
+                <td class="center aligned"><%= data.datas[i].supplierName %></td>
                 <td class="center aligned"><%= data.datas[i].zipCodeHead %></td>
-                <td class="center aligned"><%= data.datas[i].goodsType %></td>
+                <td class="center aligned"><%= data.datas[i].goodsName %></td>
                 <td class="center aligned">
                     <%
                         var prices = JSON.parse(data.datas[i].prices)
@@ -93,23 +95,23 @@
     </div>
     <form id="dataForm" class="ui form content" method="post" :action="panelInfo.action">
         <input type="hidden" name="id" :value="data.id">
-        <div class="ui form">
-            <div class="inline fields">
-                <label>类型</label>
-                <div class="field">
-                    <div class="ui radio checkbox">
-                        <input type="radio" name="xx" tabindex="0" class="hidden" v-model="data.logistics" value="1">
-                        <label>双清专线</label>
-                    </div>
-                </div>
-                <div class="field">
-                    <div class="ui radio checkbox">
-                        <input type="radio" name="xx" tabindex="0" class="hidden" v-model="data.logistics" value="2">
-                        <label>快递</label>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!--<div class="ui form">-->
+            <!--<div class="inline fields">-->
+                <!--<label>类型</label>-->
+                <!--<div class="field">-->
+                    <!--<div class="ui radio checkbox">-->
+                        <!--<input type="radio" name="xx" tabindex="0" class="hidden" v-model="data.logistics" value="1">-->
+                        <!--<label>双清专线</label>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--<div class="field">-->
+                    <!--<div class="ui radio checkbox">-->
+                        <!--<input type="radio" name="xx" tabindex="0" class="hidden" v-model="data.logistics" value="2">-->
+                        <!--<label>快递</label>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
         <div class="field">
             <label>货品类型</label>
             <div class="field">
@@ -149,7 +151,7 @@
                 <input type="number" placeholder="请输入最慢到达的天数" v-model="data.slowestDay">
             </div>
         </div>
-        <div class="two fields">
+        <div class="three fields">
             <div class="field">
                 <label>邮编开头</label>
                 <div class="field">
@@ -158,6 +160,15 @@
                         <option value="0">A</option>
                         <option value="1">K</option>
                         <option value="2">L</option>
+                    </select>
+                </div>
+            </div>
+            <div class="field">
+                <label>供应商</label>
+                <div class="field">
+                    <select class="ui fluid search dropdown" v-model="data.supplier">
+                        <option value="">请选择供应商</option>
+                        <option v-for="item in suppliers.datas" :value="item.id">{{item.name}}</option>
                     </select>
                 </div>
             </div>
@@ -186,8 +197,9 @@
         "costs": [],
         "fastestDay": '',
         "slowestDay": '',
-        "logistics": '',
-        "expires": ''
+        "logistics": 1,
+        "expires": '',
+        supplier: ''
     };
     var editPanel = $('#editPanel');
     var vm = new Vue({
@@ -199,6 +211,7 @@
                 action: "?action=addAirTransport"
             },
             data: blankValue,
+            suppliers: [],
             startAddress: [],
             endAddress: [],
             goodsType: []
@@ -221,6 +234,7 @@
                     expires: 'empty'
                 }
             });
+            this.supplierList();
             this.startAddressList();
             this.endAddressList();
             this.goodsTypeList();
@@ -268,6 +282,18 @@
                         self.goodsType = data.response.datas;
                     },error: function(xhr, type){
                         self.goodsType = [];
+                    }
+                });
+            },
+            supplierList: function(){
+                var self = this;
+                $.ajax({
+                    type: 'GET',
+                    url: '/config/supplier?action=list',
+                    success: function(data){
+                        self.suppliers = data.response;
+                    },error: function(xhr, type){
+                        self.suppliers = [];
                     }
                 });
             }
@@ -333,11 +359,12 @@
         Object.assign(newValue, blankValue);
         vm.$set('panelInfo', {title: '新增', type: 0, action: "?action=addAirTransport"});
         vm.$set('data', newValue);
-        editPanel.modal("refresh");
         editPanel.modal('show');
     }
 
     function editData(id){
+        vm.$set('data', blankValue);
+        vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=update"});
         $.ajax({
             type: 'GET',
             url: '?action=info&id='+ id,
@@ -352,8 +379,9 @@
                 delete editingData.prices;
                 editingData.costs = costs;
                 vm.$set('data', editingData);
-                vm.$set('panelInfo', {title: '编辑', type: 1, action: "?action=update"});
-                editPanel.modal("refresh");
+                vm.$nextTick(function(){
+                    editPanel.modal("refresh");
+                });
                 editPanel.modal('show');
             },error: function(xhr, type){
                 console.log(xhr, type);
