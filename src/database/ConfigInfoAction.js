@@ -704,7 +704,7 @@ class ConfigInfoAction extends MKODBAction {
 
     *driverCostList() {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT a.*, b.countryID , b.provinceID , b.cityID , b.townID , b.streetID , c.id AS localWarehouseID , c.`name` AS warehouseName , d.`Name` AS province , e. NAME AS city , f. NAME AS town , g. NAME AS street FROM YSGJ_TruckCost a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN YSGJ_LocalWarehouse c ON a.destination = c.id INNER JOIN areas d ON b.provinceID = d.ID INNER JOIN areas e ON b.cityID = e.ID INNER JOIN areas f ON b.townID = f.ID INNER JOIN areas g ON b.streetID = g.ID -- SELECT';
+        let querySQL = 'SELECT a.*, b.countryID , b.provinceID , b.cityID , b.townID , b.streetID , c.id AS localWarehouseID , c.`name` AS warehouseName , d.`Name` AS province , e. NAME AS city , f. NAME AS town , g. NAME AS street FROM YSGJ_TruckCost a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN YSGJ_LocalWarehouse c ON a.destination = c.id INNER JOIN areas d ON b.provinceID = d.ID INNER JOIN areas e ON b.cityID = e.ID INNER JOIN areas f ON b.townID = f.ID INNER JOIN areas g ON b.streetID = g.ID';
         let result = yield this.execSQL(querySQL, [], dbConnection);
         dbConnection.release();
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};

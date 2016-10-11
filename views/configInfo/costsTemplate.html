@@ -1,11 +1,11 @@
-<div class="four fields" v-for="cost in data.costs">
+<div class="four fields" v-for="(key, cost) in data.costs">
     <div class="field">
         <label>最低重量（KG）</label>
-        <input type="number" placeholder="输入区间最小值" v-model="cost.min">
+        <input type="number" placeholder="输入区间最小值" v-model="cost.min" :value="data.costs[key-1].max">
     </div>
     <div class="field">
         <label>最大重量（KG）</label>
-        <input type="number" placeholder="输入区间最大值" v-model="cost.max" min="10" max="20">
+        <input type="number" placeholder="输入区间最大值" v-model="cost.max">
     </div>
     <div class="field">
         <label>费用（元）</label>

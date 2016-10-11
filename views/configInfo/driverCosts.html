@@ -41,7 +41,7 @@
         <td class="center aligned"><%= data.datas[i].city %></td>
         <td class="center aligned"><%= data.datas[i].town %></td>
         <td class="center aligned"><%= data.datas[i].street %></td>
-        <td class="center aligned"><%= data.datas[i].provinceDest %>-<%= data.datas[i].cityDest %></td>
+        <td class="center aligned"><%= data.datas[i].warehouseName %></td>
         <td class="center aligned">
             <%
             var prices = JSON.parse(data.datas[i].prices)
@@ -86,7 +86,7 @@
     </div>
     <form id="dataForm" class="ui form content">
         <input type="hidden" name="id" :value="data.id">
-        <div class="three fields">
+        <div class="four fields">
             <div class="field">
                 <label>起始地址</label>
                 <div class="field">
@@ -108,47 +108,30 @@
             <div class="field">
                 <label>&nbsp;</label>
                 <div class="field">
-                    <select class="ui fluid search dropdown" v-model="data.startAddress.townID">
+                    <select class="ui fluid search dropdown" v-model="data.startAddress.townID" v-on:change="streetList(data.startAddress.townID, 1, true)">
                         <option value="">请选择区/县</option>
                         <option v-for="item in startTowns" :value="item.ID">{{item.Name}}</option>
                     </select>
                 </div>
             </div>
-        </div>
-        <div class="field">
-            <input type="text" placeholder="输入详细地址" v-model="data.startAddress.street">
-        </div>
-        <div class="three fields">
-            <div class="field">
-                <label>目的地址地址</label>
-                <div class="field">
-                    <select class="ui fluid search dropdown" v-model="data.endAddress.provinceID" v-on:change="cityList(data.endAddress.provinceID, 2, true)">
-                        <option value="">请选择省份</option>
-                        <option v-for="item in endProvinces" :value="item.ID">{{item.Name}}</option>
-                    </select>
-                </div>
-            </div>
             <div class="field">
                 <label>&nbsp;</label>
                 <div class="field">
-                    <select class="ui fluid search dropdown" v-model="data.endAddress.cityID" v-on:change="townList(data.endAddress.cityID, 2, true)">
-                        <option value="">请选择城市</option>
-                        <option v-for="item in endCities" :value="item.ID">{{item.Name}}</option>
-                    </select>
-                </div>
-            </div>
-            <div class="field">
-                <label>&nbsp;</label>
-                <div class="field">
-                    <select class="ui fluid search dropdown" v-model="data.endAddress.townID">
-                        <option value="">请选择区/县</option>
-                        <option v-for="item in endTowns" :value="item.ID">{{item.Name}}</option>
+                    <select class="ui fluid search dropdown" v-model="data.startAddress.streetID">
+                        <option value="">请选择街道</option>
+                        <option v-for="item in startStreet" :value="item.ID">{{item.Name}}</option>
                     </select>
                 </div>
             </div>
         </div>
         <div class="field">
-            <input type="text" placeholder="输入详细地址" v-model="data.endAddress.street">
+            <label>目的地址</label>
+            <div class="field">
+                <select class="ui fluid search dropdown" v-model="data.destination">
+                    <option value="">请选择目的地址</option>
+                    <option v-for="item in localWarehouse" :value="item.id">{{item.name}}</option>
+                </select>
+            </div>
         </div>
         <div class="field">
             <label>有效期</label>
@@ -171,15 +154,10 @@
             provinceID: '',
             cityID: '',
             townID: '',
-            street: ''
+            streetID: ''
         },
-        endAddress: {
-            countryID: 100000,
-            provinceID: '',
-            cityID: '',
-            townID: '',
-            street: ''
-        }, costs: [], expires: ''};
+        destination: '',
+        costs: [], expires: ''};
 
     var editPanel = $('#editPanel');
     var _isProvinces = [];
@@ -199,6 +177,8 @@
             endProvinces: [],
             endCities: [],
             endTowns: [],
+            startStreet: [],
+            localWarehouse: [],
             costs: []
         },
         ready: function(){
@@ -221,6 +201,7 @@
                 }
             });
             this.provinceList();
+            this.localWarehouseList();
         },
         methods: {
             addCost: function(cost){
@@ -251,6 +232,7 @@
                     if(type == 1){
                         this.data.startAddress.cityID = '';
                         this.data.startAddress.townID = '';
+                        this.data.startAddress.streetID = '';
                     }else{
                         this.data.endAddress.cityID = '';
                         this.data.endAddress.townID = '';
@@ -276,6 +258,7 @@
                 if(isChange){
                     if(type == 1){
                         this.data.startAddress.townID = '';
+                        this.data.startAddress.streetID = '';
                     }else{
                         this.data.endAddress.townID = '';
                     }
@@ -293,6 +276,37 @@
                     },error: function(xhr, type){
                         self.startTowns = [];
                         self.endTowns = [];
+                    }
+                });
+            },
+            streetList: function(id, type, isChange){
+                if(isChange){
+                    if(type == 1){
+                        this.data.startAddress.streetID = '';
+                    }
+                }
+                var self = this;
+                $.ajax({
+                    type: 'GET',
+                    url: '/config/address?action=street&townID=' + id,
+                    success: function(data){
+                        if(type == 1){
+                            self.startStreet = data.response;
+                        }
+                    },error: function(xhr, type){
+                        self.startStreet = [];
+                    }
+                });
+            },
+            localWarehouseList: function(){
+                var self = this;
+                $.ajax({
+                    type: 'GET',
+                    url: '/config/localWarehouse?action=list',
+                    success: function(data){
+                        self.localWarehouse = data.response.datas;
+                    },error: function(xhr, type){
+                        self.localWarehouse = [];
                     }
                 });
             }

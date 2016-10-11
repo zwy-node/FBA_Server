@@ -220,7 +220,7 @@ var doDriverCost = function*(ctx, next) {
         let startAddress = truckCostInfo.startAddress;
         delete truckCostInfo.startAddress;
 
-        yield configInfoAction.updateDriverCost(id, truckCostInfo, addressID, startAddress, localWarehouseID);
+        yield configInfoAction.updateDriverCost(id, truckCostInfo, addressID, startAddress);
         ctx.response.redirect('/config/driverCosts');
     } else if (ctx.query.action == 'info') {
         try {
@@ -236,6 +236,7 @@ var doDriverCost = function*(ctx, next) {
         for (let item of result.datas) {
             item.expires = item.expires.format('yyyy-MM-dd');
         }
+
         yield ctx.render('configInfo/driverCosts', {data: result});
     }
 };
