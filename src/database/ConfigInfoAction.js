@@ -560,10 +560,16 @@ class ConfigInfoAction extends MKODBAction {
         let insertSQL = 'INSERT INTO YSGJ_Address SET ?';
         let addressID = yield this.execSQL(insertSQL, [address], dbConnection);
 
-        let querySQL = 'SELECT b.street, d.`Name` as country, e.`Name` as province, f.`Name` as city, g.Name as town FROM YSGJ_Address b INNER JOIN areas d ON b.countryID = d.ID INNER JOIN areas e ON b.provinceID = e.ID INNER JOIN areas f ON b.cityID = f.ID INNER JOIN areas g ON b.townID = g.ID WHERE b.id = ?';
+        let querySQL = 'SELECT b.specificAddress, d.`Name` as country, e.`Name` as province, f.`Name` as city, g.Name as town FROM YSGJ_Address b INNER JOIN areas d ON b.countryID = d.ID INNER JOIN areas e ON b.provinceID = e.ID INNER JOIN areas f ON b.cityID = f.ID INNER JOIN areas g ON b.townID = g.ID WHERE b.id = ?';
         let addressInfo = yield this.execSQL(querySQL, [addressID.insertId], dbConnection);
         let updateOpt = {};
-        updateOpt.fullAddress = addressInfo[0].country + ',' + addressInfo[0].province + ',' + addressInfo[0].city + ',' + addressInfo[0].town + ',' + addressInfo[0].street;
+        updateOpt.fullAddress = addressInfo[0].country + ',' + addressInfo[0].province + ',' + addressInfo[0].city + ',' + addressInfo[0].town;
+        if(addressInfo[0].streetID) {
+            updateOpt.fullAddress = updateOpt.fullAddress + ',' + addressInfo[0].streetID;
+        }
+        if(addressInfo[0].specificAddress) {
+            updateOpt.fullAddress = updateOpt.fullAddress + ',' + addressInfo[0].specificAddress;
+        }
 
         let updateSQL = 'UPDATE YSGJ_Address SET ? WHERE `id` = ?';
         yield this.execSQL(updateSQL, [updateOpt, addressID.insertId], dbConnection);
@@ -595,11 +601,16 @@ class ConfigInfoAction extends MKODBAction {
         let dbConnection = yield this.getDBConnection();
         let updateSQL = 'UPDATE YSGJ_Address SET ? WHERE `id` = ?';
         yield this.execSQL(updateSQL, [address, id], dbConnection);
-        let querySQL = 'SELECT b.street, d.`Name` as country, e.`Name` as province, f.`Name` as city, g.Name as town FROM YSGJ_Address b INNER JOIN areas d ON b.countryID = d.ID INNER JOIN areas e ON b.provinceID = e.ID INNER JOIN areas f ON b.cityID = f.ID INNER JOIN areas g ON b.townID = g.ID WHERE b.id = ?';
+        let querySQL = 'SELECT b.specificAddress, d.`Name` as country, e.`Name` as province, f.`Name` as city, g.Name as town FROM YSGJ_Address b INNER JOIN areas d ON b.countryID = d.ID INNER JOIN areas e ON b.provinceID = e.ID INNER JOIN areas f ON b.cityID = f.ID INNER JOIN areas g ON b.townID = g.ID WHERE b.id = ?';
         let addressInfo = yield this.execSQL(querySQL, [id], dbConnection);
         let opt = {};
-        opt.fullAddress = addressInfo[0].country + ',' + addressInfo[0].province + ',' + addressInfo[0].city + ',' + addressInfo[0].town + ',' + addressInfo[0].street;
-        console.log(address.fullAddress)
+        opt.fullAddress = addressInfo[0].country + ',' + addressInfo[0].province + ',' + addressInfo[0].city + ',' + addressInfo[0].town;
+        if(addressInfo[0].streetID) {
+            opt.fullAddress = opt.fullAddress + ',' + addressInfo[0].streetID;
+        }
+        if(addressInfo[0].specificAddress) {
+            opt.fullAddress = opt.fullAddress + ',' + addressInfo[0].specificAddress;
+        }
         updateSQL = 'UPDATE YSGJ_Address SET ? WHERE `id` = ?';
         yield this.execSQL(updateSQL, [opt, id], dbConnection);
         dbConnection.release();
@@ -639,7 +650,7 @@ class ConfigInfoAction extends MKODBAction {
 
     *localWarehouseInfo(id) {
         let dbConnection = yield this.getDBConnection();
-        let updateSQL = 'SELECT a.*, b.`name` as supplierName, c.countryID, c.provinceID, c.cityID, c.townID, c.street FROM YSGJ_LocalWarehouse a INNER JOIN YSGJ_Supplier b ON a.supplier = b.id INNER JOIN YSGJ_Address c  ON a.addressID = c.id WHERE a.id = ?';
+        let updateSQL = 'SELECT a.*, b.`name` as supplierName, c.countryID, c.provinceID, c.cityID, c.townID, c.specificAddress FROM YSGJ_LocalWarehouse a INNER JOIN YSGJ_Supplier b ON a.supplier = b.id INNER JOIN YSGJ_Address c  ON a.addressID = c.id WHERE a.id = ?';
         let result = yield this.execSQL(updateSQL, [id], dbConnection);
         dbConnection.release();
         return result[0];
@@ -685,7 +696,7 @@ class ConfigInfoAction extends MKODBAction {
 
     *driverCostInfo(id) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT a.*, b.countryID , b.provinceID , b.cityID , b.townID , b.street , c.id AS localWarehouseID, c.`name` AS warehouseName FROM YSGJ_TruckCost a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN YSGJ_LocalWarehouse c ON a.destination = c.id WHERE a.id = ?';
+        let querySQL = 'SELECT a.*, b.countryID , b.provinceID , b.cityID , b.townID , b.specificAddress , c.id AS localWarehouseID, c.`name` AS warehouseName FROM YSGJ_TruckCost a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN YSGJ_LocalWarehouse c ON a.destination = c.id WHERE a.id = 15';
         let result = yield this.execSQL(querySQL, [id], dbConnection);
         dbConnection.release();
         return result[0];
@@ -693,7 +704,7 @@ class ConfigInfoAction extends MKODBAction {
 
     *driverCostList() {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT a.*, c.`Name` AS country , d.`Name` AS province , e.`Name` AS city , b.street , f.`Name` AS town , g.id AS localWarehouseID , g.`name` AS warehouseName FROM YSGJ_TruckCost a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.countryID = c.ID INNER JOIN areas d ON b.provinceID = d.ID INNER JOIN areas e ON b.cityID = e.ID INNER JOIN areas f ON b.townID = f.ID INNER JOIN YSGJ_LocalWarehouse g ON a.destination = g.id';
+        let querySQL = 'SELECT a.*, c.`Name` AS country , d.`Name` AS province , e.`Name` AS city , b.specificAddress , f.`Name` AS town , g.id AS localWarehouseID , g.`name` AS warehouseName FROM YSGJ_TruckCost a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.countryID = c.ID INNER JOIN areas d ON b.provinceID = d.ID INNER JOIN areas e ON b.cityID = e.ID INNER JOIN areas f ON b.townID = f.ID INNER JOIN YSGJ_LocalWarehouse g ON a.destination = g.id';
         let result = yield this.execSQL(querySQL, [], dbConnection);
         dbConnection.release();
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};

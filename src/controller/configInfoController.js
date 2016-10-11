@@ -490,7 +490,7 @@ var doLocalWarehouse = function*(ctx, next) {
             {key: 'provinceID', type: 'number'},
             {key: 'cityID', type: 'number'},
             {key: 'townID', type: 'number'},
-            {key: 'street'}
+            {key: 'specificAddress'}
         ];
         let addressInfo = Utils.verifyAndFillObject(postData, rulesAddress);
         addressInfo.createDate = new Date();
@@ -517,7 +517,7 @@ var doLocalWarehouse = function*(ctx, next) {
             {key: 'provinceID', type: 'number'},
             {key: 'cityID', type: 'number'},
             {key: 'townID', type: 'number'},
-            {key: 'street'}
+            {key: 'specificAddress'}
         ];
         let addressInfo = Utils.verifyAndFillObject(postData, rulesAddress);
         let id = localWarehouseInfo.id;
@@ -529,6 +529,14 @@ var doLocalWarehouse = function*(ctx, next) {
             let id = ctx.query.id;
             let startAddress = yield configInfoAction.localWarehouseInfo(id);
             ctx.body = Utils.createResponse(resCode.RES_Success, null, startAddress);
+        } catch (e) {
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'localWarehouse not exist!')
+        }
+    } else if (ctx.query.action == 'list') {
+        try {
+            let result = yield configInfoAction.localWarehouseList();
+            console.log(result)
+            ctx.body = Utils.createResponse(resCode.RES_Success, null, result);
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'localWarehouse not exist!')
         }
