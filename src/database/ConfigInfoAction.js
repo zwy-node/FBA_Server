@@ -696,7 +696,7 @@ class ConfigInfoAction extends MKODBAction {
 
     *driverCostInfo(id) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT a.*, b.countryID , b.provinceID , b.cityID , b.townID , b.specificAddress , c.id AS localWarehouseID, c.`name` AS warehouseName FROM YSGJ_TruckCost a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN YSGJ_LocalWarehouse c ON a.destination = c.id WHERE a.id = 15';
+        let querySQL = 'SELECT a.*, b.countryID , b.provinceID , b.cityID , b.townID , b.streetID , c.id AS localWarehouseID , c.`name` AS warehouseName FROM YSGJ_TruckCost a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN YSGJ_LocalWarehouse c ON a.destination = c.id WHERE a.id = ?';
         let result = yield this.execSQL(querySQL, [id], dbConnection);
         dbConnection.release();
         return result[0];
@@ -704,7 +704,7 @@ class ConfigInfoAction extends MKODBAction {
 
     *driverCostList() {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT a.*, c.`Name` AS country , d.`Name` AS province , e.`Name` AS city , b.specificAddress , f.`Name` AS town , g.id AS localWarehouseID , g.`name` AS warehouseName FROM YSGJ_TruckCost a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.countryID = c.ID INNER JOIN areas d ON b.provinceID = d.ID INNER JOIN areas e ON b.cityID = e.ID INNER JOIN areas f ON b.townID = f.ID INNER JOIN YSGJ_LocalWarehouse g ON a.destination = g.id';
+        let querySQL = 'SELECT a.*, b.countryID , b.provinceID , b.cityID , b.townID , b.streetID , c.id AS localWarehouseID , c.`name` AS warehouseName , d.`Name` AS province , e. NAME AS city , f. NAME AS town , g. NAME AS street FROM YSGJ_TruckCost a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN YSGJ_LocalWarehouse c ON a.destination = c.id INNER JOIN areas d ON b.provinceID = d.ID INNER JOIN areas e ON b.cityID = e.ID INNER JOIN areas f ON b.townID = f.ID INNER JOIN areas g ON b.streetID = g.ID -- SELECT';
         let result = yield this.execSQL(querySQL, [], dbConnection);
         dbConnection.release();
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};

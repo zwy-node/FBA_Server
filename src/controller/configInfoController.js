@@ -172,7 +172,7 @@ var doDriverCost = function*(ctx, next) {
         let postData = ctx.request.body;
         let rules = [
             {key: 'startAddress', type: 'object'},
-            {key: 'localWarehouseID', type: 'number'},
+            {key: 'destination', type: 'number'},
             {key: 'prices', type: 'object', cb: function (value, cb) {
                 try {
                     let result = JSON.stringify(value);
@@ -198,7 +198,7 @@ var doDriverCost = function*(ctx, next) {
         let rules = [
             {key: 'id', type: 'number'},
             {key: 'addressID', type: 'number'},
-            {key: 'localWarehouseID', type: 'number'},
+            {key: 'destination', type: 'number'},
             {key: 'startAddress', type: 'object'},
             {key: 'prices', type: 'object', cb: function (value, cb) {
                 try {
@@ -217,8 +217,6 @@ var doDriverCost = function*(ctx, next) {
         delete truckCostInfo.id;
         let addressID = truckCostInfo.addressID;
         delete truckCostInfo.addressID;
-        let localWarehouseID = truckCostInfo.localWarehouseID;
-        delete truckCostInfo.destination;
         let startAddress = truckCostInfo.startAddress;
         delete truckCostInfo.startAddress;
 
