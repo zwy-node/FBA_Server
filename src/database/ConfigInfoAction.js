@@ -10,6 +10,14 @@ class ConfigInfoAction extends MKODBAction {
         super();
     }
 
+    /*
+     由数据库自动生成自增id
+    */
+    *newID(opt, value, dbConnection) {
+        let sql = `CALL generate_inc_serail('${opt}', ${value})`;
+        let result = yield this.execSQL(sql, null, dbConnection);
+        return result[0][0].serialString;
+    }
 
     /*
      FBA 仓库模块
@@ -149,32 +157,16 @@ class ConfigInfoAction extends MKODBAction {
      */
     *countryList() {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT `ID`, `Name` FROM areas WHERE ParentId = 0;';
+        let querySQL = 'SELECT `ID`, `Name` FROM areas WHERE ParentId = 0';
         let result = yield this.execSQL(querySQL, [], dbConnection);
         dbConnection.release();
         return result;
     }
 
-    *provinceList(countryID) {
+    *addressList(addressID) {
         let dbConnection = yield this.getDBConnection();
         let querySQL = 'SELECT `ID`, `Name` FROM areas WHERE ParentId = ?';
-        let result = yield this.execSQL(querySQL, [countryID], dbConnection);
-        dbConnection.release();
-        return result;
-    }
-
-    *cityList(provinceID) {
-        let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT `ID`, `Name` FROM areas WHERE ParentId = ?;';
-        let result = yield this.execSQL(querySQL, [provinceID], dbConnection);
-        dbConnection.release();
-        return result;
-    }
-
-    *townList(cityID) {
-        let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT `ID`, `Name` FROM areas WHERE ParentId = ?;';
-        let result = yield this.execSQL(querySQL, [cityID], dbConnection);
+        let result = yield this.execSQL(querySQL, [addressID], dbConnection);
         dbConnection.release();
         return result;
     }
@@ -464,7 +456,6 @@ class ConfigInfoAction extends MKODBAction {
      司机模块
      */
     *addDriver(driver) {
-        driver.driverID = 'DR100002';
         let dbConnection = yield this.getDBConnection();
         let querySQL = 'SELECT * FROM YSGJ_Driver WHERE mobile = ? OR idCard = ?';
         let driverData = yield this.execSQL(querySQL, [driver.mobile, driver.idCard], dbConnection);
@@ -472,6 +463,8 @@ class ConfigInfoAction extends MKODBAction {
         if (driverData.length > 0) {
             return null;
         } else {
+            let newID = yield this.newID('DR', 5, dbConnection)
+            driver.driverID = newID;
             let insertSQL = 'INSERT INTO YSGJ_Driver SET ?';
             let addressID = yield this.execSQL(insertSQL, [driver], dbConnection);
             return addressID.insertId;
@@ -521,8 +514,9 @@ class ConfigInfoAction extends MKODBAction {
      本地费用
      */
     *addLocalCost(localCosts) {
-        localCosts.localCostID = "LC100001";
         let dbConnection = yield this.getDBConnection();
+        let newID = yield this.newID('LC', 5, dbConnection);
+        localCosts.localCostID = newID;
         let insertSQL = 'INSERT INTO YSGJ_LocalCost SET ?';
         let addressID = yield this.execSQL(insertSQL, [localCosts], dbConnection);
         return addressID.insertId;
@@ -579,7 +573,6 @@ class ConfigInfoAction extends MKODBAction {
 
 
     *addLocalWarehouse(localWarehouse, address) {
-        localWarehouse.warehouseID = "LW003";
         let dbConnection = yield this.getDBConnection();
         let querySQL = 'SELECT * FROM YSGJ_LocalWarehouse WHERE `name`= ? AND phone = ? OR supplier = ?';
         let findLocalWarehouse = yield this.execSQL(querySQL, [localWarehouse.name, localWarehouse.phone, localWarehouse.supplier], dbConnection);
@@ -589,6 +582,8 @@ class ConfigInfoAction extends MKODBAction {
         } else {
             let addressID = yield this.addAddressByStartOrEnd(address);
             localWarehouse.addressID = addressID;
+            let newID = yield this.newID('LW', 5, dbConnection)
+            localWarehouse.warehouseID = newID;
             let insertSQL = 'INSERT INTO YSGJ_LocalWarehouse SET ?';
             let result = yield this.execSQL(insertSQL, [localWarehouse], dbConnection);
             dbConnection.release();
@@ -661,11 +656,9 @@ class ConfigInfoAction extends MKODBAction {
     /*
      * 提货费用
      */
-    *addDriverCost(truckCostInfo, startAddress, endAddress) {
+    *addDriverCost(truckCostInfo, startAddress) {
         let startID = yield this.addAddressByStartOrEnd(startAddress);
-        let endID = yield this.addAddressByStartOrEnd(endAddress);
         truckCostInfo.addressID = startID;
-        truckCostInfo.destination = endID;
         let dbConnection = yield this.getDBConnection();
         let insertSQL = 'INSERT INTO YSGJ_TruckCost SET ?';
         let result = yield this.execSQL(insertSQL, truckCostInfo, dbConnection);
@@ -681,19 +674,18 @@ class ConfigInfoAction extends MKODBAction {
         return result;
     }
 
-    *updateDriverCost(id, truckCostInfo, addressID, startAddress, destination, endAddress) {
+    *updateDriverCost(id, truckCostInfo, addressID, startAddress) {
         let dbConnection = yield this.getDBConnection();
         let querySQL = 'UPDATE YSGJ_TruckCost SET ? WHERE id = ?';
         let result = yield this.execSQL(querySQL, [truckCostInfo, id], dbConnection);
         yield this.updateAddressByStartOrEnd(addressID, startAddress);
-        yield this.updateAddressByStartOrEnd(destination, endAddress);
         dbConnection.release();
         return result.insertId;
     }
 
     *driverCostInfo(id) {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT a.*, b.countryID , b.provinceID , b.cityID , b.townID , b.street , g.countryID AS countryDestID , g.provinceID AS provinceDestID , g.cityID AS cityDestID , g.townID AS townDestID , g.street as streetDest FROM YSGJ_TruckCost a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN YSGJ_Address g ON a.destination = g.id WHERE a.id = ?';
+        let querySQL = 'SELECT a.*, b.countryID , b.provinceID , b.cityID , b.townID , b.street , c.id AS localWarehouseID, c.`name` AS warehouseName FROM YSGJ_TruckCost a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN YSGJ_LocalWarehouse c ON a.destination = c.id WHERE a.id = ?';
         let result = yield this.execSQL(querySQL, [id], dbConnection);
         dbConnection.release();
         return result[0];
@@ -701,7 +693,7 @@ class ConfigInfoAction extends MKODBAction {
 
     *driverCostList() {
         let dbConnection = yield this.getDBConnection();
-        let querySQL = 'SELECT a.*, c.`Name` as country , d.`Name` as province , e.`Name` as city , b.street, f.`Name` as town , h.`Name` as countryDest , i.`Name` as provinceDest , j.`Name` as cityDest , k.`Name` as townDest , g.street as streetDest FROM YSGJ_TruckCost a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.countryID = c.ID INNER JOIN areas d ON b.provinceID = d.ID INNER JOIN areas e ON b.cityID = e.ID INNER JOIN areas f ON b.townID = f.ID INNER JOIN YSGJ_Address g ON a.destination = g.id INNER JOIN areas h ON g.countryID = h.ID INNER JOIN areas i ON g.provinceID = i.ID INNER JOIN areas j ON g.cityID = j.ID INNER JOIN areas k ON g.townID = k.ID';
+        let querySQL = 'SELECT a.*, c.`Name` AS country , d.`Name` AS province , e.`Name` AS city , b.street , f.`Name` AS town , g.id AS localWarehouseID , g.`name` AS warehouseName FROM YSGJ_TruckCost a INNER JOIN YSGJ_Address b ON a.addressID = b.id INNER JOIN areas c ON b.countryID = c.ID INNER JOIN areas d ON b.provinceID = d.ID INNER JOIN areas e ON b.cityID = e.ID INNER JOIN areas f ON b.townID = f.ID INNER JOIN YSGJ_LocalWarehouse g ON a.destination = g.id';
         let result = yield this.execSQL(querySQL, [], dbConnection);
         dbConnection.release();
         return {page: 1, pageCount: 1, pageNumber: 1, datas: result};

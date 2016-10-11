@@ -172,7 +172,7 @@ var doDriverCost = function*(ctx, next) {
         let postData = ctx.request.body;
         let rules = [
             {key: 'startAddress', type: 'object'},
-            {key: 'endAddress', type: 'object'},
+            {key: 'localWarehouseID', type: 'number'},
             {key: 'prices', type: 'object', cb: function (value, cb) {
                 try {
                     let result = JSON.stringify(value);
@@ -190,19 +190,16 @@ var doDriverCost = function*(ctx, next) {
 
         let startAddress = truckCostInfo.startAddress;
         delete truckCostInfo.startAddress;
-        let endAddress = truckCostInfo.endAddress;
-        delete truckCostInfo.endAddress;
 
-        yield configInfoAction.addDriverCost(truckCostInfo, startAddress, endAddress);
+        yield configInfoAction.addDriverCost(truckCostInfo, startAddress);
         ctx.response.redirect('/config/driverCosts');
     } else if (ctx.query.action == 'update') {
         let postData = ctx.request.body;
         let rules = [
             {key: 'id', type: 'number'},
             {key: 'addressID', type: 'number'},
-            {key: 'destination', type: 'number'},
+            {key: 'localWarehouseID', type: 'number'},
             {key: 'startAddress', type: 'object'},
-            {key: 'endAddress', type: 'object'},
             {key: 'prices', type: 'object', cb: function (value, cb) {
                 try {
                     let result = JSON.stringify(value);
@@ -220,14 +217,12 @@ var doDriverCost = function*(ctx, next) {
         delete truckCostInfo.id;
         let addressID = truckCostInfo.addressID;
         delete truckCostInfo.addressID;
-        let destination = truckCostInfo.destination;
+        let localWarehouseID = truckCostInfo.localWarehouseID;
         delete truckCostInfo.destination;
         let startAddress = truckCostInfo.startAddress;
         delete truckCostInfo.startAddress;
-        let endAddress = truckCostInfo.endAddress;
-        delete truckCostInfo.endAddress;
 
-        yield configInfoAction.updateDriverCost(id, truckCostInfo, addressID, startAddress, destination, endAddress);
+        yield configInfoAction.updateDriverCost(id, truckCostInfo, addressID, startAddress, localWarehouseID);
         ctx.response.redirect('/config/driverCosts');
     } else if (ctx.query.action == 'info') {
         try {
@@ -483,7 +478,8 @@ var doLocalWarehouse = function*(ctx, next) {
             {key: 'name'},
             {key: 'contact'},
             {key: 'phone'},
-            {key: 'supplier', type: 'number'}
+            {key: 'supplier', type: 'number'},
+            {key: 'isDeclareCost', type: 'number'}
         ];
         let LocalWarehouseInfo = Utils.verifyAndFillObject(postData, rules);
         LocalWarehouseInfo.createDate = new Date();
@@ -511,7 +507,8 @@ var doLocalWarehouse = function*(ctx, next) {
             {key: 'name'},
             {key: 'contact'},
             {key: 'phone'},
-            {key: 'supplier', type: 'number'}
+            {key: 'supplier', type: 'number'},
+            {key: 'isDeclareCost', type: 'number'}
         ];
         let localWarehouseInfo = Utils.verifyAndFillObject(postData, rules);
         localWarehouseInfo.modifiedTime = new Date();
@@ -707,7 +704,7 @@ var doAddress = function*(ctx, next) {
     } else if (ctx.query.action == 'province') {
         try {
             let countryID = ctx.query.countryID || 100000;
-            let provinceData = yield configInfoAction.provinceList(countryID);
+            let provinceData = yield configInfoAction.addressList(countryID);
             ctx.body = Utils.createResponse(resCode.RES_Success, null, provinceData);
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'country not found!');
@@ -715,7 +712,7 @@ var doAddress = function*(ctx, next) {
     } else if (ctx.query.action == 'city') {
         try {
             let provinceID = ctx.query.provinceID;
-            let cityData = yield configInfoAction.cityList(provinceID);
+            let cityData = yield configInfoAction.addressList(provinceID);
             ctx.body = Utils.createResponse(resCode.RES_Success, null, cityData);
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'city not found!');
@@ -723,26 +720,19 @@ var doAddress = function*(ctx, next) {
     } else if (ctx.query.action == 'town') {
         try {
             let cityID = ctx.query.cityID;
-            let townData = yield configInfoAction.townList(cityID);
+            let townData = yield configInfoAction.addressList(cityID);
             ctx.body = Utils.createResponse(resCode.RES_Success, null, townData);
         } catch (e) {
             ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'town not found!');
         }
-    } else {
-        //try {
-        //    let param = ctx.query.param;
-        //    let addressData = yield configInfoAction.addressList(param);
-        //    console.log(addressData)
-        //    if(addressData) {
-        //        ctx.body = Utils.createResponse(resCode.RES_Success, null, addressData);
-        //    } else {
-        //        ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'address not found!');
-        //    }
-        //} catch(e) {
-        //    ctx.body = Utils.createResponse(resCode.RES_BusinessError, e);
-        //}
-
-        // yield ctx.render('configInfo/localWarehouse', {});
+    } else if (ctx.query.action == 'street') {
+        try {
+            let townID = ctx.query.townID;
+            let townData = yield configInfoAction.addressList(townID);
+            ctx.body = Utils.createResponse(resCode.RES_Success, null, townData);
+        } catch (e) {
+            ctx.body = Utils.createResponse(resCode.RES_RecordNotFound, 'town not found!');
+        }
     }
 };
 
